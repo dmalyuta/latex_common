@@ -1,0 +1,78 @@
+% Sets
+
+\newcommand{\reals}{\mathbb R}
+\newcommand{\ball}{\mathbb B}
+\newcommand{\nat}{{\mbox{\bf N}}}
+\newcommand{\integers}{\mathbb Z}
+\newcommand{\binary}{\mathbb I}
+\newcommand{\symm}{\mathbb S}  % symmetric matrices
+\newcommand{\Co}{{\mathop \mathrm{co}}}
+
+% Linear Algebra
+
+\newcommand{\Span}{\mbox{\textrm{span}}}
+\newcommand{\Range}{\mbox{\textrm{range}}}
+\newcommand{\nullspace}{{\mathcal N}}
+\newcommand{\range}{{\mathcal R}}
+\newcommand{\Nullspace}{\mbox{\textrm{nullspace}}}
+\newcommand{\Rank}{\mathop{\bf Rank}}
+\newcommand{\Tr}{\mathop{\bf Tr}}
+\newcommand{\diag}{\mathop{\bf diag}}
+\newcommand{\Spec}{\mathrm{spec}}
+
+% Generic math
+
+\newcommand{\sgn}{\mbox{\textrm{sgn}}}
+\newcommand{\Proj}[1]{\mathop{\text{Proj}_{#1}}}
+\newcommand{\Pre}{\mathop\text{Pre}}
+\newcommand{\NPhard}{$\mathcal{NP}$-hard}
+\newcommand{\NPcomplete}{$\mathcal{NP}$-complete}
+\newcommand{\transp}{{\scriptscriptstyle\mathsf{T}}}
+\newcommand{\innerproduct}[2]{\langle#1,#2\rangle}
+
+% Optimization
+
+\DeclareMathOperator*{\find}{find}
+
+\makeatletter
+\def\optimize{\@ifnextchar[{\@with}{\@without}}
+\def\@with[#1]#2#3#4#5{
+  \ifthenelse{\equal{#2}{}}{
+    \begin{aligned}
+      #3_{#4}\text{ } & #5 \\
+      \mathrm{s.t.}\text{ } & #1
+    \end{aligned}
+  }{
+    \begin{aligned}
+      #2 & = & #3_{#4}\text{ } & #5 \\
+         &   & \mathrm{s.t.}\text{ } & #1
+    \end{aligned}
+  }
+}
+\def\@without#1#2#3#4{
+  \ifthenelse{\equal{#1}{}}{
+    \begin{aligned}
+      #2_{#3}\text{ } & #4
+    \end{aligned}
+  }{
+    \begin{aligned}
+      #1 & = & #2_{#3}\text{ } & #4
+    \end{aligned}
+  }
+}
+\makeatother
+
+% Editing
+
+\newcommand{\seecode}{\textit{For code, see Appendix~\ref{sec:code}}.}
+\definecolor{darkolivegreen}{rgb}{0.33, 0.42, 0.18}
+\newcommand{\idea}[1]{{\color{darkolivegreen} #1}}
+\newcommand{\postmeeting}[1]{{\color{orange} #1}}
+\newcommand{\Behcet}{Beh\c{c}et}
+\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e}
+\newcommand{\todo}[1]{{\color{blue} (TODO: #1)}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

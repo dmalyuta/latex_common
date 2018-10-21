@@ -1,5 +1,8 @@
 % Sets
 
+\newcommand{\set}[1]{\mathcal #1}
+\newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
+\newcommand{\eucledian}{\mathbb E}
 \newcommand{\reals}{\mathbb R}
 \newcommand{\ball}{\mathbb B}
 \newcommand{\nat}{{\mbox{\bf N}}}
@@ -12,11 +15,16 @@
 
 \newcommand{\nul}{\mathrm{null}}
 \newcommand{\rank}{\mathrm{rank}}
+\newcommand{\range}{\mathrm{range}}
 \newcommand{\diag}{\mathrm{diag}}
 \newcommand{\spec}{\mathrm{spec}}
 
 % Generic math
 
+\newcommand{\C}[1]{\mathcal C^{#1}}
+\newcommand{\inv}{{-1}}
+\newcommand{\sign}{\mathrm{sgn}}
+\newcommand{\seq}[1]{\{#1\}}
 \newcommand{\sgn}{\mbox{\textrm{sgn}}}
 \newcommand{\Proj}[1]{\mathop{\text{Proj}_{#1}}}
 \newcommand{\Pre}{\mathop\text{Pre}}
@@ -25,50 +33,81 @@
 \newcommand{\transp}{{\scriptscriptstyle\mathsf{T}}}
 \newcommand{\innerproduct}[2]{\langle#1,#2\rangle}
 \newcommand{\dd}{\mathrm{d}}
+\newcommand{\fromabove}{\downarrow}
+\newcommand{\frombelow}{\downarrow}
+
+% Operators
+
+\newcommand{\find}{\mathrm{find}}
 
 % Optimization
 
-\DeclareMathOperator*{\find}{find}
-
 \makeatletter
-\def\optimize{\@ifnextchar[{\@with}{\@without}}
-\def\@with[#1]#2#3#4#5{
-  \ifthenelse{\equal{#2}{}}{
-    \begin{aligned}
-      #3_{#4}\text{ } & #5 \\
-      \mathrm{s.t.}\text{ } & #1
-    \end{aligned}
+\newcommand{\optimization}{\@ifstar{\@nonumberoptimization}{\@numberedoptimization}}
+\newcommand{\@numberedoptimization}[5][free]{
+  \ifthenelse{\equal{#1}{free}}{
+    \ifthenelse{\equal{#2}{}}{
+      \begin{alignat}{2}
+        #3_{#4}\text{ } & #5
+      \end{alignat}
+    }{
+      \begin{alignat}{4}
+        #2 & {}= & #3_{#4}\text{ } & #5
+      \end{alignat}
+    }
   }{
-    \begin{aligned}
-      #2 & = & #3_{#4}\text{ } & #5 \\
-         &   & \mathrm{s.t.}\text{ } & #1
-    \end{aligned}
+    \ifthenelse{\equal{#2}{}}{
+      \begin{alignat}{2}
+        #3_{#4}\text{ } & #5 \\
+        \mathrm{s.t.}\text{ } & #1
+      \end{alignat}
+    }{
+      \begin{alignat}{4}
+        #2 & {}= & #3_{#4}\text{ } & #5 \\
+        &     & \mathrm{s.t.}\text{ } & #1
+      \end{alignat}
+    }
   }
 }
-\def\@without#1#2#3#4{
-  \ifthenelse{\equal{#1}{}}{
-    \begin{aligned}
-      #2_{#3}\text{ } & #4
-    \end{aligned}
+\newcommand{\@nonumberoptimization}[5][free]{
+  \ifthenelse{\equal{#1}{free}}{
+    \ifthenelse{\equal{#2}{}}{
+      \begin{alignat*}{2}
+        #3_{#4}\text{ } & #5
+      \end{alignat*}
+    }{
+      \begin{alignat*}{4}
+        #2 & {}= & #3_{#4}\text{ } & #5
+      \end{alignat*}
+    }
   }{
-    \begin{aligned}
-      #1 & = & #2_{#3}\text{ } & #4
-    \end{aligned}
+    \ifthenelse{\equal{#2}{}}{
+      \begin{alignat*}{2}
+        #3_{#4}\text{ } & #5 \\
+        \mathrm{s.t.}\text{ } & #1
+      \end{alignat*}
+    }{
+      \begin{alignat*}{4}
+        #2 & {}= & #3_{#4}\text{ } & #5 \\
+        &     & \mathrm{s.t.}\text{ } & #1
+      \end{alignat}
+    }
   }
 }
 \makeatother
 
 % Editing
 
+\definecolor{darkolivegreen}{rgb}{0.33, 0.6, 0.18}
+
 \newcommand{\seecode}{\textit{For code, see Appendix~\ref{sec:code}}.}
-\definecolor{darkolivegreen}{rgb}{0.33, 0.42, 0.18}
-\newcommand{\idea}[1]{{\color{darkolivegreen} #1}}
 \newcommand{\postmeeting}[1]{{\color{orange} #1}}
+\newcommand{\idea}[1]{{\color{orange} #1}}
+\newcommand{\todo}[1]{{\color{blue} (TODO: #1)}}
+\newcommand{\question}[1]{{\color{darkolivegreen} (Q: #1)}}
+\newcommand{\comment}[1]{{\color{red} (C: #1)}}
+
+% Miscellaneous
+
 \newcommand{\Behcet}{Beh\c{c}et}
 \newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e}
-\newcommand{\todo}[1]{{\color{blue} (TODO: #1)}}
-
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: t
-%%% End:

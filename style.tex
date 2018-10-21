@@ -1,2 +1,24 @@
 % No paragraph indentation
 \setlength\parindent{0pt}
+
+% Hyperlinks
+\hypersetup{
+  colorlinks,
+  linkcolor={red},
+  citecolor={green},
+  urlcolor={blue}
+}
+
+% Equation numbers by section
+\numberwithin{equation}{section}
+
+% Theorem environments
+\newtheorem{example}{Example}[section]
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{property}{Property}[section]
+\newtheorem{remark}{Remark}[section]

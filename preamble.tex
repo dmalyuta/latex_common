@@ -1,9 +1,34 @@
+% Math
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{mathtools}
+
+% Colors
 \usepackage{color}
 \usepackage{xcolor}
+
+% Logic/scripting
 \usepackage{ifthen}
-\usepackage{hyperref}
+\usepackage{pgffor}
+\usepackage{etoolbox}
+
+% Figures
 \usepackage{graphicx}
 \usepackage{subcaption}
+
+% Tables
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage{diagbox} % \diagbox{rows}{columns} with slash in between
+\usepackage{varwidth} % V{max_width} variable-width cell type
+\usepackage{makecell} % \makecell[l|r|c]{line 1 \\ line 2}
+% \usepackage{colortbl}
+
+% Layout
+\usepackage{afterpage}
+%\usepackage{lscape} % production (non-rotated PDF pages)
+\usepackage{pdflscape} % writing (rotated PDF pages, don't need to twist head)
+
+% Referencing
+\usepackage{hyperref}

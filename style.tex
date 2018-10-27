@@ -1,6 +1,9 @@
 % No paragraph indentation
 \setlength\parindent{0pt}
 
+% Paragraph spacing
+\setlength{\parskip}{4pt}
+
 % Hyperlinks
 \hypersetup{
   colorlinks,
@@ -12,6 +15,12 @@
 % Equation numbers by section
 \numberwithin{equation}{section}
 
+% Table column types
+\renewcommand\tabularxcolumn[1]{m{#1}} % Vertical centering
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
 % Theorem environments
 \newtheorem{example}{Example}[section]
 \newtheorem{assumption}{Assumption}[section]
@@ -22,3 +31,14 @@
 \newtheorem{proposition}{Proposition}[section]
 \newtheorem{property}{Property}[section]
 \newtheorem{remark}{Remark}[section]
+
+% Colortbl patch
+% https://tex.stackexchange.com/questions/86211/colortbl-and-amsmath-conflict
+% \makeatletter
+% \pretocmd\start@align
+% {%
+%   \let\everycr\CT@everycr
+%   \CT@start
+% }{}{}
+% \apptocmd{\endalign}{\CT@end}{}{}
+% \makeatother

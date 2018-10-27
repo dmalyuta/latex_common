@@ -1,5 +1,7 @@
 % Sets
 
+\newcommand{\union}{\cup}
+\newcommand{\intersection}{\cap}
 \newcommand{\set}[1]{\mathcal #1}
 \newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
 \newcommand{\eucledian}{\mathbb E}
@@ -9,7 +11,33 @@
 \newcommand{\integers}{\mathbb Z}
 \newcommand{\binary}{\mathbb I}
 \newcommand{\symm}{\mathbb S}  % symmetric matrices
-\newcommand{\Co}{{\mathop \mathrm{co}}}
+\newcommand{\Co}{\mathrm{co}}
+\newcommand{\dom}{\mathrm{dom}}
+\newcommand{\epi}{\mathrm{epi}}
+\newcommand{\hypo}{\mathrm{hypo}}
+\newcommand{\interior}{\mathrm{int}}
+\newcommand{\boundary}{\mathrm{bd}}
+\newcommand{\relint}{\mathrm{relint}}
+
+% Calculus
+
+\newcommand{\gradient}{{\mathop \nabla}}
+
+% Convex analysis
+
+\newcommand{\subdiff}[1][none]{%
+  \ifthenelse{\equal{#1}{none}}{%
+    \partial%
+  }{%
+    \partial_{#1}%
+  }%
+}
+\newcommand{\normalcone}[1]{\set{N}_{\set{#1}}}
+\newcommand{\indicator}[1]{\delta_{\set{#1}}}
+
+% Functions
+
+\newcommand{\heaviside}{\sigma}
 
 % Linear Algebra
 
@@ -34,13 +62,45 @@
 \newcommand{\innerproduct}[2]{\langle#1,#2\rangle}
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\fromabove}{\downarrow}
-\newcommand{\frombelow}{\downarrow}
+\newcommand{\frombelow}{\uparrow}
+\newcommand{\fun}[2][1]{%
+  #2(%
+  \foreach \index in {1, ..., #1} {%
+    \ifthenelse{\equal{\index}{#1}}{%
+      \cdot%
+    }{%
+      \cdot,%
+    }%
+  })}
 
 % Operators
 
 \newcommand{\find}{\mathrm{find}}
 
+% Measure theory
+
+\newcommand{\alev}[2]{\ifthenelse{\equal{#1}{}}{\text{a.e. }[0,#2]}{\text{a.e. }[#1,#2]}}
+\newcommand{\ev}[3][c]{%
+  \ifthenelse{\equal{#1}{c}}{%
+    \ifthenelse{\equal{#2}{}}{\forall[0,#3]}{\forall[#2,#3]}%
+  }{%
+    \ifthenelse{\equal{#1}{o}}{%
+      \ifthenelse{\equal{#2}{}}{\forall(0,#3)}{\forall(#2,#3)}%
+    }{%
+      \ifthenelse{\equal{#1}{oc}}{%
+        \ifthenelse{\equal{#2}{}}{\forall(0,#3]}{\forall(#2,#3]}%
+      }{%
+        \ifthenelse{\equal{#2}{}}{\forall[0,#3)}{\forall[#2,#3)}%
+      }%
+    }%
+  }%
+}
+
 % Optimization
+
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand{\optimal}[1]{{#1}^*}
 
 \makeatletter
 \newcommand{\optimization}{\@ifstar{\@nonumberoptimization}{\@numberedoptimization}}

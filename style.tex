@@ -4,6 +4,9 @@
 % Paragraph spacing
 \setlength{\parskip}{4pt}
 
+% List spacing
+\setlist{itemsep=0pt}
+
 % Hyperlinks
 \hypersetup{
   colorlinks,
@@ -32,13 +35,29 @@
 \newtheorem{property}{Property}[section]
 \newtheorem{remark}{Remark}[section]
 
-% Colortbl patch
-% https://tex.stackexchange.com/questions/86211/colortbl-and-amsmath-conflict
-% \makeatletter
-% \pretocmd\start@align
-% {%
-%   \let\everycr\CT@everycr
-%   \CT@start
-% }{}{}
-% \apptocmd{\endalign}{\CT@end}{}{}
-% \makeatother
+% Boxes
+\newmdenv[
+outerlinewidth = 1,%
+linewidth = 0pt,%
+roundcorner = 2pt,%
+leftmargin = 20,%
+rightmargin = 0,%
+backgroundcolor = lightgray!10,%
+outerlinecolor = gray!50,%
+innertopmargin = \topskip,%
+splittopskip = \topskip,%
+frametitle = Summary,%
+frametitlebelowskip = 0pt,%
+]{summary_box}
+
+\newmdenv[
+outerlinewidth = 1,%
+linewidth = 0pt,%
+roundcorner = 2pt,%
+leftmargin = 60,%
+rightmargin = 60,%
+backgroundcolor = yellow!40,%
+outerlinecolor = black!50,%
+innertopmargin = \topskip,%
+splittopskip = \topskip,%
+]{highlight_box}

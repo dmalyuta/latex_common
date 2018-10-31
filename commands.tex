@@ -21,7 +21,7 @@
 
 % Calculus
 
-\newcommand{\gradient}{{\mathop \nabla}}
+\newcommand{\gradient}{\nabla}
 
 % Convex analysis
 
@@ -123,7 +123,7 @@
       \end{alignat}
     }{
       \begin{alignat}{4}
-        #2 & {}= & #3_{#4}\text{ } & #5 \\
+        #2 & {}= & {}#3_{#4}\text{ } & #5 \\
         &     & \mathrm{s.t.}\text{ } & #1
       \end{alignat}
     }
@@ -148,7 +148,7 @@
       \end{alignat*}
     }{
       \begin{alignat*}{4}
-        #2 & {}= & #3_{#4}\text{ } & #5 \\
+        #2 & {}= & {}#3_{#4}\text{ } & #5 \\
         &     & \mathrm{s.t.}\text{ } & #1
       \end{alignat}
     }
@@ -161,11 +161,31 @@
 \definecolor{darkolivegreen}{rgb}{0.33, 0.6, 0.18}
 
 \newcommand{\seecode}{\textit{For code, see Appendix~\ref{sec:code}}.}
-\newcommand{\postmeeting}[1]{{\color{orange} #1}}
-\newcommand{\idea}[1]{{\color{orange} #1}}
-\newcommand{\todo}[1]{{\color{blue} (TODO: #1)}}
-\newcommand{\question}[1]{{\color{darkolivegreen} (Q: #1)}}
-\newcommand{\comment}[1]{{\color{red} (C: #1)}}
+\newcommand{\postmeeting}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{orange} #2}%
+  }{}%
+}
+\newcommand{\idea}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{orange} #2}%
+  }{}%
+}
+\newcommand{\todo}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{blue} (TODO: #2)}%
+  }{}%
+}
+\newcommand{\question}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{darkolivegreen} (Q: #2)}%
+  }{}%
+}
+\newcommand{\comment}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{red} (C: #2)}%
+  }{}%
+}
 
 % Miscellaneous
 

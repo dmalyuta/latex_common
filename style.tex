@@ -21,6 +21,11 @@
 % Equation numbers by section
 \numberwithin{equation}{section}
 
+% Equation box style
+\tcbset{highlight math style={enhanced,
+colframe=red!60!black,colback=yellow!50!white,arc=4pt,boxrule=1pt,
+drop fuzzy shadow}}
+
 % Table column types
 \renewcommand\tabularxcolumn[1]{m{#1}} % Vertical centering
 \newcolumntype{C}{>{\centering\arraybackslash}X}

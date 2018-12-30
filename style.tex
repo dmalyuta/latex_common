@@ -18,9 +18,6 @@
 % Allow breaking long equations across pages
 \allowdisplaybreaks
 
-% Equation numbers by section
-\numberwithin{equation}{section}
-
 % Equation box style
 \tcbset{highlight math style={enhanced,
 colframe=red!60!black,colback=yellow!50!white,arc=4pt,boxrule=1pt,
@@ -33,15 +30,21 @@ drop fuzzy shadow}}
 \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
 
 % Theorem environments
-\newtheorem{example}{Example}[section]
-\newtheorem{assumption}{Assumption}[section]
-\newtheorem{definition}{Definition}[section]
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{corollary}{Corollary}[section]
-\newtheorem{lemma}{Lemma}[section]
-\newtheorem{proposition}{Proposition}[section]
-\newtheorem{property}{Property}[section]
-\newtheorem{remark}{Remark}[section]
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{property}{Property}
+
+\theoremstyle{definition}
+
+\newtheorem{remark}{Remark}
+\newtheorem{definition}{Definition}
+\newtheorem{condition}{Condition}
+\newtheorem{problem}{Problem}
+\newtheorem{method}{Method}
+\newtheorem{example}{Example}
+\newtheorem{assumption}{Assumption}
 
 % Boxes
 \newmdenv[

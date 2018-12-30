@@ -18,10 +18,11 @@
 \newcommand{\interior}{\mathrm{int}}
 \newcommand{\boundary}{\mathrm{bd}}
 \newcommand{\relint}{\mathrm{relint}}
+\newcommand{\coni}[1]{\mathrm{coni}(#1)}
 
 % Calculus
 
-\newcommand{\gradient}{\nabla}
+\newcommand{\grad}{\nabla}
 
 % Convex analysis
 
@@ -44,7 +45,7 @@
 \newcommand{\nul}{\mathrm{null}}
 \newcommand{\rank}{\mathrm{rank}}
 \newcommand{\range}{\mathrm{range}}
-\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\diag}[1]{\mathrm{diag}(#1)}
 \newcommand{\spec}{\mathrm{spec}}
 
 % Generic math
@@ -72,6 +73,8 @@
       \cdot,%
     }%
   })}
+\newcommand{\define}[1]{\textit{#1}}
+\newcommand{\definedas}{\overset{\triangle}{=}}
 
 % Operators
 
@@ -79,7 +82,7 @@
 
 % Measure theory
 
-\newcommand{\alev}[2]{\ifthenelse{\equal{#1}{}}{\text{a.e. }[0,#2]}{\text{a.e. }[#1,#2]}}
+\newcommand{\alev}[1]{\textnormal{a.e. }#1}
 \newcommand{\ev}[3][c]{%
   \ifthenelse{\equal{#1}{c}}{%
     \ifthenelse{\equal{#2}{}}{\forall[0,#3]}{\forall[#2,#3]}%
@@ -100,61 +103,54 @@
 
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\minimize}{\mathrm{minimize}}
+\DeclareMathOperator*{\maximize}{\mathrm{maximize}}
+
 \newcommand{\optimal}[1]{{#1}^*}
 
-\makeatletter
-\newcommand{\optimization}{\@ifstar{\@nonumberoptimization}{\@numberedoptimization}}
-\newcommand{\@numberedoptimization}[5][free]{
-  \ifthenelse{\equal{#1}{free}}{
-    \ifthenelse{\equal{#2}{}}{
-      \begin{alignat}{2}
-        #3_{#4}\text{ } & #5
-      \end{alignat}
-    }{
-      \begin{alignat}{4}
-        #2 & {}= & #3_{#4}\text{ } & #5
-      \end{alignat}
-    }
-  }{
-    \ifthenelse{\equal{#2}{}}{
-      \begin{alignat}{2}
-        #3_{#4}\text{ } & #5 \\
-        \mathrm{s.t.}\text{ } & #1
-      \end{alignat}
-    }{
-      \begin{alignat}{4}
-        #2 & {}= & {}#3_{#4}\text{ } & #5 \\
-        &     & \mathrm{s.t.}\text{ } & #1
-      \end{alignat}
-    }
-  }
+\newcounter{l}
+\newcounter{j}
+\newcounter{k}
+
+\newcommand{\lloptimization}[4]{
+  \setsepchar{\\}%
+  \readlist\mylist{#4}
+  \begin{subequations}
+    \ifthenelse{\equal{#1}{}}{}{\label{eq:#1}}
+    \begin{align}
+      \ifthenelse{\equal{#1}{}}{}{\label{eq:#1_a}}
+      \minimize_{\ifthenelse{\equal{#2}{}}{}{#2}}~& #3 \\
+      \mathrm{subject~to:~}
+      \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
+      \setcounter{j}{\value{k}+1}
+      \setcounter{l}{\value{k}+2}
+      \ifthenelse{\equal{#1}{}}{}{\label{eq:#1_\alph{l}}}
+      \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
+                                                  &\mylist[\arabic{j}]%
+                                                    }{%
+                                                  &\mylist[\arabic{j}]\\%
+      }%
+      }
+    \end{align}
+  \end{subequations}
 }
-\newcommand{\@nonumberoptimization}[5][free]{
-  \ifthenelse{\equal{#1}{free}}{
-    \ifthenelse{\equal{#2}{}}{
-      \begin{alignat*}{2}
-        #3_{#4}\text{ } & #5
-      \end{alignat*}
-    }{
-      \begin{alignat*}{4}
-        #2 & {}= & #3_{#4}\text{ } & #5
-      \end{alignat*}
-    }
-  }{
-    \ifthenelse{\equal{#2}{}}{
-      \begin{alignat*}{2}
-        #3_{#4}\text{ } & #5 \\
-        \mathrm{s.t.}\text{ } & #1
-      \end{alignat*}
-    }{
-      \begin{alignat*}{4}
-        #2 & {}= & {}#3_{#4}\text{ } & #5 \\
-        &     & \mathrm{s.t.}\text{ } & #1
-      \end{alignat}
-    }
-  }
+
+\newcommand{\llpoptimization}[5]{
+  \begin{problem}\ifthenelse{\equal{#1}{NoNe}}{}{\textbf{#1.}}%
+    \ifthenelse{\equal{#2}{}}{}{\label{problem:#2}}%
+    \lloptimization{#2}{#3}{#4}{#5}%
+  \end{problem}%
 }
-\makeatother
+
+\NewEnviron{optimization}[3]{\lloptimization{#1}{#2}{#3}{\BODY}}
+\NewEnviron{foptimization}[4][NoNe]{%
+  \begin{mdframed}[default,linewidth=1pt]%
+    \llpoptimization{#1}{#2}{#3}{#4}{\BODY}%
+  \end{mdframed}%
+}
+\NewEnviron{poptimization}[4][NoNe]{%
+  \llpoptimization{#1}{#2}{#3}{#4}{\BODY}%
+}
 
 % Editing
 
@@ -189,5 +185,5 @@
 
 % Miscellaneous
 
-\newcommand{\Behcet}{Beh\c{c}et}
-\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e}
+\newcommand{\Behcet}{Beh\c{c}et\xspace}
+\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e\xspace}

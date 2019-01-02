@@ -16,7 +16,7 @@
 \newcommand{\epi}{\mathrm{epi}}
 \newcommand{\hypo}{\mathrm{hypo}}
 \newcommand{\interior}{\mathrm{int}}
-\newcommand{\boundary}{\mathrm{bd}}
+\newcommand{\boundary}[1]{\mathrm{bdry}\left(#1\right)}
 \newcommand{\relint}{\mathrm{relint}}
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
 
@@ -106,7 +106,7 @@
 \DeclareMathOperator*{\minimize}{\mathrm{minimize}}
 \DeclareMathOperator*{\maximize}{\mathrm{maximize}}
 
-\newcommand{\optimal}[1]{{#1}^*}
+\newcommand{\optimal}[1]{#1^*}
 
 \newcounter{l}
 \newcounter{j}
@@ -175,6 +175,11 @@
 \newcommand{\question}[2][show]{%
   \ifthenelse{\equal{#1}{show}}{%
     {\color{darkolivegreen} (Q: #2)}%
+  }{}%
+}
+\newcommand{\fixme}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{red} (FIXME: #2)}%
   }{}%
 }
 \newcommand{\mycomment}[2][show]{%

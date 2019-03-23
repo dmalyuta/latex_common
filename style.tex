@@ -30,17 +30,17 @@ drop fuzzy shadow}}
 \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
 
 % Theorem environments
-\makeatletter
-\newtheorem*{rep@theorem}{\rep@title}
-\newcommand{\newreptheorem}[2]{%
-\newenvironment{rep#1}[1]{%
-\def\rep@title{#2 \ref{##1}}%
-\begin{rep@theorem}}%
-{\end{rep@theorem}}}
-\makeatother
+% \makeatletter
+% \newtheorem*{rep@theorem}{\rep@title}
+% \newcommand{\newreptheorem}[2]{%
+% \newenvironment{rep#1}[1]{%
+% \def\rep@title{#2 \ref{##1}}%
+% \begin{rep@theorem}}%
+% {\end{rep@theorem}}}
+% \makeatother
 
 \newtheorem{theorem}{Theorem}
-\newreptheorem{theorem}{Theorem}
+% \newreptheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}

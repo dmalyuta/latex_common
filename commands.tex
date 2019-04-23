@@ -16,6 +16,7 @@
 \newcommand{\epi}{\mathrm{epi}}
 % \newcommand{\hypo}{\mathrm{hypo}}
 \newcommand{\interior}[1]{\mathrm{int}(#1)}
+\newcommand{\compl}[1]{#1^\mathrm{c}}
 \newcommand{\boundary}[1]{\mathrm{bdry}\left(#1\right)}
 \newcommand{\relint}{\mathrm{relint}}
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
@@ -33,8 +34,10 @@
     \partial_{#1}%
   }%
 }
-\newcommand{\normalcone}[1]{\set{N}_{\set{#1}}}
-\newcommand{\indicator}[1]{\delta_{\set{#1}}}
+\newcommand{\normalcone}[2]{\set{N}_{#1}(#2)}
+\newcommand{\con}{\mathrm{cone}}
+\newcommand{\indicator}[1]{\delta_{#1}}
+\newcommand{\support}[1]{\delta^*_{#1}}
 
 % Functions
 
@@ -79,6 +82,7 @@
   })}
 \newcommand{\define}[1]{\textit{#1}}
 \newcommand{\definedas}{:=}%\overset{\triangle}{=}}
+\newcommand{\inlineint}{\textstyle\int}
 \newcommand{\inlinesum}{\textstyle\sum}
 
 % Operators
@@ -125,7 +129,7 @@
     \ifthenelse{\equal{#1}{left}}{
       \begin{flalign}
         \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
-        &\min_{\ifthenelse{\equal{#3}{}}{}{#3}}~ #4\textnormal{ s.t.} &&\\
+        &\min_{\ifthenelse{\equal{#3}{}}{}{#3}}~ #4\textnormal{ s.t.}\hspace{-1mm} &&\\
         \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
           \setcounter{j}{\value{k}+1}
           \setcounter{l}{\value{k}+2}

@@ -10,6 +10,7 @@
 \newcommand{\nat}{{\mbox{\bf N}}}
 \newcommand{\integers}{\mathbb Z}
 \newcommand{\binary}{\mathbb I}
+\newcommand{\quaternion}{\mathbb Q}
 \newcommand{\symm}{\mathbb S}  % symmetric matrices
 \newcommand{\Co}{\mathrm{co}}
 \newcommand{\dom}{\mathrm{dom}}
@@ -52,6 +53,7 @@
 \newcommand{\spec}{\mathrm{spec}}
 \newcommand{\rpinv}{\dagger}
 \newcommand{\lpinv}{\ddagger}
+\newcommand{\blkdiag}[1]{\mathrm{blkdiag}(#1)}
 
 % Generic math
 
@@ -80,10 +82,14 @@
       \cdot,%
     }%
   })}
-\newcommand{\define}[1]{\textit{#1}}
-\newcommand{\definedas}{:=}%\overset{\triangle}{=}}
+\newcommand{\define}[1]{\textit{#1}}%
+\newcommand{\definedas}{\coloneqq}
 \newcommand{\inlineint}{\textstyle\int}
 \newcommand{\inlinesum}{\textstyle\sum}
+
+% Geometry
+
+\newcommand{\fr}[1]{\mathcal{F}_{\mathcal{#1}}}
 
 % Operators
 
@@ -144,7 +150,7 @@
     }{
       \begin{align}
         \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
-        \minimize_{\ifthenelse{\equal{#2}{}}{}{#2}}~& #3 \\
+        \minimize_{\ifthenelse{\equal{#3}{}}{}{#3}}~& #4 \\
         \mathrm{subject~to:~}
         \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
         \setcounter{j}{\value{k}+1}

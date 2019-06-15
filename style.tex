@@ -86,3 +86,16 @@ outerlinecolor = black!50,%
 innertopmargin = \topskip,%
 splittopskip = \topskip,%
 ]{highlight_box}
+
+% Nomenclature
+
+\newif\ifnomentry
+\renewcommand{\nomlabel}[1]{#1\hfill\hspace{\labelsep}\ifnomentry$=$\fi}
+\newlength{\nomwidest}
+\renewcommand{\nomgroup}[1]{%
+  \nomentryfalse
+  \ifthenelse{\equal{#1}{V}}{\item[\textbf{Variables}]}{% 
+    \ifthenelse{\equal{#1}{A}}{\item[\textbf{Abbreviations}]}{}}\nomentrytrue} 
+\setlength{\nomitemsep}{-\parsep} 
+\newcommand{\defvar}[3][show]{\nomenclature[V]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#2}{}}
+\newcommand{\defabbrev}[2]{#2 (#1)\nomenclature[A]{#1}{#2}}

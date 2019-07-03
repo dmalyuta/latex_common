@@ -23,10 +23,14 @@
 \newcommand{\boundary}[1]{\mathrm{bdry}\left(#1\right)}
 \newcommand{\relint}{\mathrm{relint}}
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
+\newcommand{\lbdry}{\partial_{L}}
+\newcommand{\image}[1]{\mathrm{im}(#1)}
+\newcommand{\domain}[1]{\mathrm{dom}(#1)}
 
 % Calculus
 
 \newcommand{\grad}{\nabla}
+\newcommand{\diff}[2]{\nabla_{#1}#2}
 
 % Convex analysis
 
@@ -50,6 +54,8 @@
 
 \newcommand{\nul}{\mathrm{null}}
 \newcommand{\rank}{\mathrm{rank}}
+\newcommand{\rang}[2][big]{\mathrm{range}%
+  \ifthenelse{\equal{#1}{big}}{\left(#2\right)}{(#2)}}
 \newcommand{\range}{\mathrm{range}}
 \newcommand{\diag}[1]{\mathrm{diag}(#1)}
 \newcommand{\spec}{\mathrm{spec}}
@@ -227,3 +233,6 @@
 
 \newcommand{\Behcet}{Beh\c{c}et\xspace}
 \newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e\xspace}
+\newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
+\newcommand{\alert}[1]{\textbf{#1}}
+\newcommand{\lcvx}{LCvx\xspace}

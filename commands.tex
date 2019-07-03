@@ -2,6 +2,8 @@
 
 \newcommand{\union}{\cup}
 \newcommand{\intersection}{\cap}
+\newcommand{\Union}{\bigcup}
+\newcommand{\Intersection}{\bigcap}
 \newcommand{\set}[1]{\mathcal #1}
 \newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
 \newcommand{\eucledian}{\mathbb E}
@@ -91,10 +93,6 @@
 
 \newcommand{\fr}[1]{\mathcal{F}_{\mathcal{#1}}}
 
-% Operators
-
-\newcommand{\find}{\mathrm{find}}
-
 % Measure theory
 
 \newcommand{\alev}[1]{\textnormal{a.e. }#1}
@@ -120,6 +118,9 @@
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\minimize}{\mathrm{minimize}}
 \DeclareMathOperator*{\maximize}{\mathrm{maximize}}
+\DeclareMathOperator*{\find}{\mathrm{find}}
+
+\def\opticmd{\min}
 
 \newcommand{\optimal}[1]{#1^*}
 
@@ -127,15 +128,16 @@
 \newcounter{j}
 \newcounter{k}
 
-\newcommand{\lloptimization}[5][center]{
+\newcommand{\lloptimization}[6][center]{
   \setsepchar{\\}%
-  \readlist\mylist{#5}
+  \readlist\mylist{#6}
   \begin{subequations}
     \ifthenelse{\equal{#2}{}}{}{\label{eq:#2}}
     \ifthenelse{\equal{#1}{left}}{
       \begin{flalign}
         \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
-        &\min_{\ifthenelse{\equal{#3}{}}{}{#3}}~ #4\textnormal{ s.t.}\hspace{-1mm} &&\\
+        \ifthenelse{\equal{#3}{}}{}{#3 = }
+        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
         \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
           \setcounter{j}{\value{k}+1}
           \setcounter{l}{\value{k}+2}
@@ -150,8 +152,8 @@
     }{
       \begin{align}
         \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
-        \minimize_{\ifthenelse{\equal{#3}{}}{}{#3}}~& #4 \\
-        \mathrm{subject~to:~}
+        \ifthenelse{\equal{#3}{}}{}{#3 = }
+        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
         \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
         \setcounter{j}{\value{k}+1}
         \setcounter{l}{\value{k}+2}
@@ -167,21 +169,21 @@
   \end{subequations}
 }
 
-\newcommand{\llpoptimization}[6][left]{
+\newcommand{\llpoptimization}[7][left]{
   \begin{problem}\ifthenelse{\equal{#2}{NoNe}}{}{\textbf{#2.}}%
     \ifthenelse{\equal{#3}{}}{}{\label{problem:#3}}%
-    \lloptimization[#1]{#3}{#4}{#5}{#6}%
+    \lloptimization[#1]{#3}{#4}{#5}{#6}{#7}%
   \end{problem}%
 }
 
-\NewEnviron{optimization}[4]{\lloptimization[#1]{#2}{#3}{#4}{\BODY}}
-\NewEnviron{foptimization}[5][NoNe]{%
+\NewEnviron{optimization}[5]{\lloptimization[#1]{#2}{#3}{#4}{#5}{\BODY}}
+\NewEnviron{foptimization}[6][NoNe]{%
   \begin{mdframed}[default,linewidth=1pt]%
-    \llpoptimization[#2]{#1}{#3}{#4}{#5}{\BODY}%
+    \llpoptimization[#2]{#1}{#3}{#4}{#5}{#6}{\BODY}%
   \end{mdframed}%
 }
-\NewEnviron{poptimization}[5][NoNe]{%
-  \llpoptimization[#2]{#1}{#3}{#4}{#5}{\BODY}%
+\NewEnviron{poptimization}[6][NoNe]{%
+  \llpoptimization[#2]{#1}{#3}{#4}{#5}{#6}{\BODY}%
 }
 
 % Editing

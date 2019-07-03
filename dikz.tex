@@ -1,0 +1,96 @@
+%%%%%%%%%%%% Libraries
+
+\usetikzlibrary{math}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usetikzlibrary{positioning}
+\usetikzlibrary{scopes}
+
+%%%%%%%%%%%% Code Extensions
+
+%%%%% Union of shapes
+% Usage: \fill[draw on back,...] ...
+% Source: https://tex.stackexchange.com/a/11620/90535
+
+\pgfdeclarelayer{back}
+\pgfsetlayers{back,main}
+
+\tikzset{%
+  on layer/.code={
+    \pgfonlayer{#1}\begingroup
+    \aftergroup\endpgfonlayer
+    \aftergroup\endgroup
+  },%
+  draw on back/.style={
+    preaction={
+      draw,
+      on layer=back,
+      line width=#1
+    }
+  }
+}
+
+%%%%%%%%%%%% Custom shapes
+
+\newcommand{\dikzrectangle}[5]
+{
+  % Draw a rectangle
+  %
+  % #1: what drawing command to execute
+  % #2: rectangle center x position
+  % #3: rectangle center y position
+  % #4: rectangle width
+  % #5: rectangle height
+  \tikzmath
+  {
+    \x=#2;
+    \y=#3;
+    \w=#4;
+    \h=#5;
+  }
+  #1 (\x-\w/2,\y-\h/2) rectangle (\x+\w/2,\y+\h/2);
+}
+
+\newcommand{\dikztriangle}[4]
+{
+  % Draw an isosceles triangle
+  %
+  % #1: what drawing command to execute
+  % #2: triangle center x position
+  % #2: triangle center y position
+  % #2: triangle sidelength
+  \tikzmath
+  {
+    \x=#2;
+    \y=#3;
+    \r=#4;
+  }
+  #1 (\x-\r/2,{\y-\r/2/sqrt(3)}) --
+  (\x+\r/2,{\y-\r/2/sqrt(3)}) --
+  (\x,{\y+\r/sqrt(3)}) --
+  cycle;
+}
+
+\newcommand{\dikzparabola}[5]
+{
+  % Draw a parabola
+  %
+  % #1: t0, the left x-coordinate
+  % #2: t1, the right x-coordinate
+  % #3: y0, the left y-coordinate
+  % #4: y1, the right y-coordinate
+  % #5: theta0, the parabola trajectory angle on the left
+  \tikzmath
+  {
+    \t0=#1;
+    \t1=#2;
+    \y0=#3;
+    \y1=#4;
+    \myangle=#5;
+    \a=(\y1-\y0-tan(\myangle)*(\t1-\t0))/(\t1*\t1-\t0*\t0-2*\t0*(\t1-\t0));
+    \b=tan(\myangle)-2*\a*\t0;
+    \c=\y0-\a*\t0*\t0-\b*\t0;
+  }
+}
+

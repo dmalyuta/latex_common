@@ -26,6 +26,15 @@
 \newcommand{\lbdry}{\partial_{L}}
 \newcommand{\image}[1]{\mathrm{im}(#1)}
 \newcommand{\domain}[1]{\mathrm{dom}(#1)}
+\newcommand{\setHtwo}{\set{H}_2}
+\newcommand{\setLinfty}{\set{L}_\infty}
+\newcommand{\Ellipsoid}[1]{\mathcal E_{#1}}
+
+% Analysis
+
+\newcommand{\Lone}[1]{\|#1\|_1}
+\newcommand{\Ltwo}[1]{\|#1\|_2}
+\newcommand{\FLinf}[2]{\|#1\|_{#2}}
 
 % Calculus
 
@@ -209,7 +218,8 @@
 }
 \newcommand{\todo}[2][show]{%
   \ifthenelse{\equal{#1}{show}}{%
-    {\color{blue} (TODO: #2)}%
+    {\color{blue}%
+      \ifthenelse{\equal{#2}{}}{TODO}{(TODO: #2)}}%
   }{}%
 }
 \newcommand{\question}[2][show]{%
@@ -236,3 +246,7 @@
 \newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
 \newcommand{\alert}[1]{\textbf{#1}}
 \newcommand{\lcvx}{LCvx\xspace}
+\newcommand{\margindate}[1]{\marginnote{\footnotesize\color{red}\texttt{#1}}}
+\newcommand{\textsub}[1]{_{\mathrm{#1}}}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\probref}[1]{Problem~\ref{#1}}

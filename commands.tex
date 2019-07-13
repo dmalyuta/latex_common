@@ -8,6 +8,7 @@
 \newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
 \newcommand{\eucledian}{\mathbb E}
 \newcommand{\reals}{\mathbb R}
+\newcommand{\real}{\mathbb R}
 \newcommand{\ball}{\mathbb B}
 \newcommand{\nat}{{\mbox{\bf N}}}
 \newcommand{\integers}{\mathbb Z}
@@ -23,7 +24,7 @@
 \newcommand{\boundary}[1]{\mathrm{bdry}\left(#1\right)}
 \newcommand{\relint}{\mathrm{relint}}
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
-\newcommand{\lbdry}{\partial_{L}}
+\newcommand{\bdry}{\partial}
 \newcommand{\image}[1]{\mathrm{im}(#1)}
 \newcommand{\domain}[1]{\mathrm{dom}(#1)}
 
@@ -91,7 +92,8 @@
     }%
   })}
 \newcommand{\define}[1]{\textit{#1}}%
-\newcommand{\definedas}{\coloneqq}
+\newcommand{\definedas}[1][tri]{%
+  \ifthenelse{\equal{#1}{tri}}{\triangleq}{\coloneqq}}
 \newcommand{\inlineint}{\textstyle\int}
 \newcommand{\inlinesum}{\textstyle\sum}
 
@@ -236,3 +238,4 @@
 \newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
 \newcommand{\alert}[1]{\textbf{#1}}
 \newcommand{\lcvx}{LCvx\xspace}
+\newcommand{\emphasize}[1]{\textit{#1}}

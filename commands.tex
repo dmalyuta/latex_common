@@ -8,6 +8,7 @@
 \newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
 \newcommand{\eucledian}{\mathbb E}
 \newcommand{\reals}{\mathbb R}
+\newcommand{\real}{\mathbb R}
 \newcommand{\ball}{\mathbb B}
 \newcommand{\nat}{{\mbox{\bf N}}}
 \newcommand{\integers}{\mathbb Z}
@@ -23,6 +24,7 @@
 \newcommand{\boundary}[1]{\mathrm{bdry}\left(#1\right)}
 \newcommand{\relint}{\mathrm{relint}}
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
+\newcommand{\bdry}{\partial}
 \newcommand{\lbdry}{\partial_{L}}
 \newcommand{\image}[1]{\mathrm{im}(#1)}
 \newcommand{\domain}[1]{\mathrm{dom}(#1)}
@@ -100,7 +102,8 @@
     }%
   })}
 \newcommand{\define}[1]{\textit{#1}}%
-\newcommand{\definedas}{\coloneqq}
+\newcommand{\definedas}[1][tri]{%
+  \ifthenelse{\equal{#1}{tri}}{\triangleq}{\coloneqq}}
 \newcommand{\inlineint}{\textstyle\int}
 \newcommand{\inlinesum}{\textstyle\sum}
 
@@ -204,6 +207,8 @@
 % Editing
 
 \definecolor{darkolivegreen}{rgb}{0.33, 0.6, 0.18}
+\definecolor{green}{rgb}{0, 0.5, 0}
+\definecolor{orange}{rgb}{1, 0.4, 0}
 
 \newcommand{\seecode}{\textit{For code, see Appendix~\ref{sec:code}}.}
 \newcommand{\postmeeting}[2][show]{%
@@ -246,11 +251,13 @@
 \newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
 \newcommand{\alert}[1]{\textbf{#1}}
 \newcommand{\lcvx}{LCvx\xspace}
+\newcommand{\emphasize}[1]{\textit{#1}}
 \newcommand{\scvx}{SCvx\xspace}
 \newcommand{\margindate}[1]{\marginnote{\footnotesize\color{red}\texttt{#1}}}
 \newcommand{\textsub}[1]{_{\mathrm{#1}}}
 \newcommand{\figref}[1]{Figure~\ref{#1}}
 \newcommand{\probref}[1]{Problem~\ref{#1}}
+\newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\easy}{{\color{olive}[easy]}\xspace}
 \newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
 \newcommand{\hard}{{\color{red}[hard]}\xspace}

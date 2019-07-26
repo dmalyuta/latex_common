@@ -46,6 +46,8 @@ drop fuzzy shadow}}
 \newtheorem{example}{Example}
 \newtheorem{assumption}{Assumption}
 
+% \AtEndEnvironment{definitionc}{\null\hfill\qedsymbol}%
+
 \theoremstyle{empty}
 
 \newtheorem{refproof}{Proof}
@@ -82,21 +84,24 @@ splittopskip = \topskip,%
 \newif\ifnomentry
 \renewcommand{\nomlabel}[1]{#1\hfill\hspace{\labelsep}\ifnomentry$=$\fi}
 \newlength{\nomwidest}
-% \renewcommand{\nomgroup}[1]{%
-%   \nomentryfalse
-%   \ifthenelse{\equal{#1}{Z}}{\item[\textbf{Variables}]}{% 
-%     \ifthenelse{\equal{#1}{A}}{\item[\textbf{Abbreviations}]}{}}\nomentrytrue}
-%     % {%
-%   % \nomentryfalse
-%   % \ifthenelse{\equal{#1}{V}}{\item[\textbf{Variables}]}{% 
-%   %   \ifthenelse{\equal{#1}{A}}{\item[\textbf{Abbreviations}]}{%
-%   %       \ifthenelse{\equal{#1}{E}}{\item[\textbf{Equations}]}{}\nomentrytrue}\nomentrytrue}}
 \renewcommand{\nomgroup}[1]{%
+\nomentryfalse
 \ifthenelse{\equal{#1}{V}}{\item[\textbf{Variables}]}{%
 \ifthenelse{\equal{#1}{A}}{\item[\textbf{Abbreviations}]}{%
 \ifthenelse{\equal{#1}{E}}{\item[\textbf{Equations}]}{}}}
+\nomentrytrue
 }
 \setlength{\nomitemsep}{-\parsep} 
 \newcommand{\defvar}[3][show]{\nomenclature[V]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#2}{}}
 \newcommand{\defabbrev}[2]{#2 (#1)\nomenclature[A]{#1}{#2}}
 \newcommand{\defeq}[2]{\nomenclature[E]{#1}{#2}}
+
+% Algorithms
+\algrenewcommand\alglinenumber[1]{
+            {\sf\footnotesize#1}}
+\algrenewcommand\algorithmicrequire{\textbf{Precondition:}}
+\algrenewcommand\algorithmicensure{\textbf{Postcondition:}}
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+\algnewcommand\Stop{\State \textbf{STOP}}
+\algnewcommand\Break{\State \textbf{break}}

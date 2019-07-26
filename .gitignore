@@ -1,2 +1,9 @@
-auto/
+*.ilg
+*.nlo
+*.nls
+*.out
+*.bbl
 *.log
+*.synctex.gz
+/auto/
+

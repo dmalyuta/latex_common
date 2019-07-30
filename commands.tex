@@ -36,6 +36,7 @@
 \newcommand{\Ellipsoid}[1]{\mathcal E_{#1}}
 \newcommand{\sequence}[3][k]{\{#2_{#1}\}_{#1=1}^{#3}}
 \newcommand{\minkowplus}{\oplus}
+\newcommand{\powerset}[1]{\mathscr{P}(#1)}
 
 % Analysis
 
@@ -81,6 +82,7 @@
 \newcommand{\lpinv}{\ddagger}
 \newcommand{\blkdiag}[1]{\mathrm{blkdiag}(#1)}
 \DeclareMathOperator{\trace}{trace}
+\newcommand{\svmax}[1]{\bar\sigma(#1)}
 
 % Generic math
 
@@ -89,6 +91,9 @@
 \newcommand{\invT}{^{-\transp}}
 \newcommand{\sign}{\mathrm{sgn}}
 \newcommand{\norm}[2]{\|#1\|_{#2}}
+\newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1 
+        \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
+\newcommand{\inorm}[2]{\vertiii{#1}_{#2}}
 \newcommand{\seq}[1]{\{#1\}}
 \newcommand{\sgn}{\mbox{\textrm{sgn}}}
 \newcommand{\Proj}[1]{\mathop{\text{Proj}_{#1}}}
@@ -98,6 +103,7 @@
 \newcommand{\NPhard}{$\mathcal{NP}$-hard\xspace}
 \newcommand{\NPcomplete}{$\mathcal{NP}$-complete\xspace}
 \newcommand{\transp}{{\scriptscriptstyle\mathsf{T}}}
+\newcommand{\T}{^\transp}
 \newcommand{\innerproduct}[2]{\langle#1,#2\rangle}
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\dt}{\dd t}
@@ -119,6 +125,16 @@
 \newcommand{\inlinesum}{\textstyle\sum}
 \newcommand{\evalat}[2]{\left.#1\right|_{#2}}
 \newcommand{\epsmach}{\epsilon_{mach}}
+\renewcommand{\implies}{\Rightarrow}
+\renewcommand{\iff}{\Leftrightarrow}
+\newcommand{\mleq}{\preceq}
+\newcommand{\mgeq}{\succeq}
+\newcommand{\mle}{\prec}
+\newcommand{\mgr}{\succ}
+\DeclareMathOperator*{\exptx}{exp}
+\renewcommand{\exp}[2][exponent]{\ifthenelse{\equal{#1}{exponent}}{e^{#2}}{\exptx\left(#2\right)}}
+\DeclareMathOperator*{\expsf}{\mathsf{exp}}
+\newcommand{\expm}[2][exponent]{\ifthenelse{\equal{#1}{exponent}}{\mathsf{e}^{#2}}{\expsf\left(#2\right)}}
 
 % Geometry
 

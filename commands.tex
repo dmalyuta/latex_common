@@ -59,7 +59,7 @@
   }%
 }
 \newcommand{\normalcone}[2]{\set{N}_{#1}(#2)}
-\DeclareMathOperator{\con}{cone}
+\DeclareMathOperator{\conehull}{cone}
 \DeclareMathOperator{\convhull}{conv}
 \DeclareMathOperator{\extreme}{ext}
 \newcommand{\indicator}[1]{\delta_{#1}}
@@ -73,9 +73,7 @@
 
 \newcommand{\nul}{\mathrm{null}}
 \newcommand{\rank}{\mathrm{rank}}
-\newcommand{\rang}[2][big]{\mathrm{range}%
-  \ifthenelse{\equal{#1}{big}}{\left(#2\right)}{(#2)}}
-\newcommand{\range}{\mathrm{range}}
+\DeclareMathOperator{\range}{range}
 \newcommand{\diag}[2][short]{\mathrm{diag}\ifthenelse{\equal{#1}{short}}{(#2)}{\left(#2\right)}}
 \newcommand{\spec}{\mathrm{spec}}
 \newcommand{\rpinv}{\dagger}

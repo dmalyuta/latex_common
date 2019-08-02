@@ -170,6 +170,7 @@
 \def\opticmd{\min}
 
 \newcommand{\optimal}[1]{#1^*}
+\newcommand{\sprocedure}{$\mathcal S$-procedure\xspace}
 
 \newcounter{l}
 \newcounter{j}
@@ -190,7 +191,7 @@
 \makeatother %not \makeatletter
 
 \newcommand{\lloptimization}[7][center]{
-  \setsepchar{\\}%
+  \setsepchar{\#}%
   \readlist\mylist{#6}
   \ifthenelse{\equal{#7}{}}{\begin{subequations}}{\begin{taggedsubequations}{#7}}
     \ifthenelse{\equal{#2}{}}{}{\label{eq:#2}}

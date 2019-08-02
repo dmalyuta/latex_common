@@ -103,5 +103,13 @@ splittopskip = \topskip,%
 \algrenewcommand\algorithmicensure{\textbf{Postcondition:}}
 \algnewcommand\algorithmicinput{\textbf{Input:}}
 \algnewcommand\Input{\item[\algorithmicinput]}
-\algnewcommand\Stop{\State \textbf{STOP}}
+\algnewcommand\algorithmicfunctions{\textbf{Lambda Functions:}}
+\algnewcommand\Functions{\item[\algorithmicfunctions]}
+\algnewcommand\Stop[1][]{\State \textbf{STOP} {\color{green} \ul{#1}}}
 \algnewcommand\Break{\State \textbf{break}}
+\algnewcommand\Error[1][]{\State \textbf{error} {\color{red} \uwave{#1}}}
+\algnewcommand\Section[1]{\Statex \textbf{\color{gray} #1}}
+\algdef{SE}[PARAMETERS]{Parameters}{EndParameters}
+   {\algorithmicparameters}
+   {\algorithmicend\ \algorithmicparameters}
+\algnewcommand{\algorithmicparameters}{\textbf{parameters}}

@@ -97,8 +97,13 @@ splittopskip = \topskip,%
 \newcommand{\defeq}[2]{\nomenclature[E]{#1}{#2}}
 
 % Algorithms
-\algrenewcommand\alglinenumber[1]{
-            {\sf\footnotesize#1}}
+
+\algrenewcommand\algorithmicindent{1em}
+\algrenewcommand\alglinenumber[1]{{\sf\footnotesize#1}}
+\algtext*{EndWhile}% Remove "end while" text
+\algtext*{EndIf}% Remove "end if" text
+\algtext*{EndFor}% Remove "end for" text
+
 \algrenewcommand\algorithmicrequire{\textbf{Precondition:}}
 \algrenewcommand\algorithmicensure{\textbf{Postcondition:}}
 \algnewcommand\algorithmicinput{\textbf{Input:}}
@@ -108,8 +113,12 @@ splittopskip = \topskip,%
 \algnewcommand\Stop[1][]{\State \textbf{STOP} {\color{green} \ul{#1}}}
 \algnewcommand\Break{\State \textbf{break}}
 \algnewcommand\Error[1][]{\State \textbf{error} {\color{red} \uwave{#1}}}
-\algnewcommand\Section[1]{\Statex \textbf{\color{gray} #1}}
+\algrenewcommand\algorithmiccomment[1]{\hfill {\color{gray} \(\triangleright\) #1}}
+\makeatletter
+\algnewcommand\Section[1]{\Statex \hskip\ALG@thistlm \textbf{\color{gray} \(\triangleright\) #1}}
+\makeatother
 \algdef{SE}[PARAMETERS]{Parameters}{EndParameters}
    {\algorithmicparameters}
    {\algorithmicend\ \algorithmicparameters}
 \algnewcommand{\algorithmicparameters}{\textbf{parameters}}
+\newcommand{\algorithmiclambda}[3][]{\ifthenelse{\equal{#1}{}}{\texttt{#2}(#3)}{$\texttt{#2}\gets\textbf{lambda}~#3:~#1$}}

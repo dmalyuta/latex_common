@@ -37,12 +37,17 @@
 \newcommand{\sequence}[3][k]{\{#2_{#1}\}_{#1=1}^{#3}}
 \newcommand{\minkowplus}{\oplus}
 \newcommand{\powerset}[1]{\mathscr{P}(#1)}
+\newcommand{\zeroset}{\{0\}}
 
 % Analysis
 
 \newcommand{\Lone}[1]{\|#1\|_1}
 \newcommand{\Ltwo}[1]{\|#1\|_2}
 \newcommand{\FLinf}[2]{\|#1\|_{#2}}
+
+% Numerical analysis
+
+\renewcommand{\O}[1]{\mathcal O(#1)}
 
 % Calculus
 
@@ -133,6 +138,11 @@
 \renewcommand{\exp}[2][exponent]{\ifthenelse{\equal{#1}{exponent}}{e^{#2}}{\exptx\left(#2\right)}}
 \DeclareMathOperator*{\expsf}{\mathsf{exp}}
 \newcommand{\expm}[2][exponent]{\ifthenelse{\equal{#1}{exponent}}{\mathsf{e}^{#2}}{\expsf\left(#2\right)}}
+\newcommand{\ttilde}[1]{\tilde{\raisebox{0pt}[0.85\height]{%
+      $\tilde{#1}$}}}
+\newcommand{\tttilde}[1]{\tilde{\raisebox{0pt}[0.88\height]{%
+      $\tilde{\raisebox{0pt}[0.85\height]{%
+          $\tilde{#1}$}}$}}}
 
 % Geometry
 
@@ -295,6 +305,11 @@
 \newcommand{\lcvx}{LCvx\xspace}
 \newcommand{\emphasize}[1]{\textit{#1}}
 \newcommand{\scvx}{SCvx\xspace}
+\newcommand\dangersign[1][2ex]{%
+  \renewcommand\stacktype{L}%
+  \scaleto{\stackon[1.3pt]{\color{red}$\triangle$}{\tiny !}}{#1}%
+}
+\newcommand{\marginwarning}[1]{\marginnote{\footnotesize\dangersign{\color{red}#1}}}
 \newcommand{\margindate}[1]{\marginnote{\footnotesize\color{red}\texttt{#1}}}
 \newcommand{\textsub}[1]{_{\mathrm{#1}}}
 \newcommand{\sref}[1]{Section~\ref{#1}}
@@ -306,3 +321,6 @@
 \newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
 \newcommand{\hard}{{\color{red}[hard]}\xspace}
 \newcommand{\stoppedhere}{{\color{red}\bfseries STOPPED~HERE}\xspace}
+\newcommand{\alglineref}[3]{\ifthenelse{\equal{#3}{}}{line~\ref{alg:#1:line:#2} %
+    of Algorithm~\ref{alg:#1}\xspace}{lines~\ref{alg:#1:line:#2}-\ref{alg:#1:line:#3} %
+    of Algorithm~\ref{alg:#1}\xspace}}

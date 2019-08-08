@@ -52,6 +52,17 @@ drop fuzzy shadow}}
 
 \newtheorem{refproof}{Proof}
 
+\declaretheoremstyle[
+  headfont=\color{black}\normalfont\bfseries,
+  bodyfont=\color{darkgray}\normalfont,
+]{colored}
+
+\declaretheorem[style=colored,name=Definition]{definitionc}
+% \AtEndEnvironment{definitionc}{\null\hfill\qedsymbol}%
+\declaretheorem[style=colored,name=Condition]{conditionc}
+\declaretheorem[style=colored,name=Remark]{remarkc}
+\declaretheorem[style=colored,name=Theorem]{theoremc}
+
 % Boxes
 \newmdenv[
 outerlinewidth = 1,%

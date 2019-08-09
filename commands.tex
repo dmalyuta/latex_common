@@ -321,6 +321,8 @@
 \newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
 \newcommand{\hard}{{\color{red}[hard]}\xspace}
 \newcommand{\stoppedhere}{{\color{red}\bfseries STOPPED~HERE}\xspace}
-\newcommand{\alglineref}[3]{\ifthenelse{\equal{#3}{}}{line~\ref{alg:#1:line:#2} %
-    of Algorithm~\ref{alg:#1}\xspace}{lines~\ref{alg:#1:line:#2}-\ref{alg:#1:line:#3} %
-    of Algorithm~\ref{alg:#1}\xspace}}
+\renewcommand{\algref}[3]{\ifthenelse{\equal{#2}{}}{Algorithm~\ref{alg:#1}\xspace}%
+  {\ifthenelse{\equal{#3}{}}{line~\ref{alg:#1:line:#2} %
+      of Algorithm~\ref{alg:#1}\xspace}{lines~%
+      \ref{alg:#1:line:#2}-\ref{alg:#1:line:#3} %
+      of Algorithm~\ref{alg:#1}\xspace}}}

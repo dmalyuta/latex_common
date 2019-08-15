@@ -46,7 +46,7 @@
 \usepackage[normalem]{ulem}
 \usepackage{accents}
 
-% Layout
+% % Layout
 \usepackage{float}
 \usepackage{afterpage}
 %\usepackage{lscape} % production (non-rotated PDF pages)
@@ -55,7 +55,9 @@
 \usepackage{nomencl}
 \usepackage{longtable}
 \usepackage{marginnote}
-\usepackage{titlesec}
+\makeatletter
+\@ifclassloaded{beamer}{}{\usepackage{titlesec}}
+\makeatother
 \usepackage{soul}
 \usepackage{stackengine}
 \usepackage{scalerel}

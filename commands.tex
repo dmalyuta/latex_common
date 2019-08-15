@@ -176,6 +176,8 @@
 \DeclareMathOperator*{\find}{\mathrm{find}}
 
 \def\opticmd{\min}
+\newenvironment{optienvc}{\begin{align}}{\end{align}}
+\newenvironment{optienvl}{\begin{flalign}}{\end{flalign}}
 
 \newcommand{\optimal}[1]{#1^*}
 \newcommand{\sprocedure}{$\mathcal S$-procedure\xspace}
@@ -219,22 +221,48 @@
           }%
         }
       \end{flalign}
-    }{
+    }{\ifthenelse{\equal{#1}{center}}{
       \begin{align}
         \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
         \ifthenelse{\equal{#3}{}}{}{#3 = }
         &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
         \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-        \setcounter{j}{\value{k}+1}
-        \setcounter{l}{\value{k}+2}
-        \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_\alph{l}}}
-        \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-                                                    &\mylist[\arabic{j}]%
-                                                      }{%
-                                                    &\mylist[\arabic{j}]\\%
-        }%
+          \setcounter{j}{\value{k}+1}
+          \setcounter{l}{\value{k}+2}
+          \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_\alph{l}}}
+          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
+            &\mylist[\arabic{j}]%
+          }{%
+            &\mylist[\arabic{j}]\\%
+          }%
         }
-      \end{align}
+      \end{align}}{\ifthenelse{\equal{#1}{left*}}{
+      \begin{flalign*}
+        \ifthenelse{\equal{#3}{}}{}{#3 = }
+        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
+        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
+          \setcounter{j}{\value{k}+1}
+          \setcounter{l}{\value{k}+2}
+          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
+            &\mylist[\arabic{j}]%
+          }{%
+            &\mylist[\arabic{j}] &&\\%
+          }%
+        }
+      \end{flalign*}
+    }{\begin{align*}
+        \ifthenelse{\equal{#3}{}}{}{#3 = }
+        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
+        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
+          \setcounter{j}{\value{k}+1}
+          \setcounter{l}{\value{k}+2}
+          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
+            &\mylist[\arabic{j}]%
+          }{%
+            &\mylist[\arabic{j}]\\%
+          }%
+        }
+      \end{align*}}}
     }
   \ifthenelse{\equal{#7}{}}{\end{subequations}}{\end{taggedsubequations}}
 }
@@ -301,7 +329,9 @@
 \newcommand{\Behcet}{Beh\c{c}et\xspace}
 \newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e\xspace}
 \newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
-\newcommand{\alert}[1]{\textbf{#1}}
+\makeatletter
+\@ifclassloaded{beamer}{}{\newcommand{\alert}[1]{\textbf{#1}}}
+\makeatother
 \newcommand{\lcvx}{LCvx\xspace}
 \newcommand{\emphasize}[1]{\textit{#1}}
 \newcommand{\scvx}{SCvx\xspace}
@@ -326,3 +356,4 @@
       of Algorithm~\ref{alg:#1}\xspace}{lines~%
       \ref{alg:#1:line:#2}-\ref{alg:#1:line:#3} %
       of Algorithm~\ref{alg:#1}\xspace}}}
+\newcommand{\defintext}[1]{\textbf{#1}}

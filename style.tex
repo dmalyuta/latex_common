@@ -30,14 +30,14 @@ drop fuzzy shadow}}
 \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
 
 % Theorem environments
+\makeatletter
+\@ifclassloaded{beamer}{}{
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
 \newtheorem{property}{Property}
-
 \theoremstyle{definition}
-
 \newtheorem{remark}{Remark}
 \newtheorem{definition}{Definition}
 \newtheorem{condition}{Condition}
@@ -45,6 +45,8 @@ drop fuzzy shadow}}
 \newtheorem{method}{Method}
 \newtheorem{example}{Example}
 \newtheorem{assumption}{Assumption}
+}
+\makeatother
 
 % \AtEndEnvironment{definitionc}{\null\hfill\qedsymbol}%
 

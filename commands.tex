@@ -11,7 +11,7 @@
 \newcommand{\real}{\mathbb R}
 \newcommand{\pos}{\mathbb R_{++}}
 \newcommand{\nonneg}{\mathbb R_{+}}
-\newcommand{\ball}{\mathbb B}
+\newcommand{\ball}[1][r]{\set B_{#1}}
 \newcommand{\nat}{{\mbox{\bf N}}}
 \newcommand{\integers}{\mathbb Z}
 \newcommand{\binary}{\mathbb I}
@@ -38,6 +38,13 @@
 \newcommand{\minkowplus}{\oplus}
 \newcommand{\powerset}[1]{\mathscr{P}(#1)}
 \newcommand{\zeroset}{\{0\}}
+
+% Algorithms
+
+\newcommand{\algvar}[1]{\text{\IfSubStr{#1}{_}{%
+    \StrSubstitute{#1}{_}{\textunderscore}}{#1}}}
+\newcommand{\true}{\algvar{true}\xspace}
+\newcommand{\false}{\algvar{false}\xspace}
 
 % Analysis
 
@@ -143,6 +150,9 @@
 \newcommand{\tttilde}[1]{\tilde{\raisebox{0pt}[0.88\height]{%
       $\tilde{\raisebox{0pt}[0.85\height]{%
           $\tilde{#1}$}}$}}}
+\newcommand{\overlline}[1]{\overline{\overline{#1}}}
+\newcommand{\bbar}[1]{\bar{\bar{#1}}}
+\newcommand{\prefix}[2][]{{}^{#1}_{#2}}
 
 % Geometry
 

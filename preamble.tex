@@ -10,7 +10,7 @@
 
 % Colors
 \usepackage{color}
-\usepackage{xcolor}
+\usepackage[table]{xcolor}
 
 % Logic/scripting
 \usepackage{ifthen}
@@ -21,6 +21,7 @@
 \usepackage{listofitems}
 \usepackage{forloop}
 \usepackage{calc}
+\usepackage{xstring}
 
 % Figures
 \usepackage{graphicx}
@@ -45,12 +46,17 @@
 \usepackage{chemformula}
 \usepackage[normalem]{ulem}
 \usepackage{accents}
+\usepackage{nicematrix}
 
 % Layout
 \usepackage{float}
 \usepackage{afterpage}
+\ifthenelse{\isundefined{\landscapemode}}{
 %\usepackage{lscape} % production (non-rotated PDF pages)
-\usepackage{pdflscape} % writing (rotated PDF pages, don't need to twist head)
+%\usepackage{pdflscape} % writing (rotated PDF pages, don't need to twist head)
+\def\landscapemode{pdflscape}
+}{}
+\usepackage{\landscapemode} % writing (rotated PDF pages, don't need to twist head)
 \usepackage{varwidth}
 \usepackage{nomencl}
 \usepackage{longtable}

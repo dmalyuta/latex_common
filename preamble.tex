@@ -10,7 +10,9 @@
 
 % Colors
 \usepackage{color}
-\usepackage[table]{xcolor}
+\makeatletter
+\@ifclassloaded{beamer}{}{\usepackage[table]{xcolor}}
+\makeatother
 
 % Logic/scripting
 \usepackage{ifthen}

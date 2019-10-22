@@ -40,6 +40,7 @@
 
 \newcommand\footlineon{
   \setbeamertemplate{footline} {
+    \vskip 0.1cm
     \begin{beamercolorbox}[ht=2.5ex,dp=1.125ex,leftskip=.8cm,rightskip=.6cm]{structure}
       \footnotesize \insertsection
       \hfill
@@ -47,15 +48,55 @@
       \hfill
       {\insertframenumber/\inserttotalframenumber}
     \end{beamercolorbox}
-    \vskip 0.45cm
+    % \vskip 0.45cm
   }
 }
 \footlineon
 
 \AtBeginSection[] 
 { 
-	\begin{frame}<beamer> 
-		\frametitle{Outline} 
-		\tableofcontents[currentsection,currentsubsection] 
-	\end{frame} 
-} 
+  \begin{frame}<beamer> 
+    \frametitle{Outline} 
+    \tableofcontents[currentsection,currentsubsection] 
+  \end{frame} 
+}
+
+\setbeamercolor{frametitle}{fg=black}
+
+\makeatletter
+\setbeamertemplate{frametitle}{
+  \ifbeamercolorempty[bg]{frametitle}{}{\nointerlineskip}%
+  \@tempdima=\textwidth%
+  \advance\@tempdima by\beamer@leftmargin%
+  \advance\@tempdima by\beamer@rightmargin%
+  \vspace*{-0.1cm} %%%%%%%%%%%%% For example insert shift to right
+  \large
+  \bfseries
+  \begin{beamercolorbox}[sep=0.3cm,center,wd=\the\@tempdima]{frametitle}
+    \usebeamerfont{frametitle}%
+    \vbox{}\vskip-1ex%
+    \if@tempswa\else\csname beamer@ftecenter\endcsname\fi%
+    \strut\insertframetitle\strut\par%
+    {%
+      \ifx\insertframesubtitle\@empty%
+      \else%
+      {\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}\insertframesubtitle\strut\par}%
+      \fi
+    }%
+    \vskip-1ex%
+    \if@tempswa\else\vskip-.3cm\fi% set inside beamercolorbox... evil here...
+  \end{beamercolorbox}%
+}
+\makeatother
+
+\setbeamertemplate{itemize items}[circle]
+
+\setbeamerfont{bibliography item}{size=\footnotesize}
+\setbeamerfont{bibliography entry author}{size=\footnotesize}
+\setbeamerfont{bibliography entry title}{size=\footnotesize}
+\setbeamerfont{bibliography entry location}{size=\footnotesize}
+\setbeamerfont{bibliography entry note}{size=\footnotesize}
+\setbeamertemplate{frametitle continuation}{%
+    \ifnum\insertcontinuationcount>1
+    \insertcontinuationcount
+    \fi}

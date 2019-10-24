@@ -24,6 +24,7 @@
 \newcommand{\epi}{\mathrm{epi}}
 % \newcommand{\hypo}{\mathrm{hypo}}
 \newcommand{\interior}[1]{\mathrm{int}(#1)}
+\newcommand{\closure}[1]{\mathrm{cl}(#1)}
 \newcommand{\compl}[1]{#1^\mathrm{c}}
 \newcommand{\boundary}[1]{\mathrm{bdry}\left(#1\right)}
 \newcommand{\relint}{\mathrm{relint}}
@@ -293,7 +294,7 @@
 }
 
 \newcommand{\llpoptimization}[8][left]{
-  \begin{problem}\ifthenelse{\equal{#2}{NoNe}}{}{\textbf{#2.}}%
+  \begin{problem}[#8]\ifthenelse{\equal{#2}{NoNe}}{}{\textbf{#2.}}%
     \ifthenelse{\equal{#3}{}}{}{\label{problem:#3}}%
     \lloptimization[#1]{#3}{#4}{#5}{#6}{#7}{#8}%
   \end{problem}%

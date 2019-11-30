@@ -31,6 +31,7 @@
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
 \newcommand{\bdry}{\partial}
 \newcommand{\image}[1]{\mathrm{im}(#1)}
+\DeclareMathOperator{\comain}{dom}
 \newcommand{\domain}[1]{\mathrm{dom}(#1)}
 \newcommand{\setHtwo}{\set{H}_2}
 \newcommand{\setLinfty}{\set{L}_\infty}
@@ -84,9 +85,10 @@
 
 % Linear Algebra
 
-\newcommand{\nul}{\mathrm{null}}
-\newcommand{\rank}{\mathrm{rank}}
+\DeclareMathOperator{\nul}{null}
+\DeclareMathOperator{\rank}{rank}
 \DeclareMathOperator{\range}{range}
+\DeclareMathOperator{\linspan}{span}
 \newcommand{\diag}[2][short]{\mathrm{diag}\ifthenelse{\equal{#1}{short}}{(#2)}{\left(#2\right)}}
 \DeclareMathOperator{\spec}{spec}
 \newcommand{\rpinv}{\dagger}
@@ -107,7 +109,7 @@
 \newcommand{\inorm}[2]{\vertiii{#1}_{#2}}
 \newcommand{\seq}[1]{\{#1\}}
 \newcommand{\sgn}{\mbox{\textrm{sgn}}}
-\newcommand{\Proj}[1]{\mathop{\text{Proj}_{#1}}}
+\newcommand{\Proj}[2]{\mathcal P_{#1}(#2)}
 \newcommand{\Pre}{\mathop\text{Pre}}
 \newcommand{\PP}{$\mathcal{P}$\xspace}
 \newcommand{\NP}{$\mathcal{NP}$\xspace}
@@ -176,7 +178,8 @@
 
 % Measure theory
 
-\newcommand{\alev}[1]{\textnormal{a.e. }#1}
+\newcommand{\alev}[1]{\text{a.e. }#1}
+\newcommand{\gen}[1]{\text{gen. }#1}
 \newcommand{\ev}[3][c]{%
   \ifthenelse{\equal{#1}{c}}{%
     \ifthenelse{\equal{#2}{}}{\forall[0,#3]}{\forall[#2,#3]}%

@@ -1,7 +1,9 @@
 % Math
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{amsthm}
+\makeatletter
+\@ifclassloaded{autart}{}{\usepackage{amsthm}}
+\makeatother
 \usepackage{mathtools}
 \usepackage{thmtools}
 \usepackage{ar}
@@ -32,6 +34,7 @@
 % Figures
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{caption}
 
 % Tables
 \usepackage{tabularx}
@@ -70,7 +73,9 @@
 \usepackage{longtable}
 \usepackage{marginnote}
 \makeatletter
-\@ifclassloaded{beamer}{}{\usepackage{titlesec}}
+\@ifclassloaded{beamer}{}{
+\@ifclassloaded{autart}{}{\usepackage{titlesec}}
+}
 \makeatother
 \usepackage{soul}
 \usepackage{stackengine}

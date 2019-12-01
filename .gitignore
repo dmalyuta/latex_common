@@ -1,9 +1,15 @@
-*.ilg
-*.nlo
-*.nls
-*.out
-*.bbl
-*.log
-*.synctex.gz
-/auto/
+/**/*.ilg
+/**/*.nlo
+/**/*.nls
+/**/*.out
+/**/*.bbl
+/**/*.log
+/**/*.nav
+/**/*.aux
+/**/*.snm
+/**/*.toc
+/**/*pdf
+/**/#*#
+/**/*.synctex.gz
+/**/auto/
 

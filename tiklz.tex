@@ -1,0 +1,147 @@
+%%%%%%%%%%%% Libraries
+
+\usetikzlibrary{math}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{positioning}
+\usetikzlibrary{scopes}
+\usetikzlibrary{shapes.multipart}
+
+%%%%%%%%%%%% Code Extensions
+
+%%%%% Union of shapes
+% Usage: \fill[draw on back,...] ...
+% Source: https://tex.stackexchange.com/a/11620/90535
+
+\pgfdeclarelayer{back}
+\pgfsetlayers{back,main}
+
+\tikzset{%
+  on layer/.code={
+    \pgfonlayer{#1}\begingroup
+    \aftergroup\endpgfonlayer
+    \aftergroup\endgroup
+  },%
+  draw on back/.style={
+    preaction={
+      draw,
+      on layer=back,
+      line width=#1
+    }
+  }
+}
+
+%%%%%%%%%%%% Custom shapes
+
+\newcommand{\tiklzrectangle}[5]
+{
+  % Draw a rectangle
+  %
+  % #1: what drawing command to execute
+  % #2: rectangle center x position
+  % #3: rectangle center y position
+  % #4: rectangle width
+  % #5: rectangle height
+  \tikzmath
+  {
+    \x=#2;
+    \y=#3;
+    \w=#4;
+    \h=#5;
+  }
+  #1 (\x-\w/2,\y-\h/2) rectangle (\x+\w/2,\y+\h/2);
+}
+
+\newcommand{\tiklztriangle}[4]
+{
+  % Draw an isosceles triangle
+  %
+  % #1: what drawing command to execute
+  % #2: triangle center x position
+  % #2: triangle center y position
+  % #2: triangle sidelength
+  \tikzmath
+  {
+    \x=#2;
+    \y=#3;
+    \r=#4;
+  }
+  #1 (\x-\r/2,{\y-\r/2/sqrt(3)}) --
+  (\x+\r/2,{\y-\r/2/sqrt(3)}) --
+  (\x,{\y+\r/sqrt(3)}) --
+  cycle;
+}
+
+\newcommand{\tiklzparabola}[5]
+{
+  % Draw a parabola
+  %
+  % #1: t0, the left x-coordinate
+  % #2: t1, the right x-coordinate
+  % #3: y0, the left y-coordinate
+  % #4: y1, the right y-coordinate
+  % #5: theta0, the parabola trajectory angle on the left
+  \tikzmath
+  {
+    \t0=#1;
+    \t1=#2;
+    \y0=#3;
+    \y1=#4;
+    \myangle=#5;
+    \a=(\y1-\y0-tan(\myangle)*(\t1-\t0))/(\t1*\t1-\t0*\t0-2*\t0*(\t1-\t0));
+    \b=tan(\myangle)-2*\a*\t0;
+    \c=\y0-\a*\t0*\t0-\b*\t0;
+  }
+}
+
+%%%%%%%%%%%% Helper grid
+
+\makeatletter
+\def\grd@save@target#1{%
+  \def\grd@target{#1}}
+\def\grd@save@start#1{%
+  \def\grd@start{#1}}
+\def\grdOpacity{0.5}
+\tikzset{
+  grid with coordinates/.style={
+    to path={%
+      \pgfextra{%
+        \edef\grd@@target{(\tikztotarget)}%
+        \tikz@scan@one@point\grd@save@target\grd@@target\relax
+        \edef\grd@@start{(\tikztostart)}%
+        \tikz@scan@one@point\grd@save@start\grd@@start\relax
+        \draw[minor help lines] (\tikztostart) grid (\tikztotarget);
+        \draw[major help lines] (\tikztostart) grid (\tikztotarget);
+        \grd@start
+        \pgfmathsetmacro{\grd@xa}{\the\pgf@x/1cm}
+        \pgfmathsetmacro{\grd@ya}{\the\pgf@y/1cm}
+        \grd@target
+        \pgfmathsetmacro{\grd@xb}{\the\pgf@x/1cm}
+        \pgfmathsetmacro{\grd@yb}{\the\pgf@y/1cm}
+        \pgfmathsetmacro{\grd@xc}{\grd@xa + \pgfkeysvalueof{/tikz/grid with coordinates/major step}}
+        \pgfmathsetmacro{\grd@yc}{\grd@ya + \pgfkeysvalueof{/tikz/grid with coordinates/major step}}
+        \foreach \x in {\grd@xa,\grd@xc,...,\grd@xb}
+        \node[anchor=north] at (\x,\grd@ya) {\pgfmathprintnumber{\x}};
+        \foreach \y in {\grd@ya,\grd@yc,...,\grd@yb}
+        \node[anchor=east] at (\grd@xa,\y) {\pgfmathprintnumber{\y}};
+      }
+    }
+  },
+  minor help lines/.style={
+    help lines,
+    opacity=\grdOpacity,
+    step=\pgfkeysvalueof{/tikz/grid with coordinates/minor step}
+  },
+  major help lines/.style={
+    help lines,
+    opacity=\grdOpacity,
+    line width=\pgfkeysvalueof{/tikz/grid with coordinates/major line width},
+    step=\pgfkeysvalueof{/tikz/grid with coordinates/major step}
+  },
+  grid with coordinates/.cd,
+  minor step/.initial=.2,
+  major step/.initial=1,
+  major line width/.initial=1pt
+}

@@ -67,6 +67,8 @@ drop fuzzy shadow}}
 }
 \makeatother
 
+\makeatletter
+\@ifclassloaded{beamer}{}{
 \newcounter{theorem}
 \newtheorem{innertheorem}{Theorem}
 \makeatletter
@@ -110,6 +112,8 @@ drop fuzzy shadow}}
 \makeatother
 
 \newtheorem{assumption}{Assumption}
+}
+\makeatother
 
 % \AtEndEnvironment{definitionc}{\null\hfill\qedsymbol}%
 

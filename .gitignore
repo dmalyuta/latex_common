@@ -12,4 +12,5 @@
 /**/#*#
 /**/*.synctex.gz
 /**/auto/
-
+/tiklz_canvas/canvases/*
+!/tiklz_canvas/canvases/.gitkeep

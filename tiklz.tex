@@ -1,3 +1,8 @@
+%%%%%%%%%%%% Packages
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
 %%%%%%%%%%%% Libraries
 
 \usetikzlibrary{math}
@@ -8,6 +13,12 @@
 \usetikzlibrary{positioning}
 \usetikzlibrary{scopes}
 \usetikzlibrary{shapes.multipart}
+\usetikzlibrary{bending}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{intersections}
+
+% curve through points: (A) to[curve through={(B) .. (C) .. (...)}] {Z};
+\usetikzlibrary{hobby}
 
 %%%%%%%%%%%% Code Extensions
 
@@ -145,3 +156,5 @@
   major step/.initial=1,
   major line width/.initial=1pt
 }
+
+\newcommand{\tiklzhelpgrid}{\draw (-7,-4) to[grid with coordinates] (7,4);}

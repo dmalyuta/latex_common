@@ -13,4 +13,5 @@
 /**/*.synctex.gz
 /**/auto/
 /tiklz_canvas/canvases/*
-!/tiklz_canvas/canvases/.gitkeep
+!/tiklz_canvas/canvases/beamer_example.tex
+!/tiklz_canvas/canvases/standalone_example.tex

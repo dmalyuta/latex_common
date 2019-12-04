@@ -17,7 +17,8 @@
 % Colors
 \usepackage{color}
 \makeatletter
-\@ifclassloaded{beamer}{}{\usepackage[table]{xcolor}}
+\@ifclassloaded{beamer}{}{
+\@ifclassloaded{standalone}{}{\usepackage[table]{xcolor}}}
 \makeatother
 
 % Logic/scripting
@@ -46,7 +47,9 @@
 
 % Document elements
 \usepackage{tikz}
-\usepackage[tikz]{mdframed}
+\makeatletter
+\@ifclassloaded{standalone}{}{\usepackage[tikz]{mdframed}}
+\makeatother
 % \usepackage{enumitem}
 \usepackage{algorithm, algorithmicx}
 \usepackage{algpseudocode}%[noend]
@@ -74,8 +77,9 @@
 \usepackage{marginnote}
 \makeatletter
 \@ifclassloaded{beamer}{}{
-\@ifclassloaded{autart}{}{\usepackage{titlesec}}
-}
+\@ifclassloaded{autart}{}{
+\@ifclassloaded{standalone}{}{\usepackage{titlesec}}
+}}
 \makeatother
 \usepackage{soul}
 \usepackage{stackengine}

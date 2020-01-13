@@ -58,6 +58,7 @@
 \usepackage{chemformula}
 \usepackage[normalem]{ulem}
 \usepackage{accents}
+\usepackage{multimedia}
 \usepackage{nicematrix}
 \usepackage{bibentry} % use \bibentry{...} for in-text citation
 \nobibliography*
@@ -88,7 +89,9 @@
 \usepackage{fancyhdr}
 
 % Referencing
-\usepackage{hyperref}
+\makeatletter
+\@ifclassloaded{standalone}{}{\usepackage{hyperref}}
+\makeatother
 
 % General
 \usepackage{xspace}

@@ -34,7 +34,11 @@
 
 % Figures
 \usepackage{graphicx}
-\usepackage{subcaption}
+\makeatletter
+\@ifclassloaded{UWThesis/uwthesis}{
+\usepackage{subfig}
+}{\usepackage{subcaption}}
+\makeatother
 \usepackage{caption}
 
 % Tables
@@ -59,6 +63,7 @@
 \usepackage[normalem]{ulem}
 \usepackage{accents}
 \usepackage{multimedia}
+\usepackage{lipsum}
 \usepackage{nicematrix}
 \usepackage{bibentry} % use \bibentry{...} for in-text citation
 \nobibliography*
@@ -90,7 +95,8 @@
 
 % Referencing
 \makeatletter
-\@ifclassloaded{standalone}{}{\usepackage{hyperref}}
+\@ifclassloaded{standalone}{}{
+\@ifclassloaded{UWThesis/uwthesis}{}{\usepackage{hyperref}}}
 \makeatother
 
 % General

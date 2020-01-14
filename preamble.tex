@@ -62,7 +62,9 @@
 \usepackage{chemformula}
 \usepackage[normalem]{ulem}
 \usepackage{accents}
-\usepackage{multimedia}
+\makeatletter
+\@ifclassloaded{beamer}{\usepackage{multimedia}}{}
+\makeatother
 \usepackage{lipsum}
 \usepackage{nicematrix}
 \usepackage{bibentry} % use \bibentry{...} for in-text citation

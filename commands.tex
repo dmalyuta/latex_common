@@ -61,6 +61,7 @@
 % Calculus
 
 \newcommand{\grad}{\nabla}
+\newcommand{\hess}{\nabla^2}
 \newcommand{\diff}[2]{\nabla_{#1}#2}
 
 % Convex analysis
@@ -77,7 +78,9 @@
 \DeclareMathOperator{\convhull}{conv}
 \DeclareMathOperator{\extreme}{ext}
 \newcommand{\indicator}[1]{\delta_{#1}}
-\newcommand{\support}[1]{\delta^*_{#1}}
+\newcommand{\support}[2][delta]{\ifthenelse{\equal{#1}{delta}}{%
+    \delta^*_{#2}%
+  }{\sigma_{#2}}}
 
 % Functions
 
@@ -103,7 +106,7 @@
 \newcommand{\inv}{^{-1}}
 \newcommand{\invT}{^{-\transp}}
 \newcommand{\sign}{\mathrm{sgn}}
-\newcommand{\norm}[2]{\|#1\|_{#2}}
+\newcommand{\norm}[2][]{\|#2\|_{#1}}
 \newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1 
         \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
 \newcommand{\inorm}[2]{\vertiii{#1}_{#2}}
@@ -387,5 +390,3 @@
       \ref{alg:#1:line:#2}-\ref{alg:#1:line:#3} %
       of Algorithm~\ref{alg:#1}\xspace}}}
 \newcommand{\defintext}[1]{\textbf{#1}}
-\newcommand{\unfinished}[1]{\textit{\color{red}#1}}
-

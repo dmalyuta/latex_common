@@ -9,6 +9,7 @@
 \usepackage{ar}
 \usepackage{empheq}
 \usepackage{mathrsfs}
+\usepackage{bm}
 
 \makeatletter
 \let\ltxxlabel\ltx@label
@@ -27,10 +28,13 @@
 \usepackage{etoolbox}
 \usepackage{parselines}
 \usepackage{environ}
+\usepackage{keyval}
 \usepackage{listofitems}
 \usepackage{forloop}
 \usepackage{calc}
 \usepackage{xstring}
+\usepackage{changepage}
+\usepackage{scrextend}
 
 % Figures
 \usepackage{graphicx}
@@ -43,6 +47,7 @@
 
 % Tables
 \usepackage{tabularx}
+\usepackage{adjustbox}
 \usepackage{multicol}
 \usepackage{diagbox} % \diagbox{rows}{columns} with slash in between
 \usepackage{varwidth} % V{max_width} variable-width cell type
@@ -51,10 +56,11 @@
 
 % Document elements
 \usepackage{tikz}
+\usepackage{tikz-3dplot}
 \makeatletter
 \@ifclassloaded{standalone}{}{\usepackage[tikz]{mdframed}}
 \makeatother
-% \usepackage{enumitem}
+\usepackage{enumitem}
 \usepackage{algorithm, algorithmicx}
 \usepackage{algpseudocode}%[noend]
 \usepackage[many]{tcolorbox}
@@ -66,8 +72,11 @@
 \@ifclassloaded{beamer}{\usepackage{multimedia}}{}
 \makeatother
 \usepackage{lipsum}
+\usepackage{mfirstuc}
+\usepackage{import}
 \usepackage{nicematrix}
 \usepackage{bibentry} % use \bibentry{...} for in-text citation
+\usepackage[numbers,sort]{natbib}
 \nobibliography*
 
 % Layout
@@ -86,7 +95,7 @@
 \makeatletter
 \@ifclassloaded{beamer}{}{
 \@ifclassloaded{autart}{}{
-\@ifclassloaded{standalone}{}{\usepackage{titlesec}}
+\@ifclassloaded{standalone}{}{\usepackage[explicit]{titlesec}}
 }}
 \makeatother
 \usepackage{soul}
@@ -94,6 +103,7 @@
 \usepackage{scalerel}
 \usepackage{lastpage}
 \usepackage{fancyhdr}
+\usepackage{nameref}
 
 % Referencing
 \makeatletter

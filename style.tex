@@ -17,8 +17,9 @@
 
 \setcounter{MaxMatrixCols}{20}
 
-% Allow breaking long equations across pages
-\allowdisplaybreaks
+% Units
+\DeclareSIUnit\century{century}
+\DeclareSIUnit\year{yr}
 
 % Equation box style
 \tcbset{highlight math style={enhanced,
@@ -158,8 +159,23 @@ splittopskip = \topskip,%
 }
 \setlength{\nomitemsep}{-\parsep} 
 \newcommand{\defvar}[3][show]{\nomenclature[V]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#2}{}}
-\newcommand{\defabbrev}[2]{#2 (#1)\nomenclature[A]{#1}{#2}}
+\newcommand{\defabbrev}[3][show]{\nomenclature[A]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#3 (#2)}{}}
 \newcommand{\defeq}[2]{\nomenclature[E]{#1}{#2}}
+
+% \setlength{\nomlabelwidth}{3cm}
+% \renewcommand{\nomlabel}[1]{#1\hfill\hspace{\labelsep}\ifnomentry$=$\fi}
+% \newlength{\nomwidest}
+% \renewcommand{\nomgroup}[1]{%
+% \nomentryfalse
+% \ifthenelse{\equal{#1}{V}}{\item[\textbf{Variables}]}{%
+% \ifthenelse{\equal{#1}{A}}{\item[\textbf{Abbreviations}]}{%
+% \ifthenelse{\equal{#1}{E}}{\item[\textbf{Equations}]}{}}}
+% \nomentrytrue
+% }
+% \setlength{\nomitemsep}{-\parsep} 
+% \newcommand{\defvar}[3][show]{\nomenclature[V]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#2}{}}
+% \newcommand{\defabbrev}[3][show]{\nomenclature[A]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#3 (#2)}{}}
+% \newcommand{\defeq}[2]{\nomenclature[E]{#1}{#2}}
 
 % Algorithms
 
@@ -188,3 +204,6 @@ splittopskip = \topskip,%
    {\algorithmicend\ \algorithmicparameters}
 \algnewcommand{\algorithmicparameters}{\textbf{parameters}}
 \newcommand{\algorithmiclambda}[3][]{\ifthenelse{\equal{#1}{}}{\texttt{#2}(#3)}{$\texttt{#2}\gets\textbf{lambda}~#3:~#1$}}
+
+% Allow breaking long equations across pages
+\allowdisplaybreaks

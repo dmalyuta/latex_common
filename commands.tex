@@ -9,9 +9,12 @@
 \newcommand{\eucledian}{\mathbb E}
 \newcommand{\reals}{\mathbb R}
 \newcommand{\real}{\mathbb R}
-\newcommand{\pos}{\mathbb R_{++}}
-\newcommand{\nonneg}{\mathbb R_{+}}
-\newcommand{\ball}[1][r]{\set B_{#1}}
+\newcommand{\pos}[1][R]{\mathbb #1_{++}}
+\newcommand{\nonneg}[1][\reals]{#1_{+}}
+\newcommand{\normball}[1][]{%
+  % {x : ||x||_#1 <= 1}
+  % #1: norm type
+  \mathbb B_{#1}}
 \newcommand{\nat}{{\mbox{\bf N}}}
 \newcommand{\integers}{\mathbb Z}
 \newcommand{\binary}{\mathbb I}
@@ -19,7 +22,6 @@
 \newcommand{\symm}{\mathbb S}  % symmetric matrices
 \newcommand{\psd}{\mathbb S_{+}}
 \newcommand{\pd}{\mathbb S_{++}}
-\newcommand{\Co}{\mathrm{co}}
 \newcommand{\dom}{\mathrm{dom}}
 \newcommand{\epi}{\mathrm{epi}}
 % \newcommand{\hypo}{\mathrm{hypo}}
@@ -40,6 +42,10 @@
 \newcommand{\minkowplus}{\oplus}
 \newcommand{\powerset}[1]{\mathscr{P}(#1)}
 \newcommand{\zeroset}{\{0\}}
+\DeclareMathOperator{\vol}{vol}
+\newcommand{\volume}[1]{\vol\left(#1\right)}
+\DeclareMathOperator{\vtcs}{\set V}
+\newcommand{\vertices}[1]{\vtcs\left(#1\right)}
 
 % Algorithms
 
@@ -99,6 +105,9 @@
 \newcommand{\blkdiag}[1]{\mathrm{blkdiag}(#1)}
 \DeclareMathOperator{\trace}{trace}
 \newcommand{\svmax}[1]{\bar\sigma(#1)}
+\newcommand{\Matrix}[2][]{%
+  \ifthenelse{\equal{#1}{}}{}{\setlength\arraycolsep{#1}}%
+  \begin{bmatrix}#2\end{bmatrix}}
 
 % Generic math
 
@@ -355,7 +364,6 @@
     {\color{red} (C: #2)}%
   }{}%
 }
-\newcommand{\subfigref}[1]{(\protect\subref{#1})}
 
 % Miscellaneous
 
@@ -375,20 +383,128 @@
 \newcommand{\marginwarning}[1]{\marginnote{\footnotesize\dangersign{\color{red}#1}}}
 \newcommand{\margindate}[1]{\marginnote{\footnotesize\color{red}\texttt{#1}}}
 \newcommand{\textsub}[1]{_{\mathrm{#1}}}
-\newcommand{\sref}[1]{Section~\ref{#1}}
-\newcommand{\figref}[1]{Figure~\ref{#1}}
-\newcommand{\probref}[1]{Problem~\ref{#1}}
-\newcommand{\tabref}[1]{Table~\ref{#1}}
-\newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\easy}{{\color{olive}[easy]}\xspace}
 \newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
 \newcommand{\hard}{{\color{red}[hard]}\xspace}
 \newcommand{\stoppedhere}{{\color{red}\bfseries STOPPED~HERE}\xspace}
-\renewcommand{\algref}[3]{\ifthenelse{\equal{#2}{}}{Algorithm~\ref{alg:#1}\xspace}%
-  {\ifthenelse{\equal{#3}{}}{line~\ref{alg:#1:line:#2} %
-      of Algorithm~\ref{alg:#1}\xspace}{lines~%
-      \ref{alg:#1:line:#2}-\ref{alg:#1:line:#3} %
-      of Algorithm~\ref{alg:#1}\xspace}}}
 \newcommand{\defintext}[1]{\textbf{#1}}
 \newenvironment{hwanswer}{\color{blue}}{}
 \newenvironment{unfinished}{\color{red}\itshape}{}
+% Referencing low-level code
+\def\SectionLabel{section}
+\def\SubsectionLabel{subsection}
+\def\ChapterLabel{chapter}
+\def\AppendixLabel{appendix}
+\def\FigureLabel{fig}
+\def\TableLabel{table}
+\def\FootnoteLabel{footnote}
+\def\AlgorithmLabel{alg}
+\def\ProblemLabel{problem}
+\def\TheoremLabel{theorem}
+\def\CorollaryLabel{corollary}
+\def\ConditionLabel{condition}
+\def\AssumptionLabel{assumption}
+\def\PropositionLabel{proposition}
+\def\DefinitionLabel{definition}
+\def\LemmaLabel{lemma}
+\def\ExampleLabel{example}
+\newcommand{\GetLabel}[1]{\expandafter\csname #1Label\endcsname}
+\makeatletter
+\define@key{printRefKeys}{otherLabel}{\def\otherLabel{#1}}
+\define@key{printRefKeys}{concatenate}{\def\concatenate{#1}}
+\makeatother
+\newcommand{\PrintRefs}[3][]{%
+  % \ifthenelse{{#1}{}}{}{\edef\MyModifiedLabel{#1}}%
+  \setkeys{printRefKeys}{otherLabel=,#1}%
+  \setkeys{printRefKeys}{concatenate=false,#1}%
+  % #2: Element
+  % #3: label
+  \xdef\MyModifiedLabel{#2}%
+  \ifthenelse{\equal{\otherLabel}{}}{}{\xdef\MyModifiedLabel{\otherLabel}}%
+  \xdef\MyRefCount{0}%
+  \foreach \i in {#3} {%
+    \tikzmath{\MyRefCount=int(\MyRefCount+1);}%
+    \xdef\MyRefCount{\MyRefCount}%
+  }%
+  \ifthenelse{\equal{\MyRefCount}{1}}{%
+    #2~\ref{\GetLabel{\MyModifiedLabel}:#3}%
+  }{%
+    \xdef\MyCounter{0}%
+    #2s~%
+    \foreach \AlgRef in {#3} {%
+      \tikzmath{\MyCounter=int(\MyCounter+1);}%
+      \xdef\MyCounter{\MyCounter}%
+      \ifthenelse{\equal{\concatenate}{true}}{%
+        % \pgfmathparse{\MyCounter==1 ? 1 : 0}%
+        % \ifthenelse{\pgfmathresult>0}{%
+        %   \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}-%
+        % }{%
+        %   % \pgfmathparse{\MyCounter==\myRefCount ? 1 : 0}%
+        %   \ifthenelse{\equal{\MyCounter}{\myRefCount}}{%
+        %     \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
+        %   }{}%
+        %   }%
+        \pgfmathparse{\MyCounter==1 ? 1 : 0}%
+        \ifthenelse{\pgfmathresult>0}{%
+          \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}-%
+        }{%
+          \pgfmathparse{\MyCounter==\MyRefCount ? 1 : 0}%
+          \ifthenelse{\pgfmathresult>0}{%
+            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
+          }{}%
+        }%
+      }{%
+        \pgfmathparse{\MyCounter<\MyRefCount-1 ? 1 : 0}%
+        \ifthenelse{\pgfmathresult>0}{%
+          \ref{\GetLabel{\MyModifiedLabel}:\AlgRef},~%
+        }{%
+          \pgfmathparse{\MyCounter<\MyRefCount ? 1 : 0}%
+          \ifthenelse{\pgfmathresult>0}{%
+            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}~and~%
+          }{%
+            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
+          }%
+        }%
+      }%
+    }%
+  }%  
+}
+% Document section references
+\newcommand{\sref}[1]{\PrintRefs{Section}{#1}}
+\newcommand{\ssref}[1]{\PrintRefs[otherLabel=Subsection]{Section}{#1}}
+\newcommand{\cref}[1]{\PrintRefs{Chapter}{#1}}
+\newcommand{\appref}[1]{\PrintRefs{Appendix}{#1}}
+\newcommand{\figref}[1]{\PrintRefs{Figure}{#1}}
+\newcommand{\tabref}[1]{\PrintRefs{Table}{#1}}
+\renewcommand{\footref}[1]{\PrintRefs{Footnote}{#1}}
+\makeatletter
+\define@key{algKeys}{start}{\def\startline{#1}}
+\define@key{algKeys}{end}{\def\endline{#1}}
+\define@key{algKeys}{show}{\def\showalg{#1}}
+\makeatother
+\renewcommand{\algref}[2][]{%
+  % Parameters%
+  \setkeys{algKeys}{start=,#1}%
+  \setkeys{algKeys}{end=,#1}%
+  \setkeys{algKeys}{show=true,#1}%
+  % Print%
+  \ifthenelse{\equal{\showalg}{true}}{\PrintRefs{Algorithm}{#2}}{}%
+  \ifthenelse{\equal{\startline}{}}{}{~L\ref{alg:#2:line:\startline}%
+    \ifthenelse{\equal{\endline}{}}{}{-\ref{alg:#2:line:\endline}}%
+  }%
+}
+% Mathematical element references
+\newcommand{\pref}[2][]{\PrintRefs[#1]{Problem}{#2}}
+\newcommand{\tref}[2][]{\PrintRefs[#1]{Theorem}{#2}}
+\newcommand{\corref}[2][]{\PrintRefs[#1]{Corollary}{#2}}
+\newcommand{\conref}[2][]{\PrintRefs[#1]{Condition}{#2}}
+\newcommand{\aref}[2][]{\PrintRefs[#1]{Assumption}{#2}}
+\newcommand{\prref}[2][]{\PrintRefs[#1]{Proposition}{#2}}
+\newcommand{\dref}[2][]{\PrintRefs[#1]{Definition}{#2}}
+\newcommand{\lref}[2][]{\PrintRefs[#1]{Lemma}{#2}}
+\newcommand{\eref}[2][]{\PrintRefs[#1]{Example}{#2}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

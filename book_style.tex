@@ -1,0 +1,625 @@
+% No paragraph indentation
+\setlength\parindent{1em}
+
+% Paragraph spacing
+\setlength{\parskip}{0pt}
+
+\def\PtUnit{pt}
+
+\def\innerSep{7cm}
+\def\outerSep{1.5cm}
+\def\topSep{2cm}
+\def\botSep{2cm}
+\def\chapterTopSep{2*\topSep}
+\def\chapterBotMargin{2cm}
+
+\tikzmath{
+  \sidebarWidth = 0.9*\innerSep;
+  \textMarginWidth = \innerSep-\sidebarWidth;
+  \sidebarPad = 0.5cm;
+  \topLabelSep = 2mm;
+  \figureWidthLoc = \sidebarWidth-2*\sidebarPad;
+}
+
+\def\figureWidth{\figureWidthLoc\PtUnit}
+\def\textMarginWidthUnits{\textMarginWidth\PtUnit}
+
+% Page types:
+%  toc = table of contents
+%  text = body text
+%  biblio = references list
+%  nom = nomenclature
+\xdef\sectionType{text}
+
+\usepackage[
+% paperwidth=6in,
+% paperheight=9in,
+letterpaper,
+inner=\innerSep,
+outer=\outerSep,
+top=\topSep,
+bottom=\botSep]{geometry}
+
+\pagestyle{fancy}
+
+\fancyhf{} % clear header and footer
+\renewcommand{\headrulewidth}{0pt} % no top line
+
+% Figure caption style
+\captionsetup[figure]{labelfont={sc},labelformat={default},labelsep=period,name={Figure}}
+
+% Chapter, section, etc. names
+\newcommand{\sectiontitle}{}
+\newcommand{\setsectiontitle}[1]{\renewcommand{\sectiontitle}{#1}}
+\newcommand{\invisiblesection}[1]{%
+  \phantomsection%
+  \stepcounter{section}%
+  \addcontentsline{toc}{section}{\protect\numberline{\thesection}#1}%
+}
+\newcommand{\mySection}[2][visible]{
+  \xdef\theSectionName{#2}
+  \label{chapter:\thechapter}
+  \ifthenelse{\equal{#1}{invisible}}{
+    \invisiblesection{\theSectionName}
+  }{
+    \section{\theSectionName}
+  }
+  \label{section:\thesection}
+}
+\newcommand{\myChapter}[2]{
+  \newpage
+  \xdef\sectionType{text}
+  \xdef\theChapterName{#1}
+  \xdef\theSectionName{#2}
+  \chapter{\theChapterName}
+  \label{chapter:\thechapter}
+  \mySection[invisible]{\theSectionName}
+  % Reset counters
+  \setcounter{Booktheorem}{0}
+  \setcounter{Bookdefinition}{0}
+  \setcounter{Bookcorollary}{0}
+  \setcounter{Booklemma}{0}
+  \setcounter{Bookproposition}{0}
+  \setcounter{Bookcondition}{0}
+  \setcounter{Bookassumption}{0}
+  \setcounter{Bookexample}{0}
+}
+\newcommand{\myTOC}{
+  \xdef\sectionType{toc}
+  \tableofcontents
+  \thispagestyle{plain}
+  \newpage
+}
+\newcommand{\myNomenclature}{
+  \xdef\sectionType{nom}
+  \printnomenclature
+  \thispagestyle{plain}
+  \newpage
+}
+\newcommand{\myBib}[1]{
+  \xdef\sectionType{biblio}
+  \bibliography{#1.bib}
+}
+\newcommand{\myBlankPage}{
+  \null
+  \thispagestyle{empty}%
+  \addtocounter{page}{-1}%
+  \begin{tikzpicture}[remember picture,overlay,shift={(current page.center)}]
+    \node at (0,0) {-- This page is intentionally left blank. --};
+  \end{tikzpicture}
+  \newpage
+}
+
+\newcommand{\calcWidth}[1]{\tikzmath{\width=#1*\figureWidth;}%
+  \xdef\customFigureWidth{\width\PtUnit}%
+}
+
+% \titlespacing*{\chapter}{0pt}{*0}{0pt}
+\newlength{\HugeLetterHeight}
+\newlength{\NormalLetterHeight}
+\settoheight{\HugeLetterHeight}{\normalfont\Huge A}
+\settoheight{\NormalLetterHeight}{A}
+\tikzmath{
+  \ChapterHeightText=-(\HugeLetterHeight+\parskip+\baselineskip-\NormalLetterHeight);
+}
+\xdef\ChapterHeightText{\ChapterHeightText\PtUnit}
+\titleformat{\chapter}
+{\normalfont\huge}
+{}
+{0cm}
+{%
+  \xdef\IsChapterPage{true}%
+  \begin{tikzpicture}[remember picture,overlay,shift=(current page.north)]%
+    \tikzset{
+      chapter rule/.style={
+        black,
+        line width=1mm
+      },
+      every node/.append style={
+        inner sep=0,
+        outer sep=0
+      },
+      text node/.append style={
+        anchor=west,
+        font={\bfseries},
+        text width=\paperwidth-2*\outerSep
+      }
+    }
+    \tikzmath{
+      \ruleWidth = \paperwidth-2*\outerSep;
+      \chapterHeight = 1cm;
+    }
+    \tikzmath{
+      \xloc=-\paperwidth/2+\outerSep;
+      \yloc=-\chapterTopSep;
+    }
+    \draw[chapter rule] (\xloc*1pt,\yloc*1pt) node(top rule){} to ++(\ruleWidth*1pt,0);
+    \ifthenelse{\equal{\sectionType}{text}}{
+      \node[text node,align=left] (chapter title)
+      at ($(top rule.west)+(0,-\chapterHeight*1pt)$)
+      {\thechapter\hspace{1cm} \theChapterName};
+      \node[text node,text width=\paperwidth-2*\outerSep,
+      anchor=north west,align=right] (first section title)
+      at ($(chapter title.south west)+(0,-\chapterHeight*1pt)$)
+      {\theSectionName};
+      \draw[chapter rule]
+      ($(first section title.west)+(0,-\chapterHeight*1pt)$)
+      node(bottom rule){}
+      to ++(\ruleWidth*1pt,0);
+    }{
+      \node[text node,align=left] (chapter title)
+      at ($(top rule.west)+(0,-\chapterHeight*1pt)$)
+      {\ifthenelse{\equal{\sectionType}{toc}}{%
+          Table of Contents%
+        }{%
+          \ifthenelse{\equal{\sectionType}{biblio}}{%
+            Bibliography%
+          }{%
+            Nomenclature%
+          }
+        }
+      };
+      \draw[chapter rule]
+      ($(chapter title.west)+(0,-\chapterHeight*1pt)$)
+      node(bottom rule){} to ++(\ruleWidth*1pt,0);
+    }
+    \path let
+    \p1=(top rule),
+    \p2=(bottom rule)
+    in \pgfextra{
+      \tikzmath{
+        \chapterHeadingHeight=\y1-\y2;
+      }
+      \xdef\chapterHeadingHeight{\chapterHeadingHeight\PtUnit}
+    };
+  \end{tikzpicture}%
+  \tikzmath{%
+    \ExtraSkip = (\chapterTopSep-\topSep)*1pt;%
+    \TotalSkip = \ChapterHeightText+\ExtraSkip+\chapterHeadingHeight+%
+    \chapterBotMargin;%
+  }%
+  \xdef\TotalSkip{\TotalSkip\PtUnit}%
+  \vspace{\TotalSkip}%
+}
+\tikzmath{\ChapterHeight=\HugeLetterHeight+\parskip;}
+\xdef\ChapterHeight{\ChapterHeight\PtUnit}
+\titlespacing{\chapter}{0pt}{-\ChapterHeight}{*0}
+
+\renewcommand{\sectionmark}[1]{\markboth{}{\thesection}}
+\newcommand{\mySidebar}[2]{
+  % #1: which page? LE, RO
+  % #2: which style? plain, fancy
+  \ifthenelse{\equal{#1}{LO}}{
+    \def\sidebarLocation{north west}
+  }{
+    \def\sidebarLocation{north east}
+  }
+  \begin{tikzpicture}[
+    remember picture,
+    overlay,
+    shift={(current page.\sidebarLocation)}
+    ]
+    \ifthenelse{\equal{#2}{plain}}{
+      \def\sidebarColor{white}
+    }{
+      \def\sidebarColor{black!10}
+    }
+    \tikzset{
+      sidebar/.style={
+        rectangle,
+        anchor=\sidebarLocation,
+        inner sep=0,
+        outer sep=0,
+        fill=\sidebarColor,
+        minimum width=\sidebarWidth,
+        minimum height=\paperheight
+      },
+      section line/.style={
+        black,
+        line width=0.3mm
+      }
+    }
+    \node[sidebar] (sidebar region) at (0,0) {};
+    % Chapter, section
+    \ifthenelse{\equal{#2}{fancy}}{
+      \ifthenelse{\equal{#1}{LO}}{
+        \def\Pos{1}
+        \def\Anchor{north east}
+        \def\Align{right}
+      }{
+        \def\Pos{0}
+        \def\Anchor{north west}
+        \def\Align{left}
+      }
+      \draw[section line]
+      ($(sidebar region.north west)+(\sidebarPad*1pt,-\topSep)$)
+      to
+      node[pos=\Pos,anchor=\Anchor,
+      text width={\sidebarWidth-2*\sidebarPad},
+      align=\Align,
+      inner sep=0,
+      outer sep=0,
+      yshift=-\topLabelSep]
+      (section label)
+      {\Large%
+        \ifthenelse{\equal{\sectionType}{toc}}{%
+          {\itshape Contents}%
+        }{%
+          \ifthenelse{\equal{\sectionType}{biblio}}{%
+            {\itshape Bibliography}%
+          }{%
+            \ifthenelse{\equal{\sectionType}{text}}{%
+              \ifthenelse{\equal{#1}{LO}}{%
+                \ifthenelse{\equal{\thechapter}{0}}{}{%
+                  {\bfseries Chapter~\thechapter}\\%
+                  {\itshape \theChapterName}%
+                }%
+              }{%
+                {\bfseries Section~\rightmark}\\%
+                {\itshape \theSectionName}%
+              }%
+            }{}%
+          }
+        }%
+      }
+      ($(sidebar region.north east)+(-\sidebarPad*1pt,-\topSep)$);
+      \path let
+      \p1=(section label.north),
+      \p2=(section label.south)
+      in \pgfextra{
+        \tikzmath{
+          \sidebarSectionLabelHeight=\y1-\y2;
+        }
+        \xdef\sidebarSectionLabelHeight{\sidebarSectionLabelHeight\PtUnit}
+      };
+    }{\xdef\sidebarSectionLabelHeight{0\PtUnit}}
+    % Page number
+    \ifthenelse{\equal{#1}{LO}}{
+      \coordinate (page left) at
+      ($(sidebar region.south west)+(\sidebarWidth/2*1pt,\botSep)$);
+      \coordinate (page right) at
+      ($(sidebar region.south east)+(-\sidebarPad*1pt,\botSep)$);
+      \def\anchorPoint{north east}
+    }{
+      \coordinate (page left) at
+      ($(sidebar region.south east)+(-\sidebarWidth/2*1pt,\botSep)$);
+      \coordinate (page right) at
+      ($(sidebar region.south west)+(\sidebarPad*1pt,\botSep)$);
+      \def\anchorPoint{north west}
+    }
+    \draw[section line]
+    (page left)
+    to
+    node[pos=1,
+    anchor=\anchorPoint,
+    inner sep=0,
+    outer sep=0,
+    yshift=-\topLabelSep,
+    align=right
+    ]{\thepage}
+    (page right);
+  \end{tikzpicture}
+  % >>>>>>> Draw sidebar figures in the list
+  \tikzset{
+    figure/.append style={
+      inner sep=0,
+      outer sep=0,
+      anchor=north
+    }
+  }
+  % Define starting Y location
+  \ifthenelse{\equal{\IsChapterPage}{true}}{
+    \xdef\IsChapterPage{false}
+    \tikzmath{
+      \SidebarFigureYStart=-(\chapterTopSep+\chapterHeadingHeight+
+      \chapterBotMargin);
+    }
+  }{
+    \tikzmath{
+      \SidebarFigureYStart=-(\topSep+\sidebarSectionLabelHeight+\SidebarFigureVPadding);
+    }
+  }
+  \xdef\SidebarFigureY{\SidebarFigureYStart\PtUnit}
+  % Loop through list of figures that are to be drawn
+  \xdef\NewSidebarFigureList{}
+  \xdef\Overflow{false}
+  \foreach \figure in \SidebarContentList {
+    \ifthenelse{\equal{\Overflow}{true}}{
+      \AddToList{\NewSidebarFigureList}{\figure}
+    }{
+      \begin{tikzpicture}[
+        remember picture,
+        overlay,
+        shift={(current page.\sidebarLocation)}
+        ]
+        \ifthenelse{\equal{#1}{LO}}{
+          \tikzmath{\XLoc = \sidebarWidth/2;}
+        }{
+          \tikzmath{\XLoc = -\sidebarWidth/2;}
+        }
+        % Draw figure
+        \edef\GetBox{\expandafter\usebox\csname \figure\endcsname}
+        \node[figure,draw=none,opacity=0] (figure body phantom)
+        at (\XLoc*1pt,\SidebarFigureY*1pt) {\phantom{\GetBox}};
+        \path let
+        \p1=(figure body phantom.north),
+        \p2=(figure body phantom.south)
+        in \pgfextra{
+          \tikzmath{
+            \height=(\y1-\y2);
+            \SidebarFigureYBottom=\SidebarFigureY-\height;
+          }
+          \xdef\SidebarFigureYBottom{\SidebarFigureYBottom\PtUnit}
+        };
+        \pgfmathparse{\SidebarFigureYBottom>\SidebarFigureYEnd ? 1:0}
+        \ifthenelse{\pgfmathresult>0}{
+          \node[figure] (figure body) at (\XLoc*1pt,\SidebarFigureY*1pt)
+          {\GetBox};
+        }{
+          \AddToList{\NewSidebarFigureList}{\figure}
+          \xdef\Overflow{true}
+        }
+        \path let
+        \p1=(figure body.north),
+        \p2=(figure body.south)
+        in \pgfextra{
+          \tikzmath{\height=(\y1-\y2);}
+          % Update Y
+          \tikzmath{\SidebarFigureY=\SidebarFigureY-\height-\SidebarFigureYSep;}
+          \xdef\SidebarFigureY{\SidebarFigureY\PtUnit}
+        };
+      \end{tikzpicture}
+    }
+  }
+  \xdef\SidebarContentList{\NewSidebarFigureList}
+}
+
+\fancyhead[LO]{\mySidebar{LO}{fancy}}
+\fancyhead[RE]{\mySidebar{RE}{fancy}}
+
+\fancypagestyle{plain}{
+  \fancyhead[LO]{\mySidebar{LO}{plain}}
+  \fancyhead[RE]{\mySidebar{RE}{plain}}
+}
+
+\let\cleardoublepage=\clearpage
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+\makeatother
+
+% Sidebar figure list
+
+\xdef\SidebarContentList{}
+\xdef\SidebarFigureCounter{1}
+\xdef\SidebarFigureVPadding{1cm}
+\xdef\SidebarFigureYSep{1cm}
+\tikzmath{
+  \SidebarFigureYEnd=-\paperheight+\botSep+\SidebarFigureVPadding;
+}
+\xdef\SidebarFigureYEnd{\SidebarFigureYEnd\PtUnit}
+\newlength{\SidebarFigureHeight}
+
+\NewEnviron{sidebarFigure}{
+  % Make the box which is the figure content
+  \def\SidebarContentName{SidebarFigure\SidebarFigureCounter}
+  \edef\CommandFigureName{\csname \SidebarContentName\endcsname}
+  \expandafter\newsavebox\CommandFigureName
+  \begin{lrbox}{\CommandFigureName}
+    \calcWidth{1}%
+    \begin{minipage}{\customFigureWidth}%
+      \vspace{-\floatsep}%
+      \begin{figure}[H]
+        \centering
+        \BODY%
+      \end{figure}
+    \end{minipage}%
+  \end{lrbox}
+  % \begin{lrbox}{\CommandFigureName}\BODY\end{lrbox}
+  \global%
+  \expandafter\setbox\CommandFigureName%
+  \expandafter\box\CommandFigureName
+  % Add to list
+  \AddToList{\SidebarContentList}{\SidebarContentName}
+  % Update counter
+  \tikzmath{\SidebarFigureCounter=int(\SidebarFigureCounter+1);}
+  \xdef\SidebarFigureCounter{\SidebarFigureCounter}
+}
+
+\newcounter{Comment}
+\setcounter{Comment}{0}
+
+\makeatletter
+\define@key{sidebarCommentKeys}{clabel}{\def\clabel{#1}}%
+\define@key{sidebarCommentKeys}{yshift}{\def\yshift{#1}}%
+\makeatother
+\newcommand{\sidebarComment}[2][]{%
+  \setkeys{sidebarCommentKeys}{clabel=,#1}%
+  \refstepcounter{Comment}%
+  \ifthenelse{\equal{\clabel}{}}{}{\label{footnote:\clabel}}%
+  $^{\textnormal{\ref{footnote:\theComment}}}$%
+  % Make the box which is the comment content
+  \def\SidebarContentName{SidebarFigure\SidebarFigureCounter}%
+  \edef\CommandFigureName{\csname \SidebarContentName\endcsname}%
+  \expandafter\newsavebox\CommandFigureName%
+  \begin{lrbox}{\CommandFigureName}%
+    \calcWidth{1}%
+    \begin{minipage}{\customFigureWidth}%
+      \protect\label{footnote:\theComment}$^\theComment$ #2%
+    \end{minipage}%
+  \end{lrbox}%
+  \global%
+  \expandafter\setbox\CommandFigureName%
+  \expandafter\box\CommandFigureName%
+  % Add to list
+  \AddToList{\SidebarContentList}{\SidebarContentName}%
+  % Update counter
+  \tikzmath{\SidebarFigureCounter=int(\SidebarFigureCounter+1);}%
+  \xdef\SidebarFigureCounter{\SidebarFigureCounter}%
+}
+
+\newcommand{\AddToList}[2]{%
+  % #1: list variable
+  % #2: element
+  \ifthenelse{\equal{#1}{}}{\xdef#1{#2}}{\xdef#1{#1,#2}}%
+}
+
+% Math theorem envs
+\def\thmVSpace{3mm}%
+
+\newcommand{\bookProof}[1][]{\vspace{\thmVSpace}\noindent{\itshape Proof%
+    \ifthenelse{\equal{#1}{}}{}{~(#1)}.}\hspace{4mm}}
+
+\makeatletter
+\define@key{theoremKeys}{type}{\def\type{#1}}%
+\define@key{theoremKeys}{tlabel}{\def\tlabel{#1}}%
+\makeatother
+
+\newcounter{Booktheorem}
+\newcounter{Bookdefinition}
+\newcounter{Bookcorollary}
+\newcounter{Booklemma}
+\newcounter{Bookproposition}
+\newcounter{Bookcondition}
+\newcounter{Bookassumption}
+\newcounter{Bookexample}
+\newcounter{BookThmCounter}
+\setcounter{Booktheorem}{0}
+\setcounter{Bookdefinition}{0}
+\setcounter{Bookcorollary}{0}
+\setcounter{Booklemma}{0}
+\setcounter{Bookproposition}{0}
+\setcounter{Bookcondition}{0}
+\setcounter{Bookassumption}{0}
+\setcounter{Bookexample}{0}
+\setcounter{BookThmCounter}{1}
+
+\newcounter{qedCounter}
+\setcounter{qedCounter}{1}
+\renewcommand{\qedsymbol}{}
+\newcommand{\qedmark}{%
+  \pgfmark{qedmark\theqedCounter}%
+  \stepcounter{qedCounter}%
+}
+
+\NewEnviron{bookTheorem}[1][]{%
+  % Parameters%
+  \setkeys{theoremKeys}{type=theorem,#1}%
+  \setkeys{theoremKeys}{tlabel=,#1}%
+  % HEADING
+  \ifthenelse{\equal{\type}{}}{}{%
+    \edef\CounterName{Book\type}%
+    \refstepcounter{\CounterName}%
+    \edef\name{\capitalisewords{\type}~\arabic{\CounterName}}%
+    \label{\type:\tlabel}%
+    % Title
+    \vspace{\thmVSpace}%
+    \edef\markNameStart{defStart\theBookThmCounter}%
+    \edef\markNameEnd{defEnd\theBookThmCounter}%
+    {\noindent\pgfmark{\markNameStart}\phantom{\bfseries\name.}}\pgfmark{\markNameEnd}
+    \begin{tikzpicture}[remember picture,overlay]%
+      \tikzmath{
+        \pad = 1mm;
+        \height = 0.7em+2*\pad;
+        \Angle = 60;
+        \tipOffset = \height*tan(90-\Angle);
+        \tipOffsetValueLocal = 2.5*\tipOffset;
+      }
+      \xdef\tipOffsetValue{\tipOffsetValueLocal\PtUnit}
+      \tikzset{
+        theorem background/.append style={
+          fill=black!10,
+          draw=black!30,
+          line width=0.4mm
+        }
+      }
+      \coordinate (south west) at (pic cs:\markNameStart);
+      \coordinate (south east) at (pic cs:\markNameEnd);
+      \draw[theorem background]
+      ($(south west)+(0,-\pad*1pt)$) to
+      ($(south east)+(2*\pad*1pt,-\pad*1pt)$) to
+      ++({(\tipOffset+\pad)*1pt},\height*1pt) to
+      ($(south west)+(0,-\pad*1pt)+(0,\height*1pt)$) to
+      cycle;
+      \node[anchor=north west,inner sep=0,outer sep=0,font={\bfseries}] at ($(south west)+(\pad*1pt,\height*1pt-2*\pad*1pt)$) {\name.};
+    \end{tikzpicture}%
+    \hspace{\tipOffsetValue}%
+  }%
+  % BODY
+  \BODY\ifthenelse{\equal{\theqedCounter}{\theBookThmCounter}}{\qedmark}{}%
+  \stepcounter{BookThmCounter}%
+  \addtocounter{qedCounter}{-1}%
+  % QED
+  \begin{tikzpicture}[remember picture,overlay]%
+    \def\qedSz{0.7em}
+    \tikzset{
+      QED/.style={
+        anchor=south west,
+        rectangle,
+        inner sep=0,
+        outer sep=0,
+        minimum size=\qedSz,
+        fill=white,
+        draw=black
+      }
+    }
+    \path let
+    \p1=(pic cs:qedmark\theqedCounter),
+    \p2=(current page.east)
+    in \pgfextra{
+      \ifthispageodd{
+        \tikzmath{\xloc=\x2-\outerSep+\qedSz;}
+      }{
+        \tikzmath{\xloc=\x2-\innerSep+\qedSz;}
+      }
+      \node[QED] at (\xloc*1pt,\y1) {};
+    };
+  \end{tikzpicture}%
+  \addtocounter{qedCounter}{1}%
+  \vspace{\thmVSpace}%
+}
+
+% List style
+\def\EnumMargin{2cm}
+\NewEnviron{bookList}{
+  \begin{enumerate}[
+    leftmargin=\textMarginWidthUnits,
+    rightmargin=\textMarginWidthUnits,
+    align=left,
+    labelwidth=0.7em,
+    labelsep=0pt,
+    label=\protect\fancyarrow
+    ]
+    \BODY
+  \end{enumerate}
+}
+
+% Bibliography style
+\setlength{\bibsep}{1pt}
+\def\bibfont{\footnotesize}
+\gappto{\UrlBreaks}{\UrlOrds}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

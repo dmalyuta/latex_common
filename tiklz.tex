@@ -21,91 +21,154 @@
 % curve through points: (A) to[curve through={(B) .. (C) .. (...)}] {Z};
 % \usetikzlibrary{hobby}
 
-%%%%%%%%%%%% Code Extensions
+%%%%%%%%%%%% Common settings
 
-%%%%% Union of shapes
-% Usage: \fill[draw on back,...] ...
-% Source: https://tex.stackexchange.com/a/11620/90535
-
-\pgfdeclarelayer{back}
-\pgfsetlayers{back,main}
-
-\tikzset{%
-  on layer/.code={
-    \pgfonlayer{#1}\begingroup
-    \aftergroup\endpgfonlayer
-    \aftergroup\endgroup
-  },%
-  draw on back/.style={
-    preaction={
-      draw,
-      on layer=back,
-      line width=#1
+\newcommand{\tiklzcommonsettings}{
+  \tikzset{
+    every node/.append style={
+      inner sep=0,
+      outer sep=0
+    },
+    axis/.append style={
+      black,
+      ->
+    },
+    label text/.append style={
+      outer sep=1
     }
   }
 }
 
-%%%%%%%%%%%% Custom shapes
+%%%%%%%%%%%% Cute clock
 
-\newcommand{\tiklzrectangle}[5]
-{
-  % Draw a rectangle
-  %
-  % #1: what drawing command to execute
-  % #2: rectangle center x position
-  % #3: rectangle center y position
-  % #4: rectangle width
-  % #5: rectangle height
-  \tikzmath
-  {
-    \x=#2;
-    \y=#3;
-    \w=#4;
-    \h=#5;
-  }
-  #1 (\x-\w/2,\y-\h/2) rectangle (\x+\w/2,\y+\h/2);
+\newcommand{\cuteclock}[1][]{
+  \begin{scope}[#1]
+    \tikzset{
+      skinny/.append style={
+        inner sep=0,
+        outer sep=0
+      },
+      clockHand/.append style={
+        line width=0.2mm
+      },
+      clockFoot/.append style={
+        line width=0.3mm
+      }
+    }
+    
+    \tikzmath{
+      \R = 3mm;
+      \r = 0.3mm;
+      \angleHour = 90;
+      \angleMinute = -45;
+      \lengthHour = 0.5*\R;
+      \lengthMinute = 0.9*\R;
+      \earSize = 1mm;
+      \angleEar = 45;
+      \shiftEar = 1.1*\R;
+      \lengthFoot = 1mm;
+      \angleFoot= 30;
+    }
+  
+    \def\rimColor{black}
+    \def\faceColor{white}
+
+    \node[skinny,circle,draw=\rimColor,fill=\faceColor,
+    minimum size=2*\R] (cuteclock) at (0,0) {};
+  
+    \draw[clockHand,rotate=\angleHour] (0,0) to (\lengthHour*1pt,0);
+    \draw[clockHand,rotate=\angleMinute] (0,0) to (\lengthMinute*1pt,0);
+
+    \draw[\rimColor,fill=\rimColor] (\r*1pt,0) arc (0:360:\r*1pt);
+  
+    \foreach \earAngle in {-\angleEar,\angleEar} {
+      \draw[\rimColor,fill=\faceColor,rotate=\earAngle,shift={(0,\shiftEar*1pt)}]
+      (-\earSize*1pt,0) to (\earSize*1pt,0) arc (0:180:\earSize*1pt) to cycle;
+    }
+  
+    \foreach \footAngle in {-\angleFoot,\angleFoot} {
+      \draw[clockFoot,
+      rotate=\footAngle,shift={(0,-\R*1pt)}] (0,0) to (0,-\lengthFoot*1pt);
+    }
+  \end{scope}
 }
 
-\newcommand{\tiklztriangle}[4]
-{
-  % Draw an isosceles triangle
-  %
-  % #1: what drawing command to execute
-  % #2: triangle center x position
-  % #2: triangle center y position
-  % #2: triangle sidelength
-  \tikzmath
-  {
-    \x=#2;
-    \y=#3;
-    \r=#4;
+%%%%%%%%%%%% Arrow as a bullet point
+
+\newcommand{\fancyarrow}{
+\resizebox{!}{0.7em}{
+\begin{tikzpicture}
+  \tikzmath{
+    \width=0.7em;
+    \height=0.5em;
+    \inset=0.2*\width;
   }
-  #1 (\x-\r/2,{\y-\r/2/sqrt(3)}) --
-  (\x+\r/2,{\y-\r/2/sqrt(3)}) --
-  (\x,{\y+\r/sqrt(3)}) --
-  cycle;
+  \draw[line width=2mm] (0,0) to (-\inset,\height/2)
+  to (-\inset+\width,0) to
+  (-\inset,-\height/2) to cycle;
+  \path[fill=black] (0,0) to (-\inset,\height/2) to
+  (-\inset+\width,0) to cycle;
+\end{tikzpicture}
+}
 }
 
-\newcommand{\tiklzparabola}[5]
-{
-  % Draw a parabola
-  %
-  % #1: t0, the left x-coordinate
-  % #2: t1, the right x-coordinate
-  % #3: y0, the left y-coordinate
-  % #4: y1, the right y-coordinate
-  % #5: theta0, the parabola trajectory angle on the left
-  \tikzmath
-  {
-    \t0=#1;
-    \t1=#2;
-    \y0=#3;
-    \y1=#4;
-    \myangle=#5;
-    \a=(\y1-\y0-tan(\myangle)*(\t1-\t0))/(\t1*\t1-\t0*\t0-2*\t0*(\t1-\t0));
-    \b=tan(\myangle)-2*\a*\t0;
-    \c=\y0-\a*\t0*\t0-\b*\t0;
+%%%%%%%%%%%% Tentacle for "mind-map" style connections
+
+\makeatletter
+\define@key{tentaclekeys}{start}{\def\xys{#1}}%
+\define@key{tentaclekeys}{end}{\def\xye{#1}}%
+\define@key{tentaclekeys}{out}{\def\out{#1}}%
+\define@key{tentaclekeys}{in}{\def\in{#1}}%
+\define@key{tentaclekeys}{widthstart}{\def\ws{#1}}%
+\define@key{tentaclekeys}{widthend}{\def\we{#1}}%
+\define@key{tentaclekeys}{color}{\def\color{#1}}%
+\makeatother
+\NewEnviron{tentacle}[1][]{
+  % Parameter loading
+  \setkeys{tentaclekeys}{start={0,0},#1}
+  \setkeys{tentaclekeys}{end={1,-1},#1}
+  \setkeys{tentaclekeys}{out=-90,#1}
+  \setkeys{tentaclekeys}{in=90,#1}
+  \setkeys{tentaclekeys}{widthstart=1mm,#1}
+  \setkeys{tentaclekeys}{widthend=0mm,#1}
+  \setkeys{tentaclekeys}{color=black,#1}
+  % Drawing
+  \tikzset{
+    tip/.append style={
+      color=\color,
+      fill=\color,
+      line width=0.1mm
+    },
+    tentacle/.append style={
+      color=\color,
+      fill=\color,
+      line width=0.1mm
+    }
   }
+
+  \tikzmath{
+    \angss = \out+80;
+    \angse = \out+280;
+    \anges = \in-100;
+    \angee = \in-280;
+    \xshfts = cos(\angss)*\ws/2;
+    \yshfts = sin(\angss)*\ws/2;
+    \xshfte = cos(\anges)*\we/2;
+    \yshfte = sin(\anges)*\we/2;
+  }
+  
+  \coordinate (start) at (\xys);
+  \coordinate (end) at (\xye);
+  \coordinate (start right) at ($(start)+(\xshfts*1pt,\yshfts*1pt)$);
+  \coordinate (start left) at ($(start)-(\xshfts*1pt,\yshfts*1pt)$);
+  \coordinate (end right) at ($(end)+(\xshfte*1pt,\yshfte*1pt)$);
+  \coordinate (end left) at ($(end)-(\xshfte*1pt,\yshfte*1pt)$);
+  
+  \draw[tip] (start right) arc (\angss:\angse:\ws/2);
+  \draw[tip] (end right) arc (\anges:\angee:\we/2);
+
+  \draw[tentacle] (start right) to[out=\out,in=\in] (end right)
+  to (end left) to[out=\in,in=\out] (start left);
 }
 
 %%%%%%%%%%%% Helper grid

@@ -39,6 +39,140 @@
   }
 }
 
+%%%%%%%%%%%% Rocket lander
+
+\makeatletter
+\define@key{rocketKeys}{shift}{\def\shift{#1}}
+\define@key{rocketKeys}{legs}{\def\legs{#1}}
+\define@key{rocketKeys}{fire}{\def\fire{#1}}
+\makeatother
+\newcommand{\rocket}[1][]{
+  \setkeys{rocketKeys}{shift={(0,0)},#1}%
+  \setkeys{rocketKeys}{legs=out,#1}%
+  \setkeys{rocketKeys}{fire=false,#1}%
+  \begin{scope}[shift={\shift}]
+    \ifthenelse{\equal{\legs}{out}}{
+      \tikzmath{\lAng = 60;}
+    }{
+      \tikzmath{\lAng = 180;}
+    }
+    \tikzmath{
+      % User
+      \rL = 2;
+      \rW = 0.3;
+      \lL = 0.6;
+      \lW = 0.1;
+      \lCF = 0.2;
+      \lCH = 0.15;
+      \eW = 0.3*\rW;
+      \eH = 0.07;
+      \eAng = 30;
+      \eBellOutAng = -30;
+      \eBellInAng = 90;
+      \fH = 0.4;
+      % Derived
+      \lX = \lL*sin(\lAng);
+      \lH = \lL*cos(\lAng);
+      \eX = \eH*tan(\eAng);
+    }
+    \tikzset{
+      every node/.append style={
+        inner sep=0,
+        outer sep=0
+      },
+      fuselage/.append style={
+        rectangle,
+        draw=black,
+        minimum width=\rW cm,
+        minimum height=\rL cm,
+        shading=axis,
+        shading angle=0,
+        left color=white,
+        right color=gray
+      },
+      leg/.append style={
+        fill=black,
+        draw=black,
+        line join=bevel
+      },
+      leg cylinder/.append style={
+        black,
+        line width=0.2mm
+      },
+      engine bell/.append style={
+        draw=black,
+        shading=axis,
+        shading angle=0,
+        left color=gray,
+        right color=black
+      },
+      engine fire/.append style={
+        shading=axis,
+        top color=orange,
+        bottom color=yellow,
+        draw=none
+      }
+    }
+    \node[fuselage] (body) at (0,0) {};
+
+    \draw[leg] (body.south west) to ++(-\lX,-\lH) to
+    node[pos=\lCF](cylinder left){} ++(\lX,\lH+\lW) -- cycle;
+    \draw[leg] (body.south east) to ++(\lX,-\lH) to
+    node[pos=\lCF](cylinder right){} ++(-\lX,\lH+\lW) -- cycle;
+
+    \draw[leg cylinder] ($(body.south west)+(0,\lW+\lCH)$)
+    to (cylinder left);
+    \draw[leg cylinder] ($(body.south east)+(0,\lW+\lCH)$)
+    to (cylinder right);
+
+    \coordinate (engine south east) at ($(body.south)+(\eW/2+\eX,-\eH)$);
+    \coordinate (engine south west) at ($(body.south)+(-\eW/2-\eX,-\eH)$);
+    
+    \ifthenelse{\equal{\fire}{true}}{
+      \draw[engine fire] (engine south east) to ++(-\eW/2-\eX,-\fH) to
+      (engine south west) --cycle;
+    }{}
+
+    \draw[engine bell] (body.south) to ++(\eW/2,0)
+    to[out=\eBellOutAng,in=\eBellInAng] ++(\eX,-\eH)
+    to ++(-\eW-2*\eX,0)
+    to[out=\eBellInAng,in=-180-\eBellOutAng] ++(\eX,\eH)
+    --cycle;
+  \end{scope}
+}
+
+%%%%%%%%%%%% Center of gravity
+
+\makeatletter
+\define@key{cgKeys}{shift}{\def\shift{#1}}
+\makeatother
+\newcommand{\cg}[1][]{
+  \setkeys{cgKeys}{shift={(0,0)},#1}%
+  \begin{scope}[shift={\shift}]
+    % CG
+    \tikzmath{
+      \cgR = 0.15;
+    }
+    \tikzset{
+      cg bg/.append style={
+        circle,
+        fill=white,
+        draw=black,
+        minimum size=\cgR cm
+      },
+      cg fg/.append style={
+        circle,
+        fill=black,
+        draw=black
+      }
+    }
+    \node[cg bg] at (0,0) {};
+    \draw[cg fg] ($(0,0)+(0:\cgR cm/2)$) arc (0:90:\cgR cm/2) to (0,0) --
+    cycle;
+    \draw[cg fg] ($(0,0)+(180:\cgR cm/2)$) arc (180:270:\cgR cm/2) to (0,0) -- cycle;
+  \end{scope}
+}
+
 %%%%%%%%%%%% Cute clock
 
 \newcommand{\cuteclock}[1][]{

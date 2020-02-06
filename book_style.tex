@@ -24,6 +24,12 @@
 \def\figureWidth{\figureWidthLoc\PtUnit}
 \def\textMarginWidthUnits{\textMarginWidth\PtUnit}
 
+% Colors
+\definecolor{maroon}{rgb}{0.5, 0.0, 0.0}
+\newcommand{\highlightcolor}{maroon}
+\newcommand{\bookHighlight}[1]{{\color{\highlightcolor}#1}}
+\xdef\sidebarColorNormal{black!10}
+
 % Page types:
 %  toc = table of contents
 %  text = body text
@@ -222,7 +228,7 @@ bottom=\botSep]{geometry}
     \ifthenelse{\equal{#2}{plain}}{
       \def\sidebarColor{white}
     }{
-      \def\sidebarColor{black!10}
+      \def\sidebarColor{\sidebarColorNormal}
     }
     \tikzset{
       sidebar/.style={

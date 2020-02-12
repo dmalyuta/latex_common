@@ -24,10 +24,31 @@
 \def\figureWidth{\figureWidthLoc\PtUnit}
 \def\textMarginWidthUnits{\textMarginWidth\PtUnit}
 
+% Expensive figure blocker
+\xdef\bookCompileFigures{true}
+\newcommand{\makeFigureToggled}[2][]{%
+  \ifthenelse{\equal{\bookCompileFigures}{true}}{%
+    #2%
+  }{%
+    \ifthenelse{\equal{#1}{}}{}{%
+      \includegraphics[width=#1]{example-image-a}% 
+    }{%
+      \includegraphics[width=5cm]{example-image-a}%
+    }%
+  }%
+}
+\newcommand{\bookToggleFigures}{
+  \ifthenelse{\equal{\bookCompileFigures}{true}}{
+    \xdef\bookCompileFigures{false}
+  }{
+    \xdef\bookCompileFigures{true}
+  }
+}
+
 % Colors
 \definecolor{maroon}{rgb}{0.5, 0.0, 0.0}
 \newcommand{\highlightcolor}{maroon}
-\newcommand{\bookHighlight}[1]{{\color{\highlightcolor}#1}}
+\newcommand{\bookHighlight}[1]{{\itshape\color{\highlightcolor}#1}}
 \xdef\sidebarColorNormal{black!10}
 
 % Page types:
@@ -72,11 +93,13 @@ bottom=\botSep]{geometry}
   }
   \label{section:\thesection}
 }
-\newcommand{\myChapter}[2]{
+\xdef\ChapterQuote{}
+\newcommand{\myChapter}[3][]{
   \newpage
+  \xdef\ChapterQuote{#1}
   \xdef\sectionType{text}
-  \xdef\theChapterName{#1}
-  \xdef\theSectionName{#2}
+  \xdef\theChapterName{#2}
+  \xdef\theSectionName{#3}
   \chapter{\theChapterName}
   \label{chapter:\thechapter}
   \mySection[invisible]{\theSectionName}
@@ -89,10 +112,37 @@ bottom=\botSep]{geometry}
   \setcounter{Bookcondition}{0}
   \setcounter{Bookassumption}{0}
   \setcounter{Bookexample}{0}
+  % \expandafter\newsavebox\csname ChapterQuote\thechapter\endcsname
+  % \begin{lrbox}{\csname ChapterQuote\thechapter\endcsname}
+  %   #1
+  % \end{lrbox}
+}
+\NewEnviron{bookAbstract}[1][]{
+  \xdef\ChapterQuote{#1}
+  \xdef\sectionType{abstract}
+  \newpage
+  \thispagestyle{plain}
+  \xdef\theChapterName{Abstract}
+  \chapter{\theChapterName}
+  \label{chapter:\thechapter}
+  \BODY
+  \newpage
 }
 \newcommand{\myTOC}{
   \xdef\sectionType{toc}
   \tableofcontents
+  \thispagestyle{plain}
+  \newpage
+}
+\newcommand{\myLOF}{
+  \xdef\sectionType{lof}
+  \listoffigures
+  \thispagestyle{plain}
+  \newpage
+}
+\newcommand{\myLOT}{
+  \xdef\sectionType{lot}
+  \listoftables
   \thispagestyle{plain}
   \newpage
 }
@@ -146,14 +196,14 @@ bottom=\botSep]{geometry}
         outer sep=0
       },
       text node/.append style={
-        anchor=west,
+        anchor=north west,
         font={\bfseries},
         text width=\paperwidth-2*\outerSep
       }
     }
     \tikzmath{
       \ruleWidth = \paperwidth-2*\outerSep;
-      \chapterHeight = 1cm;
+      \chapterHeight = 0.6cm;
     }
     \tikzmath{
       \xloc=-\paperwidth/2+\outerSep;
@@ -168,27 +218,66 @@ bottom=\botSep]{geometry}
       anchor=north west,align=right] (first section title)
       at ($(chapter title.south west)+(0,-\chapterHeight*1pt)$)
       {\theSectionName};
-      \draw[chapter rule]
-      ($(first section title.west)+(0,-\chapterHeight*1pt)$)
-      node(bottom rule){}
-      to ++(\ruleWidth*1pt,0);
+      \coordinate (bottom rule start) at (first section title.west);
     }{
       \node[text node,align=left] (chapter title)
       at ($(top rule.west)+(0,-\chapterHeight*1pt)$)
-      {\ifthenelse{\equal{\sectionType}{toc}}{%
-          Table of Contents%
+      {\ifthenelse{\equal{\sectionType}{abstract}}{%
+          Abstract%
         }{%
-          \ifthenelse{\equal{\sectionType}{biblio}}{%
-            Bibliography%
+          \ifthenelse{\equal{\sectionType}{toc}}{%
+            Table of Contents%
           }{%
-            Nomenclature%
-          }
-        }
+            \ifthenelse{\equal{\sectionType}{lof}}{%
+              List of Figures%
+            }{%
+              \ifthenelse{\equal{\sectionType}{lot}}{%
+                List of Tables%
+              }{%
+                \ifthenelse{\equal{\sectionType}{biblio}}{%
+                  Bibliography%
+                }{%
+                  Nomenclature%
+                }%
+              }%
+            }%
+          }%
+        }%
       };
-      \draw[chapter rule]
-      ($(chapter title.west)+(0,-\chapterHeight*1pt)$)
-      node(bottom rule){} to ++(\ruleWidth*1pt,0);
+      \coordinate (bottom rule start) at (chapter title.west);
     }
+    \ifthenelse{\equal{\ChapterQuote}{}}{}{
+      \tikzset{
+        chapter quote/.append style={
+          align=left,
+          font={\large\itshape},
+          anchor=north west,
+          text width=10cm
+        }
+      }
+      \ifthenelse{\equal{\sectionType}{text}}{
+        \node[chapter quote] (chapter quote node) at
+        (first section title.north west) {\ChapterQuote};
+        \path let
+        \p1 = (chapter quote node.south west),
+        \p2 = (first section title.south west)
+        in \pgfextra{
+          \tikzmath{
+            \botlinexpos = \x1;
+            \botlineypos = min(\y1,\y2);
+          }
+          \coordinate (bottom rule start) at (\botlinexpos*1pt,\botlineypos*1pt);
+        };
+      }{
+        \node[chapter quote,yshift=-\chapterHeight*1pt] (chapter quote node) at
+        (chapter title.south west) {\ChapterQuote};
+        \coordinate (bottom rule start) at (chapter quote node.south west);
+      }
+      \xdef\ChapterQuote{}
+    }
+    \draw[chapter rule]
+    ($(bottom rule start)+(0,-\chapterHeight*1pt)$)
+    node(bottom rule){} to ++(\ruleWidth*1pt,0);
     \path let
     \p1=(top rule),
     \p2=(bottom rule)
@@ -471,7 +560,7 @@ bottom=\botSep]{geometry}
   \begin{lrbox}{\CommandFigureName}%
     \calcWidth{1}%
     \begin{minipage}{\customFigureWidth}%
-      \protect\label{footnote:\theComment}$^\theComment$ #2%
+      \protect\label{footnote:\theComment}$^{\theComment}$ #2%
     \end{minipage}%
   \end{lrbox}%
   \global%

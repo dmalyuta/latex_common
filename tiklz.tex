@@ -44,6 +44,299 @@
 \cs_set_eq:NN \fpeval \fp_eval:n
 \ExplSyntaxOff
 
+%%%%%%%%%%%% 3D coordinate system settings
+
+\makeatletter
+\define@key{coordKeys}{altitude}{\def\altitude{#1}}
+\define@key{coordKeys}{azimuth}{\def\azimuth{#1}}
+\makeatother
+\newcommand{\tiklzSetViewAngle}[1][]{
+  \setkeys{coordKeys}{altitude=20,#1}%
+  \setkeys{coordKeys}{azimuth=40,#1}%
+  \tikzmath{
+    \tikzAltitude=90-\altitude;
+    \tikzAzimuth=90+\azimuth;
+  }
+  \tdplotsetmaincoords{\tikzAltitude}{\tikzAzimuth}
+  \tikzmath{
+    \X = cos(\altitude)*cos(\azimuth);
+    \Y = cos(\altitude)*sin(\azimuth);
+    \Z = sin(\altitude);
+  }
+  \xdef\viewVector{\X,\Y,\Z}
+}
+
+%%%%%%%%%%%% Ellipsoid
+
+\makeatletter
+\define@key{ellipseKeys}{x}{\def\x{#1}}
+\define@key{ellipseKeys}{y}{\def\y{#1}}
+\define@key{ellipseKeys}{maj}{\def\maj{#1}}
+\define@key{ellipseKeys}{min}{\def\min{#1}}
+\define@key{ellipseKeys}{rot}{\def\rot{#1}}
+\define@key{ellipseKeys}{style}{\def\style{#1}}
+\define@key{ellipseKeys}{name}{\def\name{#1}}
+\makeatother
+\newcommand{\ellipse}[1][]{
+  \setkeys{ellipseKeys}{x=0,#1}%
+  \setkeys{ellipseKeys}{y=0,#1}%
+  \setkeys{ellipseKeys}{min=1,#1}%
+  \setkeys{ellipseKeys}{maj=2,#1}%
+  \setkeys{ellipseKeys}{rot=0,#1}%
+  \setkeys{ellipseKeys}{style={},#1}%
+  \setkeys{ellipseKeys}{name=ellipse,#1}%
+  \node[
+  \style,
+  inner sep=0,
+  outer sep=0,
+  ellipse,
+  minimum width=\min*1cm,
+  minimum height=\maj*1cm,
+  rotate=\rot] (\name) at (\x,\y) {};
+}
+
+%%%%%%%%%%%% Quadrotor
+
+\newcommand{\sphereCoord}[2]{
+  % return x,y,z a point on a sphere
+  % #1: sphere radius
+  % #2: azimuth angle, altitude angle
+  \tikzmath{
+    \X = #1*cos({#2}[1])*cos({#2}[0]);
+    \Y = #1*cos({#2}[1])*sin({#2}[0]);
+    \Z = #1*sin({#2}[1]);
+  }
+}
+
+\newcommand{\convertTaitBryanToTikZ}[3]{
+  % set (\TikZalpha,\TikZbeta,\TikZgamma) the coordinates to
+  % tdplotsetrotatedcoords
+  \pgfmathsetmacro\yaw{#1}
+  \pgfmathsetmacro\pitch{#2}
+  \pgfmathsetmacro\roll{#3}
+  \tikzmath{
+    \degToRad = \fpeval{pi/180};
+    \radToDeg = \fpeval{180/pi};
+    \TBpsi = \yaw*\degToRad;
+    \TBtheta = \pitch*\degToRad;
+    \TBphi = \roll*\degToRad;
+    % 
+    \TikZbeta = \fpeval{acos(cos(\TBtheta)*cos(\TBphi))};
+    \TikZalpha = 0;
+    \TikZgamma = 0;
+  }
+  \pgfmathparse{abs(\TikZbeta)<1e-4 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{
+    % Gimbal lock
+    \tikzmath{
+      \TikZgamma = 0;
+      \TikZalpha = \fpeval{\TBpsi};
+    }
+  }{
+    % Normal operation
+    \tikzmath{
+      \TikZgamma =
+      atan2(\fpeval{cos(\TBtheta)*sin(\TBphi)},\fpeval{sin(\TBtheta)})*
+      \degToRad;
+      \TikZalpha = atan2(
+      \fpeval{cos(\TBphi)*sin(\TBpsi)*sin(\TBtheta)-cos(\TBpsi)*sin(\TBphi)},
+      \fpeval{sin(\TBpsi)*sin(\TBphi)+cos(\TBpsi)*cos(\TBphi)*sin(\TBtheta)})*\degToRad;
+    }
+  }
+  \tikzmath{
+    \TikZalpha = \TikZalpha*\radToDeg;
+    \TikZbeta = \TikZbeta*\radToDeg;
+    \TikZgamma = \TikZgamma*\radToDeg;
+  }
+  \xdef\TikZalpha{\TikZalpha}
+  \xdef\TikZbeta{\TikZbeta}
+  \xdef\TikZgamma{\TikZgamma}
+}
+
+\makeatletter
+\define@key{droneKeysNew}{yaw}{\def\yaw{#1}}
+\define@key{droneKeysNew}{pitch}{\def\pitch{#1}}
+\define@key{droneKeysNew}{roll}{\def\roll{#1}}
+\define@key{droneKeysNew}{x}{\def\x{#1}}
+\define@key{droneKeysNew}{y}{\def\y{#1}}
+\define@key{droneKeysNew}{scale}{\def\scale{#1}}
+\define@key{droneKeysNew}{layers}{\def\layers{#1}}
+\define@key{droneKeysNew}{showaxes}{\def\showaxes{#1}}
+\makeatother
+\xdef\QuadCounter{1}
+\newcommand{\quadrotor}[1][]{
+  \setkeys{droneKeysNew}{yaw=0,#1}%
+  \setkeys{droneKeysNew}{pitch=0,#1}%
+  \setkeys{droneKeysNew}{roll=0,#1}%
+  \setkeys{droneKeysNew}{x=0,#1}%
+  \setkeys{droneKeysNew}{y=0,#1}%
+  \setkeys{droneKeysNew}{scale=1,#1}%
+  \setkeys{droneKeysNew}{showaxes=false,#1}%
+  \setkeys{droneKeysNew}{layers={AFR,ARR,ARL,BH,AFL,RFR,RFL,RRR,RRL},#1}%
+  % Parameters
+  \tikzmath{
+    \Larm = 1;
+    \Rr = 0.9;
+    \armNorm = sqrt(2)*\Larm;
+    \rx1 = \Larm;
+    \ry1 = \Larm;
+    \rx2 = \Larm;
+    \ry2 = -\Larm;
+    \rx3 = -\Larm;
+    \ry3 = -\Larm;
+    \rx4 = -\Larm;
+    \ry4 = \Larm;
+    \armwidth=0.40mm*\scale;
+    \rotorlinewidth=0.40mm*\scale;
+    \hubsize=\scale*0.15mm;
+  }
+  \def\frontRotorInnerColor{orange!100}
+  \def\frontRotorOuterColor{orange!40}
+  \def\frontRearInnerColor{black!40}
+  \def\frontRearOuterColor{black!5}
+  \tikzset{
+    rotor/.append style={
+      shading=radial,
+      line width=\rotorlinewidth,
+      fill opacity=0.8
+    }
+  }
+  \convertTaitBryanToTikZ{\yaw}{\pitch}{\roll}
+  % Plot quad
+  \tdplotsetrotatedcoords{\TikZalpha}{\TikZbeta}{\TikZgamma}
+  \begin{scope}[
+    shift={(\x,\y)},
+    tdplot_rotated_coords,
+    scale=\scale]
+    % Axes
+    \ifthenelse{\equal{\showaxes}{}}{
+      \draw[->,red] (0,0,0) -- (1,0,0);
+      \draw[->,green] (0,0,0) -- (0,1,0);
+      \draw[->,blue] (0,0,0) -- (0,0,1);
+    }{}
+    % Arms
+    \expandafter\newsavebox\csname AFR\QuadCounter\endcsname
+    \expandafter\newsavebox\csname AFL\QuadCounter\endcsname
+    \expandafter\newsavebox\csname ARR\QuadCounter\endcsname
+    \expandafter\newsavebox\csname ARL\QuadCounter\endcsname
+    \foreach \i/\name in {1/FL,2/FR,3/RR,4/RL} {
+      \begin{lrbox}{\csname A\name\QuadCounter\endcsname}
+        \tikzmath{
+          \armX = \rx\i/(\armNorm)*\hubsize/2;
+          \armY = \ry\i/(\armNorm)*\hubsize/2;
+        }
+        \draw[line width=\armwidth]
+        (\armX,\armY,0) to (\rx\i,\ry\i,0);
+      \end{lrbox}
+      \global%
+      \expandafter\setbox\csname A\name\QuadCounter\endcsname%
+      \expandafter\box\csname A\name\QuadCounter\endcsname%
+    }
+    % Electronics hub
+    \expandafter\newsavebox\csname BH\QuadCounter\endcsname
+    \begin{lrbox}{\csname BH\QuadCounter\endcsname}
+      \node[
+      circle,
+      shading=radial,
+      outer color=black!100,
+      inner color=black!10,
+      minimum size=\hubsize*1cm,
+      inner sep=0
+      ] at (0,0,0) {};
+    \end{lrbox}
+    % Rotors
+    \expandafter\newsavebox\csname RFR\QuadCounter\endcsname
+    \expandafter\newsavebox\csname RFL\QuadCounter\endcsname
+    \expandafter\newsavebox\csname RRR\QuadCounter\endcsname
+    \expandafter\newsavebox\csname RRL\QuadCounter\endcsname
+    % Rotor 1
+    \begin{lrbox}{\csname RFR\QuadCounter\endcsname}
+      \begin{scope}[shift={(\rx1,\ry1)}]
+        \draw[
+        rotor,
+        outer color=\frontRotorOuterColor,
+        inner color=\frontRotorInnerColor]
+        (0,0) circle (\Rr);
+      \end{scope}
+    \end{lrbox}
+    % Rotor 2
+    \begin{lrbox}{\csname RRR\QuadCounter\endcsname}
+      \begin{scope}[shift={(\rx2,\ry2)}]
+        \draw[
+        rotor,
+        outer color=\frontRotorOuterColor,
+        inner color=\frontRotorInnerColor]
+        (0,0) circle (\Rr);
+      \end{scope}
+    \end{lrbox}            
+    % Rotor 3
+    \begin{lrbox}{\csname RRL\QuadCounter\endcsname}
+      \begin{scope}[shift={(\rx3,\ry3)}]
+        \draw[
+        rotor,
+        outer color=\frontRearOuterColor,
+        inner color=\frontRearInnerColor]
+        (0,0) circle (\Rr);
+      \end{scope}
+    \end{lrbox}                        
+    % Rotor 4
+    \begin{lrbox}{\csname RFL\QuadCounter\endcsname}
+      \begin{scope}[shift={(\rx4,\ry4)}]
+        \draw[
+        rotor,
+        outer color=\frontRearOuterColor,
+        inner color=\frontRearInnerColor]
+        (0,0) circle (\Rr);
+      \end{scope}
+    \end{lrbox}
+    % Now draw everything
+    \foreach \obj in \layers {
+      \expandafter\usebox\csname \obj\QuadCounter\endcsname
+    }
+  \end{scope}
+  \tikzmath{\QuadCounter=int(\QuadCounter+1);}
+  \xdef\QuadCounter{\QuadCounter}
+}
+
+%%%%%%%%%%%% Vector difference
+
+\newcommand{\vectorDiff}[2]{
+  % return the difference a - b
+  % #1: vector a
+  % #2: vector b
+  \tikzmath{
+    \X = {#1}[0]-{#2}[0];
+    \Y = {#1}[1]-{#2}[1];
+    \Z = {#1}[2]-{#2}[2];
+  }
+}
+
+%%%%%%%%%%%% Vector dot product
+
+\newcommand{\dotProduct}[2]{
+  % return the dot product a . b
+  % #1: vector a
+  % #2: vector b
+  \tikzmath
+  {
+    \OUT = {#1}[0]*{#2}[0]+{#1}[1]*{#2}[1]+{#1}[2]*{#2}[2];
+  }
+}
+
+%%%%%%%%%%%% Vector cross product
+
+\newcommand{\crossProduct}[2]{
+  % return the cross product a x b
+  % #1: vector a
+  % #2: vector b
+  \tikzmath
+  {
+    \X = {#1}[1]*{#2}[2]-{#1}[2]*{#2}[1];
+    \Y = {#1}[2]*{#2}[0]-{#1}[0]*{#2}[2];
+    \Z = {#1}[0]*{#2}[1]-{#1}[1]*{#2}[0];
+  }
+}
+
 %%%%%%%%%%%% Rocket lander
 
 \makeatletter
@@ -374,3 +667,8 @@
 }
 \draw (\axmin) to[grid with coordinates] (\axmax);
 }
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

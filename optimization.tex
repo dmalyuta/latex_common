@@ -205,7 +205,8 @@
   % #8: \pcaption
   % Print the optimization problem
   \OPTBG{cost}{\printCost[false]{#1}{#2}{#3}{#4}{#5}}{0}{#8}%
-  \printCost[true]{#1}{#2}{#3}{#4}{#5}\label{eq:#7_a}
+  \printCost[true]{#1}{#2}{#3}{#4}{#5}%
+  \ifthenelse{\equal{#7}{}}{}{\label{eq:#7_a}}
   \ifthenelse{\equal{#2}{true}}{%
     \\%
     \forloop{kk}{0}{\arabic{kk}<\listlen#6[]}{%

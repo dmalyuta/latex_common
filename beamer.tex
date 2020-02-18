@@ -53,6 +53,56 @@
 }
 \footlineon
 
+\setbeamertemplate{footline}{
+  \begin{tikzpicture}[
+    overlay,
+    remember picture
+    ]
+    \tiklzcommonsettings
+    \tikzset{
+      progressbar/.append style={
+        red!50,
+        opacity=0.5
+      },
+      progressbar top/.append style={
+        red!70!black,
+        line width=0.5mm,
+        opacity=0.5
+      },
+      progresstext/.append style={
+        black,
+        xshift=-1mm
+      }
+    }
+    \tikzmath{
+      \barh = 3mm;
+      \progress = \insertframenumber/\inserttotalframenumber;
+    }
+    \fill[progressbar]
+    (current page.south west)
+    rectangle
+    ++(\progress\paperwidth,\barh*1pt);
+    \draw[progressbar top]
+    ($(current page.south west)+(0,\barh*1pt)$)
+    --
+    ++(\progress\paperwidth,0);
+    \node[progresstext,anchor=east]
+    at ($(current page.south west)+(\progress\paperwidth,\barh/2*1pt)$)
+    {\insertframenumber/\inserttotalframenumber};
+    \cuteclock[shift={($(current page.south west)+(\progress\paperwidth+3mm,\barh/2*1pt+0.2mm)$)},
+    scale=0.5,every node/.append style={transform shape}]
+  \end{tikzpicture}
+  % \leavevmode%
+  % \hbox{%
+  % \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{section in head/foot}%
+  %   \usebeamerfont{section in head/foot}\hspace*{1cm}\today
+  % \end{beamercolorbox}%
+  % \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,right]{section in head/foot}%
+  %   \usebeamerfont{section in head/foot} \insertsection\hspace*{1cm}
+  % \end{beamercolorbox}}%
+  % \vskip0pt%
+}
+
 \AtBeginSection[] 
 { 
   \begin{frame}<beamer> 

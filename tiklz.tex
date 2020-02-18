@@ -656,14 +656,14 @@
 \newcommand{\tiklzhelpgrid}[1][7,4]{%
 \def\axmax{#1}
 \xdef\axmin{}
-\xdef\count{1}
+\xdef\myGridCounter{1}
 \foreach \val in \axmax {
-\ifthenelse{\equal{\count}{1}}{
+\ifthenelse{\equal{\myGridCounter}{1}}{
 \xdef\axmin{-\val}
 }{
 \xdef\axmin{\axmin,-\val}
 }
-\xdef\count{2}
+\xdef\myGridCounter{2}
 }
 \draw (\axmin) to[grid with coordinates] (\axmax);
 }

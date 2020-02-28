@@ -66,6 +66,123 @@
   \xdef\viewVector{\X,\Y,\Z}
 }
 
+%%%%%%%%%%%% Selector Simulink-like block
+
+\newcommand{\selector}[1]{
+  % #1 : list of input i/output j connections, e.g. 1/1,2/,3/2 for 3-input
+  %      2-output selector with mapping 1->1,3->2.
+  \def\connections{#1}
+  \xdef\Nu{0}
+  \xdef\No{0}
+  \foreach \i/\j in \connections {
+    \tikzmath{\Nu=int(\Nu+1);}
+    \ifthenelse{\equal{\j}{}}{}{
+      \tikzmath{\No=int(\No+1);}
+    }
+    \xdef\Nu{\Nu}
+    \xdef\No{\No}
+  }
+  
+  \tikzmath{
+    \elsz = 2;
+    \elsep = 4;
+    \blkh = (\Nu+0.5)*\elsep;
+    \blkw = 8*\elsz;
+  }
+
+  \tikzset{
+    every node/.append style={
+      inner sep=0,
+      outer sep=0
+    },
+    element/.append style={
+      draw=black,
+      rectangle,
+      minimum size=\elsz pt
+    },
+    block/.append style={
+      rectangle,
+      draw=black,
+      fill=white,
+      minimum width=\blkw pt,
+      minimum height=\blkh pt
+    }
+  }
+
+  \node[block] (selector) at (0,0) {};
+
+  \path let \p1=(selector.center) in \pgfextra{
+    \xdef\k{0}
+    \foreach \i/\j/\name in \connections {
+      \tikzmath{
+        \elux = \x1-\blkw/2+\elsz*3/2;
+        \eluy = \y1+\elsep*(\Nu-1)/2-(\i-1)*\elsep;
+      }
+      \ifthenelse{\equal{\j}{}}{
+        \node[element=white] at (\elux pt,\eluy pt) {};
+      }{
+        \tikzmath{
+          \k = int(\k+1);
+          \elox = \x1+\blkw/2-\elsz*3/2;
+          \eloy = \y1+\elsep*(\No-1)/2-(\k-1)*\elsep;
+        }
+        \node[element,fill=black] (input) at (\elux pt,\eluy pt) {};
+        \node[element,fill=black] (output) at (\elox pt,\eloy pt) {};
+        \ifthenelse{\equal{\name}{}}{
+          \draw (input.east) -- (output.west);
+        }{
+          \draw (input.east) --
+          node[pos=0.5,circle,fill=white,scale=0.4,inner sep=0.5mm]{\name}
+          (output.west);
+        }
+        
+        \xdef\k{\k}
+      }
+    }
+  };
+}
+
+%%%%%%%%%%%% Multicolor line (dashed)
+
+\newcommand{\multicolorline}[5]{
+  % #1: origin
+  % #2: destination
+  % #3: (origin) <INSERT #3> (destination)
+  % #4: colors list
+  % #5: line style
+  \xdef\dashunit{pt}
+  \xdef\dashlength{3}
+  \xdef\dashstep{-\dashlength}
+  \xdef\colorcount{0}
+  \foreach \color in {#4} {
+    \tikzmath{
+      \dashstep=\dashstep+\dashlength;
+      \colorcount=int(\colorcount+1);
+    }
+    \xdef\dashstep{\dashstep}
+    \xdef\colorcount{\colorcount}
+  }
+  \path[draw=none] (#1) #3 node[pos=1](multicolorlinedestination){} (#2);
+  \node[outer sep=1mm] (multicolorlinedestination) at (multicolorlinedestination) {};
+  \foreach \color [count=\i] in {#4} {
+    \pgfmathparse{\i==\colorcount ? 1:0}
+    \ifthenelse{\pgfmathresult>0}{
+      \xdef\colorlast{\color}
+    }{
+      \tikzmath{\dashphase=int(\dashlength*(\i-1));}
+      \draw[#5,
+      -,
+      draw=\color,
+      dash pattern=on \dashlength\dashunit off \dashstep\dashunit,
+      dash phase=\dashphase\dashunit] (#1) #3 (multicolorlinedestination);
+    }
+  }
+  \draw[#5,
+  draw=\colorlast,
+  dash pattern=on \dashlength\dashunit off \dashstep\dashunit,
+  dash phase=\dashstep\dashunit] (#1) #3 (#2);
+}
+
 %%%%%%%%%%%% Ellipsoid
 
 \makeatletter
@@ -222,8 +339,8 @@
     \foreach \i/\name in {1/FL,2/FR,3/RR,4/RL} {
       \begin{lrbox}{\csname A\name\QuadCounter\endcsname}
         \tikzmath{
-          \armX = \rx\i/(\armNorm)*\hubsize/2;
-          \armY = \ry\i/(\armNorm)*\hubsize/2;
+          \armX = \rx\i/(\armNorm)*\hubsize;
+          \armY = \ry\i/(\armNorm)*\hubsize;
         }
         \draw[line width=\armwidth]
         (\armX,\armY,0) to (\rx\i,\ry\i,0);
@@ -250,7 +367,7 @@
     \expandafter\newsavebox\csname RRR\QuadCounter\endcsname
     \expandafter\newsavebox\csname RRL\QuadCounter\endcsname
     % Rotor 1
-    \begin{lrbox}{\csname RFR\QuadCounter\endcsname}
+    \begin{lrbox}{\csname RFL\QuadCounter\endcsname}
       \begin{scope}[shift={(\rx1,\ry1)}]
         \draw[
         rotor,
@@ -260,7 +377,7 @@
       \end{scope}
     \end{lrbox}
     % Rotor 2
-    \begin{lrbox}{\csname RRR\QuadCounter\endcsname}
+    \begin{lrbox}{\csname RFR\QuadCounter\endcsname}
       \begin{scope}[shift={(\rx2,\ry2)}]
         \draw[
         rotor,
@@ -270,7 +387,7 @@
       \end{scope}
     \end{lrbox}            
     % Rotor 3
-    \begin{lrbox}{\csname RRL\QuadCounter\endcsname}
+    \begin{lrbox}{\csname RRR\QuadCounter\endcsname}
       \begin{scope}[shift={(\rx3,\ry3)}]
         \draw[
         rotor,
@@ -280,7 +397,7 @@
       \end{scope}
     \end{lrbox}                        
     % Rotor 4
-    \begin{lrbox}{\csname RFL\QuadCounter\endcsname}
+    \begin{lrbox}{\csname RRL\QuadCounter\endcsname}
       \begin{scope}[shift={(\rx4,\ry4)}]
         \draw[
         rotor,

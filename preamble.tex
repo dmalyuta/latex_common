@@ -77,8 +77,9 @@
 \usepackage{import}
 \usepackage{nicematrix}
 \usepackage{bibentry} % use \bibentry{...} for in-text citation
-\usepackage[numbers,sort]{natbib}
-\nobibliography*
+\makeatletter
+\@ifclassloaded{ieeeconf}{}{\usepackage[numbers,sort]{natbib}\nobibliography*}
+\makeatother
 
 % Layout
 \usepackage{float}
@@ -96,8 +97,10 @@
 \makeatletter
 \@ifclassloaded{beamer}{}{
 \@ifclassloaded{autart}{}{
-\@ifclassloaded{standalone}{}{\usepackage[explicit]{titlesec}}
-}}
+\@ifclassloaded{standalone}{}{
+\@ifclassloaded{ieeeconf}{}{
+\usepackage[explicit]{titlesec}
+}}}}
 \makeatother
 \usepackage{soul}
 \usepackage{stackengine}

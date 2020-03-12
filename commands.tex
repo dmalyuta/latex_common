@@ -35,7 +35,7 @@
 \newcommand{\bdry}{\partial}
 \newcommand{\image}[1]{\mathrm{im}(#1)}
 \DeclareMathOperator{\comain}{dom}
-\newcommand{\domain}[1]{\mathrm{dom}(#1)}
+\newcommand{\domain}[1]{\comain(#1)}
 \newcommand{\setHtwo}{\set{H}_2}
 \newcommand{\setLinfty}{\set{L}_\infty}
 \newcommand{\Ellipsoid}[1]{\mathcal E_{#1}}
@@ -47,6 +47,8 @@
 \newcommand{\volume}[1]{\vol\left(#1\right)}
 \DeclareMathOperator{\vtcs}{\set V}
 \newcommand{\vertices}[1]{\vtcs\left(#1\right)}
+\DeclareMathOperator{\myfixedpointset}{fixed}
+\newcommand{\fixedpoint}[1]{\myfixedpointset\left(#1\right)}
 
 % Algorithms
 
@@ -118,13 +120,34 @@
 \newcommand{\inv}{^{-1}}
 \newcommand{\invT}{^{-\transp}}
 \newcommand{\sign}{\mathrm{sgn}}
-\newcommand{\norm}[2][]{\|#2\|_{#1}}
+\newcommand{\norm}[2][]{\left\|#2\right\|_{#1}}
 \newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1 
         \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
-\newcommand{\inorm}[2]{\vertiii{#1}_{#2}}
+\newcommand{\inorm}[2][]{\vertiii{#2}_{#1}}
 \newcommand{\seq}[1]{\{#1\}}
 \newcommand{\sgn}{\mbox{\textrm{sgn}}}
-\newcommand{\Proj}[2]{\mathcal P_{#1}(#2)}
+
+\makeatletter
+\define@key{projKeys}{set}{\def\set{#1}}
+\define@key{proxKeys}{t}{\def\t{#1}}
+\define@key{proxKeys}{f}{\def\f{#1}}
+\makeatother
+\DeclareMathOperator{\projecti}{proj}
+\DeclareMathOperator{\proximal}{prox}
+\newcommand{\Proj}[2][]{%
+  \setkeys{projKeys}{set=,#1}%
+  \mathchoice{\underset{\set}{\projecti}}%
+  {\projecti_{\set}}{\projecti_{\set}}{\projecti_{\set}}%
+  \left(#2\right)%
+}
+\newcommand{\Prox}[2][]{%
+  \setkeys{proxKeys}{t=t,#1}%
+  \setkeys{proxKeys}{f=f,#1}%
+  \mathchoice{\underset{\t\f}{\proximal}}%
+  {\proximal_{\t\f}}{\proximal_{\t\f}}{\proximal_{\t\f}}%
+  \ifthenelse{\equal{#2}{}}{}{\left(#2\right)}%
+}
+
 \newcommand{\Pre}{\mathop\text{Pre}}
 \newcommand{\PP}{$\mathcal{P}$\xspace}
 \newcommand{\NP}{$\mathcal{NP}$\xspace}

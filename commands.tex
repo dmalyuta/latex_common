@@ -105,8 +105,8 @@
 \DeclareMathOperator{\linspan}{span}
 \newcommand{\diag}[2][short]{\mathrm{diag}\ifthenelse{\equal{#1}{short}}{(#2)}{\left(#2\right)}}
 \DeclareMathOperator{\spec}{spec}
-\newcommand{\rpinv}{\dagger}
-\newcommand{\lpinv}{\ddagger}
+\newcommand{\rpinv}{^\dagger}
+\newcommand{\lpinv}{^\ddagger}
 \newcommand{\blkdiag}[1]{\mathrm{blkdiag}(#1)}
 \DeclareMathOperator{\trace}{trace}
 \newcommand{\svmax}[1]{\bar\sigma(#1)}
@@ -116,6 +116,8 @@
 
 % Generic math
 
+\newcommand{\where}{:}
+\newcommand{\given}{\mid}
 \newcommand{\C}[1]{\mathcal C^{#1}}
 \newcommand{\inv}{^{-1}}
 \newcommand{\invT}{^{-\transp}}
@@ -427,6 +429,7 @@
 \def\FootnoteLabel{footnote}
 \def\AlgorithmLabel{alg}
 \def\ProblemLabel{problem}
+\def\PropertyLabel{property}
 \def\TheoremLabel{theorem}
 \def\CorollaryLabel{corollary}
 \def\ConditionLabel{condition}
@@ -522,6 +525,7 @@
 }
 % Mathematical element references
 \newcommand{\pref}[2][]{\PrintRefs[#1]{Problem}{#2}}
+\newcommand{\propref}[2][]{\PrintRefs[#1]{Property}{#2}}
 \newcommand{\tref}[2][]{\PrintRefs[#1]{Theorem}{#2}}
 \newcommand{\corref}[2][]{\PrintRefs[#1]{Corollary}{#2}}
 \newcommand{\conref}[2][]{\PrintRefs[#1]{Condition}{#2}}

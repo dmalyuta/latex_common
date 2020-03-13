@@ -78,7 +78,12 @@
 \usepackage{nicematrix}
 \usepackage{bibentry} % use \bibentry{...} for in-text citation
 \makeatletter
-\@ifclassloaded{ieeeconf}{}{\usepackage[numbers,sort]{natbib}\nobibliography*}
+\ifthenelse{\isundefined{\natbiboptions}}{
+%\usepackage{lscape} % production (non-rotated PDF pages)
+%\usepackage{pdflscape} % writing (rotated PDF pages, don't need to twist head)
+\def\natbiboptions{numbers,sort}
+}{}
+\@ifclassloaded{ieeeconf}{}{\usepackage[\natbiboptions]{natbib}\nobibliography*}
 \makeatother
 
 % Layout

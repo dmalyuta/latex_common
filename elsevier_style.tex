@@ -1,0 +1,153 @@
+% Font
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\let\acute\undefined
+\let\grave\undefined
+\let\ddot\undefined
+\let\tilde\undefined
+\let\bar\undefined
+\let\breve\undefined
+\let\check\undefined
+\let\hat\undefined
+\let\dot\undefined
+\let\mathring\undefined
+\let\wideparen\undefined
+\usepackage{fouriernc} % Math and text font
+\usepackage{charter} % Override text font
+
+% Margins
+\def\elsSideMargin{1.2cm}
+\def\elsTopMargin{1.1cm}
+\def\elsColSep{9.5mm}
+\usepackage[left=\elsSideMargin,
+right=\elsSideMargin,
+top=\elsTopMargin,
+bottom=\elsTopMargin,
+columnsep=\elsColSep]{geometry}
+
+% Line skip
+\renewcommand{\baselinestretch}{0.9}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% Heading and footer
+%%%%%%%%%%%%%%%%%%%%%%%
+\fancypagestyle{elsevierfancy}
+{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[L]{
+    \footnotesize
+    \thepage
+  }
+  \fancyhead[C]{
+    \itshape
+    \footnotesize
+    Hello
+    / Annual Reviews in Control
+  }
+}
+\headheight 28pt              %% put this outside
+\headsep 10pt                 %% put this outside
+
+\pagestyle{elsevierfancy}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% Section style
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{indentfirst}
+\setlength\parindent{5mm}
+
+\titleformat{\section}{\normalfont\bfseries\normalsize}{}{0cm}{\thesection.~#1}
+\titleformat{\subsection}{\normalfont\itshape\normalsize}{}{0cm}{\thesubsection.~#1}
+\titlespacing*{\section}{0cm}{8mm}{4mm}
+\titlespacing*{\subsection}{0cm}{5mm}{5mm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% Document head
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\elstitle}[1]{
+  \makeatletter
+  \def\@elstitle{#1}
+  \makeatother
+}
+
+\newcommand{\elsappendtolist}[2]{
+  % #1: list
+  % #2: element to add to end
+  \ifthenelse{\equal{#1}{}}{\xdef#1{#2}}{\xdef#1{#1,#2}}
+}
+
+\newcommand{\elsgetlistelement}[2]{%
+  % #1: list
+  % #2: element index (1-indexing)
+  \makeatletter%
+  \xdef\@@counter{1}%
+  \foreach \element in #1 {%
+    \pgfmathparse{\@@counter==#2 ? 1:0}%
+    \ifthenelse{\pgfmathresult>0}{\element\breakforeach}{}%
+    \elsaddtocounter{\@@counter}%
+  }%
+  \makeatother%
+}
+
+\newcommand{\elsaddtocounter}[2][]{%
+  \makeatletter%
+  \xdef\@increment{1}%
+  \ifthenelse{\equal{#1}{}}{}{\xdef\@increment{#1}}%
+  \tikzmath{#2=int(#2+\@increment);}%
+  \xdef#2{#2}%
+  \makeatother%
+}
+
+\xdef\elsauthorlist{}
+\xdef\elsauthorcount{0}
+\newcommand{\elsauthor}[1]{%
+  \elsappendtolist{\elsauthorlist}{{#1}}%
+  \elsaddtocounter{\elsauthorcount}%
+}
+
+\newcommand{\elspaperhead}{
+  \twocolumn[
+  \vspace{5mm}
+  \thispagestyle{empty}
+  \makeatletter
+  {\LARGE\@elstitle}\medskip
+
+  \xdef\@counter{1}
+  \foreach \authorfullname in \elsauthorlist {%
+    \large%
+    {\color{black!50}\elsgetlistelement{\authorfullname}{1}}~% % first name
+    \elsgetlistelement{\authorfullname}{2}% % last name
+    \pgfmathparse{\@counter<\elsauthorcount-1 ? 1:0}%
+    \ifthenelse{\pgfmathresult>0}{,~}{}%
+    \pgfmathparse{\@counter<\elsauthorcount ? 1:0}%
+    \ifthenelse{\pgfmathresult>0}{~and~}{}%
+    \elsaddtocounter{\@counter}%
+  }
+  \makeatother
+  \vspace{5mm}
+  ]
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\elscitecolor{blue!60}
+\setcitestyle{authoryear,semicolon}% ,open={((},close={))}}
+\hypersetup{
+  colorlinks,
+  linkcolor={red},
+  citecolor={\elscitecolor},
+  urlcolor={blue}
+}
+\renewcommand*{\bibfont}{\footnotesize\color{\elscitecolor}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

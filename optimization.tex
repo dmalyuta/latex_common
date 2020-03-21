@@ -3,6 +3,19 @@
 \def\optiPadding{1mm}
 \def\captionPadding{1mm}
 
+\makeatletter
+\newcommand{\clonelabel}[2]{\@bsphack
+  \expandafter\ifx\csname r@#2\endcsname\relax
+  \else\protected@write\@auxout{}{\string\newlabel{#1}%
+    {\csname r@#2\endcsname}}%
+  \fi
+  \expandafter\ifx\csname r@#2@cref\endcsname\relax
+  \else\protected@write\@auxout{}{\string\newlabel{#1@cref}%
+    {\csname r@#2@cref\endcsname}}%
+  \fi
+  \@esphack}
+\makeatother
+
 \newcounter{ProblemCounter}
 \newcounter{EqStartCounter}
 \newcounter{ll}
@@ -348,9 +361,8 @@
       \end{equation*}
     }{
       \begin{equation}
-        \label{problem:\plabel}
         \printProblemBody
-      \end{equation}
+      \end{equation}\clonelabel{problem:\plabel}{eq:\plabel_a}
     }
   }
 }

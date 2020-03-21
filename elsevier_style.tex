@@ -30,6 +30,18 @@ columnsep=\elsColSep]{geometry}
 \renewcommand{\baselinestretch}{0.9}
 
 %%%%%%%%%%%%%%%%%%%%%%%
+% Figures
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\setlength{\mathindent}{0pt} % Left-justified math
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% Figures
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\captionsetup[figure]{labelfont={bf},font=footnotesize,name={Fig.},labelsep=period}
+
+%%%%%%%%%%%%%%%%%%%%%%%
 % Heading and footer
 %%%%%%%%%%%%%%%%%%%%%%%
 \fancypagestyle{elsevierfancy}
@@ -43,7 +55,22 @@ columnsep=\elsColSep]{geometry}
   \fancyhead[C]{
     \itshape
     \footnotesize
-    Hello
+    \makeatletter
+    \xdef\@counter{1}
+    \xdef\@maxauthor{3}
+    \foreach \authorfullname in \elsauthorlist {%
+      \StrLeft{\authorfullname}{1}[\authornamefirstchar]%
+      \authornamefirstchar.~% % first name
+      \elsgetlistelement{\authorfullname}{2}% % last name
+      \pgfmathparse{\@counter==\@maxauthor ? 1:0}%
+      \ifthenelse{\pgfmathresult>0}{~et al.\breakforeach}{}%
+      \pgfmathparse{\@counter<min(\@maxauthor,\elsauthorcount)-1 ? 1:0}%
+      \ifthenelse{\pgfmathresult>0}{,~}{}%
+      \pgfmathparse{\@counter==min(\@maxauthor,\elsauthorcount)-1 ? 1:0}%
+      \ifthenelse{\pgfmathresult>0}{~and~}{}%
+      \elsaddtocounter{\@counter}%
+    }
+    \makeatother
     / Annual Reviews in Control
   }
 }
@@ -61,8 +88,10 @@ columnsep=\elsColSep]{geometry}
 
 \titleformat{\section}{\normalfont\bfseries\normalsize}{}{0cm}{\thesection.~#1}
 \titleformat{\subsection}{\normalfont\itshape\normalsize}{}{0cm}{\thesubsection.~#1}
+\titleformat{\subsubsection}{\normalfont\itshape\normalsize}{}{0cm}{\thesubsubsection.~#1}
 \titlespacing*{\section}{0cm}{8mm}{4mm}
 \titlespacing*{\subsection}{0cm}{5mm}{5mm}
+\titlespacing*{\subsubsection}{0cm}{5mm}{\lineskip}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -124,7 +153,7 @@ columnsep=\elsColSep]{geometry}
     \elsgetlistelement{\authorfullname}{2}% % last name
     \pgfmathparse{\@counter<\elsauthorcount-1 ? 1:0}%
     \ifthenelse{\pgfmathresult>0}{,~}{}%
-    \pgfmathparse{\@counter<\elsauthorcount ? 1:0}%
+    \pgfmathparse{\@counter==\elsauthorcount-1 ? 1:0}%
     \ifthenelse{\pgfmathresult>0}{~and~}{}%
     \elsaddtocounter{\@counter}%
   }
@@ -146,6 +175,24 @@ columnsep=\elsColSep]{geometry}
   urlcolor={blue}
 }
 \renewcommand*{\bibfont}{\footnotesize\color{\elscitecolor}}
+\setlength{\bibsep}{1pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\theoremstyle{definition}
+
+\newtheorem{definition}{Definition}
+\newtheorem{condition}{Condition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{property}{Property}
+\newtheorem{example}{Example}
 
 %%% Local Variables:
 %%% mode: latex

@@ -396,8 +396,8 @@
 % Miscellaneous
 
 \newcommand{\PhD}{Ph.D.\xspace}
-\newcommand{\Behcet}{Beh\c{c}et\xspace}
-\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e\xspace}
+\newcommand{\Behcet}{Beh\c{c}et}
+\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e}
 \newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
 \makeatletter
 \@ifclassloaded{beamer}{}{\newcommand{\alert}[1]{\textbf{#1}}}
@@ -419,6 +419,8 @@
 \newcommand{\defintext}[1]{\textbf{#1}}
 \newenvironment{qanswer}{\color{blue}}{}
 \newenvironment{unfinished}{\color{red}\itshape}{}
+\newcommand{\makeunderscoreletter}{\catcode`\_11}
+\newcommand{\makeunderscoreother}{\catcode`\_8}
 % Referencing low-level code
 \def\SectionLabel{section}
 \def\SubsectionLabel{subsection}
@@ -534,6 +536,27 @@
 \newcommand{\dref}[2][]{\PrintRefs[#1]{Definition}{#2}}
 \newcommand{\lref}[2][]{\PrintRefs[#1]{Lemma}{#2}}
 \newcommand{\eref}[2][]{\PrintRefs[#1]{Example}{#2}}
+
+% % Tables
+
+% \makeatletter
+
+% \define@key{@table@keys}{type}{\def\@type{#1}}
+% \define@key{@table@keys}{columns}{\def\@columns{#1}}
+% \newcommand{\customcell}[2][]{%
+%   %
+%   % Changes particular cell to type of cell using \multicolumn.
+%   %
+%   % Inputs
+%   % ------
+%   % #1 (optional): parameters
+%   % #2: cell text
+%   \setkeys{@table@keys}{type=c,#1}%
+%   \setkeys{@table@keys}{columns=1,#1}%
+%   \multicolumn{\@columns}{\@type}{#2}%
+% }
+
+% \makeatother
 
 %%% Local Variables:
 %%% mode: latex

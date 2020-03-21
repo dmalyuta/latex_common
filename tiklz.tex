@@ -39,10 +39,48 @@
   }
 }
 
-% Floating point calculations
+%%%%%%%%%%%%  Floating point calculations
+
 \ExplSyntaxOn
 \cs_set_eq:NN \fpeval \fp_eval:n
 \ExplSyntaxOff
+
+%%%%%%%%%%%% Common helper functions
+
+\makeatletter
+
+\define@key{@dimensionalize@keys}{unit}{\def\@@@unit{#1}}
+\newcommand{\dimensionalize}[2][]{
+  %
+  % Append to #1 the unit \@@@unit.
+  % Common use case is to append "pt" to a tikzmath output.
+  %
+  % -- Parameters
+  \setkeys{@dimensionalize@keys}{unit=pt,#1}
+  % -- Function body
+  \xdef#2{#2\@@@unit}
+}
+
+\newcommand{\rel@pos}[3][]{
+  %
+  % Define a position relative to a coordinate.
+  %
+  % Inputs
+  % ------
+  % #1 (optional): what to name the new coordinate (default: @rel@pos).
+  % #2: relative position
+  % #3: origin coordinate
+  %
+  % -- Function body
+  \ifthenelse{\equal{#1}{}}{%
+    \xdef\@@coord@name{@rel@pos}%
+  }{%
+    \xdef\@@coord@name{#1}%
+  }%
+  \coordinate (\@@coord@name) at ($#2+#3$);%
+}
+
+\makeatother
 
 %%%%%%%%%%%% 3D coordinate system settings
 
@@ -65,6 +103,124 @@
   }
   \xdef\viewVector{\X,\Y,\Z}
 }
+
+%%%%%%%%%%%% "Loop" block (used in ARC 2020 survey paper with Yue Yu)
+
+\makeatletter
+\define@key{loopKeys}{position}{\def\position{#1}}%
+\define@key{loopKeys}{title}{\def\title{#1}}%
+\define@key{loopKeys}{text}{\def\text{#1}}%
+\define@key{loopKeys}{height}{\def\height{#1}}%
+\define@key{loopKeys}{width}{\def\width{#1}}%
+\define@key{loopKeys}{textalign}{\def\textalign{#1}}%
+\define@key{loopKeys}{bgcolor}{\def\bgcolor{#1}}%
+\define@key{loopKeys}{arrowcolor}{\def\arrowcolor{#1}}%
+\newcommand{\loopblock}[1][]{
+  % Parameters
+  \setkeys{loopKeys}{position=,#1}%
+  \setkeys{loopKeys}{title=,#1}%
+  \setkeys{loopKeys}{text=,#1}%
+  \setkeys{loopKeys}{height=20mm,#1}%
+  \setkeys{loopKeys}{width=40mm,#1}%
+  \setkeys{loopKeys}{textalign=middle,#1}% middle,top
+  \setkeys{loopKeys}{bgcolor=black!30,#1}% middle,top
+  \setkeys{loopKeys}{arrowcolor=black,#1}% middle,top
+  %
+  % Draw
+  % -- Dimensions
+  \def\@loop@sw@sep{3mm}
+  \def\@loop@corner@radius{3mm}
+  \def\@loop@linewidth{1mm}
+  \def\@loop@arrow@left@pad{1mm}
+  \def\@loop@title@pad{1mm}
+  \def\@loop@area@text@pad{2mm}
+  % -- Styles
+  \tiklzcommonsettings
+  \tikzset{
+    loop arrow/.append style={
+      -latex,
+      line width=0.6mm,
+      line cap=round
+    },
+    loop bg/.append style={
+      line cap=round
+    },
+    loop title/.append style={
+      align=left,
+      anchor=west,
+      font={\bfseries\small},
+      outer sep=\@loop@title@pad
+    },
+    loop area text/.append style={
+      rectangle,
+      minimum width=\width-2*\@loop@corner@radius,
+      text width=\width-2*\@loop@corner@radius,
+      % draw=black,
+      align=left,
+      font={\footnotesize}
+    }
+  }
+  \begin{scope}[shift={\position}]
+    % -- Title
+    \node[loop title] (loop title) at (0,0) {\title};
+    % Measure title height and width
+    \path let
+    \p1=(loop title.east),
+    \p2=(loop title.south east),
+    \p3=(loop title.west)
+    in \pgfextra{
+      \tikzmath{\@loop@title@height = \y1-\y2;}
+      \tikzmath{\@loop@title@width = \x1-\x3;}
+      \dimensionalize{\@loop@title@height}
+      \dimensionalize{\@loop@title@width}
+    };
+    % Starting point for arrow
+    \coordinate (loop arrow start) at
+    ($(loop title.south west)+(\@loop@arrow@left@pad+\@loop@title@pad,0)$);
+    % -- Loop area background
+    \path[
+    loop bg,
+    fill=\bgcolor
+    ] (loop arrow start) -- node[pos=0.5](loop@area@middle@vertical){}
+    ++(0,-\height+\@loop@title@height+\@loop@corner@radius)
+    arc (180:270:\@loop@corner@radius)
+    -- node[pos=0.5](loop@area@middle@horizontal){}
+    ++(\width-\@loop@corner@radius*2,0)
+    arc (-90:0:\@loop@corner@radius)
+    -- ++(0,{\height-2*\@loop@corner@radius})
+    arc (0:90:\@loop@corner@radius)
+    -- (loop title.east)
+    -- (loop title.south east)
+    --cycle;
+    % -- Loop area perimeter arrow
+    \draw[
+    loop arrow,
+    draw=\arrowcolor
+    ] (loop arrow start) --
+    ++(0,-\height+\@loop@title@height+\@loop@corner@radius)
+    arc (180:270:\@loop@corner@radius)
+    -- ++(\width-\@loop@corner@radius*2,0)
+    arc (-90:0:\@loop@corner@radius)
+    -- ++(0,{\height-2*\@loop@corner@radius})
+    arc (0:90:\@loop@corner@radius)
+    -- (loop title.east);
+    % -- Loop area text
+    \path let
+    \p1=(loop@area@middle@vertical),
+    \p2=(loop@area@middle@horizontal),
+    \p3=(loop title.south)
+    in \pgfextra{
+      \ifthenelse{\equal{\textalign}{middle}}{
+        \coordinate (loop_area_middle) at (\x2,\y1-\@loop@corner@radius/2);
+        \node[loop area text] at (loop_area_middle) {\text};
+      }{
+        \coordinate (loop_area_top) at (\x2,\y3-\@loop@area@text@pad);
+        \node[loop area text,anchor=north] at (loop_area_top) {\text};
+      } 
+    };
+  \end{scope}
+}
+\makeatother
 
 %%%%%%%%%%%% Selector Simulink-like block
 
@@ -719,6 +875,89 @@
   \draw[tentacle] (start right) to[out=\out,in=\in] (end right)
   to (end left) to[out=\in,in=\out] (start left);
 }
+
+%%%%%%%%%%%% Helper functions for working with lists
+
+\makeatletter
+
+\define@key{@counter@keys}{amount}{\def\@@amount{#1}}
+\newcommand{\counter@increment}[2][]{%
+  %
+  % Increments counter #2 by increment amount.
+  %
+  % -- Parameters
+  \setkeys{@counter@keys}{amount=1,#1}%
+  % -- Function body
+  \tikzmath{\@@counter@next=int(#2+\@@amount);}%
+  \xdef#2{\@@counter@next}%
+}
+
+\newcommand{\list@append}[2]{
+  %
+  % Appends an element to the end of the list.
+  %
+  % Inputs
+  % ------
+  % #1 : list
+  % #2 : element to append
+  % 
+  % -- Function body
+  \ifthenelse{\equal{#1}{}}{%
+    \xdef#1{#2}%
+  }{%
+    \xdef#1{#1,#2}%
+  }%
+}
+
+\newcommand{\list@size}[1]{
+  %
+  % Puts number of list elements into variable \@list@size
+  %
+  % Inputs
+  % ------
+  % #1 : list
+  %
+  % Returns
+  % -------
+  % \@list@size : list length
+  %
+  % -- Function body
+  \xdef\@list@size{0}%
+  \foreach \@list@element in #1 {%
+    \counter@increment[amount=1]{\@list@size}%
+  }%
+}
+
+\newcommand{\list@get}[3][]{%
+  %
+  % Gets element (1-indexed) from a list.
+  %
+  % Inputs
+  % ------
+  % #1 (optional): variable to store in (default: \@list@element)
+  % #2: list
+  % #3: element index (1-indexing)
+  %
+  % Returns
+  % -------
+  % \@list@element : #1[#2]
+  %
+  % -- Function body
+  \xdef\@@counter{1}%
+  \foreach \@@@element in #2 {%
+    \pgfmathparse{\@@counter==#3 ? 1:0}%
+    \ifthenelse{\pgfmathresult>0}{%
+      \ifthenelse{\equal{#1}{}}{%
+        \xdef\@list@element{\@@@element}%
+      }{%
+        \expandafter\xdef\csname#1\endcsname{\@@@element}%
+      }%
+      \breakforeach%
+    }{}%
+    \counter@increment{\@@counter}%
+  }%
+}
+\makeatother
 
 %%%%%%%%%%%% Helper grid
 

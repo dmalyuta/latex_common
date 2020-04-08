@@ -330,46 +330,6 @@
   \llpoptimization[#2]{#1}{#3}{#4}{#5}{#6}{\BODY}{#7}%
 }
 
-% Editing
-
-\definecolor{darkolivegreen}{rgb}{0.33, 0.6, 0.18}
-\definecolor{green}{rgb}{0, 0.5, 0}
-\definecolor{orange}{rgb}{1, 0.4, 0}
-\definecolor{darkgray}{rgb}{0.2, 0.2, 0.2}
-
-\newcommand{\seecode}{\textit{For code, see Appendix~\ref{sec:code}}.}
-\newcommand{\postmeeting}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{orange} #2}%
-  }{}%
-}
-\newcommand{\idea}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{orange} #2}%
-  }{}%
-}
-\newcommand{\todo}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{blue}%
-      \ifthenelse{\equal{#2}{}}{TODO}{(TODO: #2)}}%
-  }{}%
-}
-\newcommand{\question}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{darkolivegreen} (Q: #2)}%
-  }{}%
-}
-\newcommand{\fixme}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{red} (FIXME: #2)}%
-  }{}%
-}
-\newcommand{\mycomment}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{red} (C: #2)}%
-  }{}%
-}
-
 % Miscellaneous
 
 \newcommand{\PhD}{Ph.D.\xspace}
@@ -382,17 +342,7 @@
 \newcommand{\lcvx}{LCvx\xspace}
 \newcommand{\emphasize}[1]{\textit{#1}}
 \newcommand{\scvx}{SCvx\xspace}
-\newcommand\dangersign[1][2ex]{%
-  \renewcommand\stacktype{L}%
-  \scaleto{\stackon[1.3pt]{\color{red}$\triangle$}{\tiny !}}{#1}%
-}
-\newcommand{\marginwarning}[1]{\marginnote{\footnotesize\dangersign{\color{red}#1}}}
-\newcommand{\margindate}[1]{\marginnote{\footnotesize\color{red}\texttt{#1}}}
 \newcommand{\textsub}[1]{_{\mathrm{#1}}}
-\newcommand{\easy}{{\color{olive}[easy]}\xspace}
-\newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
-\newcommand{\hard}{{\color{red}[hard]}\xspace}
-\newcommand{\stoppedhere}{{\color{red}\bfseries STOPPED~HERE}\xspace}
 \newcommand{\defintext}[1]{\textbf{#1}}
 \newenvironment{qanswer}{\color{blue}}{}
 \newenvironment{unfinished}{\color{red}\itshape}{}

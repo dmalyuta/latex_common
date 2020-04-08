@@ -9,6 +9,7 @@
 \newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
 \newcommand{\eucledian}{\mathbb E}
 \newcommand{\reals}{\mathbb R}
+\newcommand{\extendedreals}{\overline\reals}
 \newcommand{\real}{\mathbb R}
 \newcommand{\pos}[1][R]{\mathbb #1_{++}}
 \newcommand{\nonneg}[1][\reals]{#1_{+}}
@@ -16,8 +17,8 @@
   % {x : ||x||_#1 <= 1}
   % #1: norm type
   \mathbb B_{#1}}
-\newcommand{\nat}{{\mbox{\bf N}}}
 \newcommand{\integers}{\mathbb Z}
+\newcommand{\naturals}{\mathbb N}
 \newcommand{\binary}{\mathbb I}
 \newcommand{\quaternion}{\mathbb Q}
 \newcommand{\symm}{\mathbb S}  % symmetric matrices
@@ -35,7 +36,7 @@
 \newcommand{\bdry}{\partial}
 \newcommand{\image}[1]{\mathrm{im}(#1)}
 \DeclareMathOperator{\comain}{dom}
-\newcommand{\domain}[1]{\mathrm{dom}(#1)}
+\newcommand{\domain}[1]{\comain(#1)}
 \newcommand{\setHtwo}{\set{H}_2}
 \newcommand{\setLinfty}{\set{L}_\infty}
 \newcommand{\Ellipsoid}[1]{\mathcal E_{#1}}
@@ -47,6 +48,10 @@
 \newcommand{\volume}[1]{\vol\left(#1\right)}
 \DeclareMathOperator{\vtcs}{\set V}
 \newcommand{\vertices}[1]{\vtcs\left(#1\right)}
+\DeclareMathOperator{\myfixedpointset}{fixed}
+\newcommand{\fixedpoint}[1]{\myfixedpointset\left(#1\right)}
+\DeclareMathOperator{\sublevelsetsymbol}{lev}
+\newcommand{\levelset}[2][]{\sublevelsetsymbol_{#1}#2}
 
 % Algorithms
 
@@ -103,30 +108,57 @@
 \DeclareMathOperator{\linspan}{span}
 \newcommand{\diag}[2][short]{\mathrm{diag}\ifthenelse{\equal{#1}{short}}{(#2)}{\left(#2\right)}}
 \DeclareMathOperator{\spec}{spec}
+\newcommand{\Spec}[1]{\spec\left(#1\right)}
 \newcommand{\rpinv}{^\dagger}
 \newcommand{\lpinv}{^\ddagger}
 \newcommand{\blkdiag}[1]{\mathrm{blkdiag}(#1)}
 \DeclareMathOperator{\trace}{trace}
+\newcommand{\Tr}[1]{\trace\left(#1\right)}
 \newcommand{\svmax}[1]{\bar\sigma(#1)}
 \newcommand{\Matrix}[2][]{%
   \ifthenelse{\equal{#1}{}}{}{\setlength\arraycolsep{#1}}%
   \begin{bmatrix}#2\end{bmatrix}}
+\newcommand{\Mnl}{\protect\\} % protected newline
 
 % Generic math
 
 \newcommand{\where}{:}
 \newcommand{\given}{\mid}
-\newcommand{\C}[1]{\mathcal C^{#1}}
+\newcommand{\CC}[1]{\mathcal C^{#1}}
 \newcommand{\inv}{^{-1}}
 \newcommand{\invT}{^{-\transp}}
+\newcommand{\invsq}{^{-\frac{1}{2}}}
+\newcommand{\powsq}{^{\frac{1}{2}}}
 \newcommand{\sign}{\mathrm{sgn}}
-\newcommand{\norm}[2][]{\|#2\|_{#1}}
+\newcommand{\norm}[2][]{\left\|#2\right\|_{#1}}
+\newcommand{\dualnorm}[2][]{\norm[#1]{#2}^*}
 \newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1 
         \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
-\newcommand{\inorm}[2]{\vertiii{#1}_{#2}}
+\newcommand{\inorm}[2][]{\vertiii{#2}_{#1}}
 \newcommand{\seq}[1]{\{#1\}}
 \newcommand{\sgn}{\mbox{\textrm{sgn}}}
-\newcommand{\Proj}[2]{\mathcal P_{#1}(#2)}
+
+\makeatletter
+\define@key{projKeys}{set}{\def\set{#1}}
+\define@key{proxKeys}{t}{\def\t{#1}}
+\define@key{proxKeys}{f}{\def\f{#1}}
+\makeatother
+\DeclareMathOperator{\projecti}{proj}
+\DeclareMathOperator{\proximal}{prox}
+\newcommand{\Proj}[2][]{%
+  \setkeys{projKeys}{set=,#1}%
+  \mathchoice{\underset{\set}{\projecti}}%
+  {\projecti_{\set}}{\projecti_{\set}}{\projecti_{\set}}%
+  \left(#2\right)%
+}
+\newcommand{\Prox}[2][]{%
+  \setkeys{proxKeys}{t=t,#1}%
+  \setkeys{proxKeys}{f=f,#1}%
+  \mathchoice{\underset{\t\f}{\proximal}}%
+  {\proximal_{\t\f}}{\proximal_{\t\f}}{\proximal_{\t\f}}%
+  \ifthenelse{\equal{#2}{}}{}{\left(#2\right)}%
+}
+
 \newcommand{\Pre}{\mathop\text{Pre}}
 \newcommand{\PP}{$\mathcal{P}$\xspace}
 \newcommand{\NP}{$\mathcal{NP}$\xspace}
@@ -134,7 +166,8 @@
 \newcommand{\NPcomplete}{$\mathcal{NP}$-complete\xspace}
 \newcommand{\transp}{{\scriptscriptstyle\mathsf{T}}}
 \newcommand{\T}{^\transp}
-\newcommand{\innerproduct}[2]{\langle#1,#2\rangle}
+\newcommand{\innerproduct}[3][]{\langle#2,#3\rangle_{#1}}
+\newcommand{\inner}[2][]{\langle#2\rangle_{#1}}
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\dt}{\dd t}
 \newcommand{\fromabove}{\downarrow}
@@ -333,8 +366,8 @@
 % Miscellaneous
 
 \newcommand{\PhD}{Ph.D.\xspace}
-\newcommand{\Behcet}{Beh\c{c}et\xspace}
-\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e\xspace}
+\newcommand{\Behcet}{Beh\c{c}et}
+\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e}
 \newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
 \makeatletter
 \@ifclassloaded{beamer}{}{\newcommand{\alert}[1]{\textbf{#1}}}
@@ -346,6 +379,8 @@
 \newcommand{\defintext}[1]{\textbf{#1}}
 \newenvironment{qanswer}{\color{blue}}{}
 \newenvironment{unfinished}{\color{red}\itshape}{}
+\newcommand{\makeunderscoreletter}{\catcode`\_11}
+\newcommand{\makeunderscoreother}{\catcode`\_8}
 % Referencing low-level code
 \def\SectionLabel{section}
 \def\SubsectionLabel{subsection}
@@ -461,6 +496,27 @@
 \newcommand{\dref}[2][]{\PrintRefs[#1]{Definition}{#2}}
 \newcommand{\lref}[2][]{\PrintRefs[#1]{Lemma}{#2}}
 \newcommand{\eref}[2][]{\PrintRefs[#1]{Example}{#2}}
+
+% % Tables
+
+% \makeatletter
+
+% \define@key{@table@keys}{type}{\def\@type{#1}}
+% \define@key{@table@keys}{columns}{\def\@columns{#1}}
+% \newcommand{\customcell}[2][]{%
+%   %
+%   % Changes particular cell to type of cell using \multicolumn.
+%   %
+%   % Inputs
+%   % ------
+%   % #1 (optional): parameters
+%   % #2: cell text
+%   \setkeys{@table@keys}{type=c,#1}%
+%   \setkeys{@table@keys}{columns=1,#1}%
+%   \multicolumn{\@columns}{\@type}{#2}%
+% }
+
+% \makeatother
 
 %%% Local Variables:
 %%% mode: latex

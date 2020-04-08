@@ -1,7 +1,20 @@
+\makeatletter
+
 \def\emptyCaption{{\color{white}?}}
 
 \def\optiPadding{1mm}
 \def\captionPadding{1mm}
+
+\newcommand{\clonelabel}[2]{\@bsphack
+  \expandafter\ifx\csname r@#2\endcsname\relax
+  \else\protected@write\@auxout{}{\string\newlabel{#1}%
+    {\csname r@#2\endcsname}}%
+  \fi
+  \expandafter\ifx\csname r@#2@cref\endcsname\relax
+  \else\protected@write\@auxout{}{\string\newlabel{#1@cref}%
+    {\csname r@#2@cref\endcsname}}%
+  \fi
+  \@esphack}
 
 \newcounter{ProblemCounter}
 \newcounter{EqStartCounter}
@@ -28,7 +41,7 @@
   % #2: type {cost,constraint}
   % #3: cost OR constraint list
   % #4: constraint number (only relevant if type=constraint)
-  % #5: \pcaption
+  % #5: \@caption
   \begin{tikzpicture}[remember picture,overlay]%
     % Styles
     \ifthenelse{\equal{#1}{true}}
@@ -98,7 +111,7 @@
         font={\bfseries\footnotesize\baselineskip=1.3em}
         ] (problemLabel) at ($(cost.south west)+
         (-\captionPadding,\costBelowShift*1pt)$)
-        {\ifthenelse{\equal{\ptag}{}}{Problem \theequation.}{Problem \ptag.}};
+        {\ifthenelse{\equal{\@tag}{}}{Problem \theequation.}{Problem \@tag.}};
         \node[
         anchor=north east,
         align=right,
@@ -201,8 +214,8 @@
   % #4: \variables
   % #5: \objective
   % #6: list of constraints
-  % #7: \plabel
-  % #8: \pcaption
+  % #7: \@label
+  % #8: \@caption
   % Print the optimization problem
   \OPTBG{cost}{\printCost[false]{#1}{#2}{#3}{#4}{#5}}{0}{#8}%
   \printCost[true]{#1}{#2}{#3}{#4}{#5}%
@@ -274,27 +287,32 @@
   \end{tikzpicture}
 }
 
-\makeatletter
 \define@key{optimusKeys}{task}{\def\task{#1}}%
 \define@key{optimusKeys}{objective}{\def\objective{#1}}%
 \define@key{optimusKeys}{variables}{\def\variables{#1}}%
 \define@key{optimusKeys}{result}{\def\result{#1}}%
-\define@key{optimusKeys}{plabel}{\def\plabel{#1}}%
-\define@key{optimusKeys}{ptag}{\def\ptag{#1}}%
 \define@key{optimusKeys}{border}{\def\border{#1}}%
-\define@key{optimusKeys}{pcaption}{\def\pcaption{#1}}%
-\makeatother
-
+\define@key{optimusKeys}{label}{\def\@label{#1}}%
+\define@key{optimusKeys}{tag}{\def\@tag{#1}}%
+\define@key{optimusKeys}{caption}{\def\@caption{#1}}%
+%
+\define@key{optimusKeys}{plabel}{\def\@label{#1}}% DEPRECATED, use {label}
+\define@key{optimusKeys}{ptag}{\def\@tag{#1}}% DEPRECATED, use {tag}
+\define@key{optimusKeys}{pcaption}{\def\@caption{#1}}% DEPRECATED, use {caption}
+%
 \NewEnviron{optimus}[1][]{%
   % Parameters
   \setkeys{optimusKeys}{plabel=,#1}%
+  \setkeys{optimusKeys}{label=,#1}%
   \setkeys{optimusKeys}{border=false,#1}%
   \setkeys{optimusKeys}{task=\min,#1}%
   \setkeys{optimusKeys}{objective=,#1}%
   \setkeys{optimusKeys}{variables=,#1}%
   \setkeys{optimusKeys}{result=,#1}%
   \setkeys{optimusKeys}{ptag=,#1}%
+  \setkeys{optimusKeys}{tag=,#1}%
   \setkeys{optimusKeys}{pcaption=,#1}
+  \setkeys{optimusKeys}{caption=,#1}
   %
   % Prepare variables
   \stepcounter{ProblemCounter}%
@@ -303,7 +321,7 @@
     \xdef\constrained{true}
     \setsepchar{\#}%
     \readlist\constraints{\BODY}}
-  \ifthenelse{\equal{\pcaption}{}}{
+  \ifthenelse{\equal{\@caption}{}}{
     \xdef\writeCaption{false}}{
     \xdef\writeCaption{true}}
   % Print the problem
@@ -316,25 +334,25 @@
     {\variables}%
     {\objective}%
     {\constraints}%
-    {\plabel}%
-    {\pcaption}
+    {\@label}%
+    {\@caption}
   }
   \ifthenelse{\equal{\constrained}{true}}{
-    \ifthenelse{\equal{\plabel}{}}{
+    \ifthenelse{\equal{\@label}{}}{
       \begin{align*}
         \printProblemBody
       \end{align*}
     }{
-      \ifthenelse{\equal{\ptag}{}}{
+      \ifthenelse{\equal{\@tag}{}}{
         \begin{subequations}
-          \label{problem:\plabel}
+          \label{problem:\@label}
           \begin{align}
             \printProblemBody
           \end{align}
         \end{subequations}
       }{
-        \begin{taggedsubequations}{\ptag}
-          \label{problem:\plabel}
+        \begin{taggedsubequations}{\@tag}
+          \label{problem:\@label}
           \begin{align}
             \printProblemBody
           \end{align}
@@ -342,18 +360,19 @@
       }
     }
   }{
-    \ifthenelse{\equal{\plabel}{}}{
+    \ifthenelse{\equal{\@label}{}}{
       \begin{equation*}
         \printProblemBody
       \end{equation*}
     }{
       \begin{equation}
-        \label{problem:\plabel}
         \printProblemBody
-      \end{equation}
+      \end{equation}\clonelabel{problem:\@label}{eq:\@label_a}
     }
   }
 }
+
+\makeatother
 
 %%% Local Variables:
 %%% mode: latex

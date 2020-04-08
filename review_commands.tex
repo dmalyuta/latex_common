@@ -1,0 +1,171 @@
+\def\removeColor{red}
+\def\changeColor{orange}
+\def\commentColor{green}
+
+\newcommand{\reviewAddToList}[2]{%
+  % #1: list variable
+  % #2: element
+  \ifthenelse{\equal{#1}{}}{\xdef#1{#2}}{\xdef#1{#1,#2}}%
+}
+
+\makeatletter
+\define@key{removeKeys}{style}{\def\style{#1}}%
+\makeatother
+\newcommand{\remove}[2][]{%
+  \setkeys{removeKeys}{style=-,#1}%
+  {%
+    \color{\removeColor}%
+    \ifthenelse{\equal{\style}{/}}{%
+      \cancel{#2}%
+    }{%
+      \sout{#2}%
+    }%
+  }%
+}
+
+\newcommand{\addin}[1]{%
+  {%
+    \color{\commentColor}%
+    {#1}%
+  }%
+}
+
+\newcommand{\change}[2]{%
+  {%
+    \color{\removeColor}%
+    \remove{#1}~%
+  }{%
+    \color{\changeColor}%
+    #2%
+  }%
+}
+
+\xdef\reviewCommentCounter{0}
+\xdef\reviewCommentList{}
+\makeatletter
+\define@key{commentKeys}{txt}{\def\txt{#1}}%
+\define@key{commentKeys}{inline}{\def\inline{#1}}%
+\makeatother
+\newcommand{\commentBoxName}[1]{CommentBox#1}
+\renewcommand{\comment}[2][]{%
+  \setkeys{commentKeys}{txt=,#1}%
+  \setkeys{commentKeys}{inline=f,#1}%
+  \def\InsertText{\color{black}\txt}
+  \tikzmath{\reviewCommentCounter=int(\reviewCommentCounter+1);}%
+  \xdef\reviewCommentCounter{\reviewCommentCounter}%
+  {%
+    \color{\commentColor}%
+    [#2]$^{\textnormal{\hyperlink{commentRef\reviewCommentCounter}{\reviewCommentCounter}}}$%
+  }%
+  \ifthenelse{\equal{\inline}{f}}{%
+    \edef\BoxName{\csname \commentBoxName{\reviewCommentCounter}\endcsname}%
+    \expandafter\newsavebox\BoxName%
+    \begin{lrbox}{\BoxName}%
+      \begin{minipage}{\textwidth}%
+        \normalsize\InsertText%
+      \end{minipage}%
+    \end{lrbox}%
+    \global%
+    \expandafter\setbox\BoxName%
+    \expandafter\box\BoxName%
+    \reviewAddToList{\reviewCommentList}%
+    {\reviewCommentCounter/\commentBoxName{\reviewCommentCounter}}%
+  }{%
+    \pgfmark{commentPos\reviewCommentCounter}%
+    \begin{tikzpicture}[
+      overlay,
+      remember picture
+      ]%
+      \tiklzcommonsettings
+      \tikzmath{
+        \leftpad=3mm;
+      }
+      \tikzset{
+        sidebar comment/.append style={
+          \commentColor,
+          anchor=north west,
+          align=left,
+          text width=2cm
+        }
+      }
+      \path let
+      \p1=(current page.west),
+      \p2=(pic cs:commentPos\reviewCommentCounter)
+      in \pgfextra{
+        \node[sidebar comment] at (\x1+\leftpad pt,\y2+0.7em)
+        {\footnotesize$^{\hypertarget{commentRef\reviewCommentCounter}{\reviewCommentCounter}}$
+          \InsertText};
+      };
+    \end{tikzpicture}%
+  }%
+}
+\newcommand{\printCommentList}{
+  \section*{\color{\commentColor}Comments}
+  \foreach \commentNumber/\commentText in \reviewCommentList {
+    
+    \hypertarget{commentRef\commentNumber}{\textbf{Comment \commentNumber:}}
+    \medskip
+
+    \edef\GetBox{\expandafter\usebox\csname \commentText\endcsname}
+    \GetBox
+    \medskip
+  }
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%% OLD
+
+\definecolor{darkolivegreen}{rgb}{0.33, 0.6, 0.18}
+\definecolor{green}{rgb}{0, 0.5, 0}
+\definecolor{orange}{rgb}{1, 0.4, 0}
+\definecolor{darkgray}{rgb}{0.2, 0.2, 0.2}
+
+\newcommand{\seecode}{\textit{For code, see Appendix~\ref{sec:code}}.}
+\newcommand{\postmeeting}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{orange} #2}%
+  }{}%
+}
+\newcommand{\idea}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{orange} #2}%
+  }{}%
+}
+\newcommand{\todo}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{blue}%
+      \ifthenelse{\equal{#2}{}}{TODO}{(TODO: #2)}}%
+  }{}%
+}
+\newcommand{\question}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{darkolivegreen} (Q: #2)}%
+  }{}%
+}
+\newcommand{\fixme}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{red} (FIXME: #2)}%
+  }{}%
+}
+\newcommand{\mycomment}[2][show]{%
+  \ifthenelse{\equal{#1}{show}}{%
+    {\color{red} (C: #2)}%
+  }{}%
+}
+
+\newcommand\dangersign[1][2ex]{%
+  \renewcommand\stacktype{L}%
+  \scaleto{\stackon[1.3pt]{\color{red}$\triangle$}{\tiny !}}{#1}%
+}
+\newcommand{\marginwarning}[1]{\marginnote{\footnotesize\dangersign{\color{red}#1}}}
+\newcommand{\margindate}[1]{\marginnote{\footnotesize\color{red}\texttt{#1}}}
+\newcommand{\easy}{{\color{olive}[easy]}\xspace}
+\newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
+\newcommand{\hard}{{\color{red}[hard]}\xspace}
+\newcommand{\stoppedhere}{{\color{red}\bfseries STOPPED~HERE}\xspace}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

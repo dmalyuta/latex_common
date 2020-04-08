@@ -36,10 +36,8 @@ drop fuzzy shadow}}
 \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
 
 % Theorem environments
-\makeatletter
-\@ifclassloaded{beamer}{}{
-\@ifclassloaded{autart}{}{
-
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
 \newtheorem{proposition}{Proposition}
 
@@ -47,8 +45,12 @@ drop fuzzy shadow}}
 
 \newtheorem{remark}{Remark}
 \newtheorem{property}{Property}
+\newtheorem{condition}{Condition}
 \newtheorem{method}{Method}
 \newtheorem{example}{Example}
+\newtheorem{problem}{Problem}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
 
 \theoremstyle{empty}
 
@@ -65,59 +67,6 @@ drop fuzzy shadow}}
 \declaretheorem[style=colored,name=Assumption]{assumptionc}
 \declaretheorem[style=colored,name=Remark]{remarkc}
 \declaretheorem[style=colored,name=Theorem]{theoremc}
-
-}
-}
-\makeatother
-
-\makeatletter
-\@ifclassloaded{beamer}{}{
-\newcounter{theorem}
-\newtheorem{innertheorem}{Theorem}
-\makeatletter
-\newenvironment{theorem}[1]
-{\refstepcounter{theorem}%
-\protected@edef\@currentlabelname{\value{theorem}}%
-\renewcommand\theinnertheorem{{\thetheorem#1}}
-\innertheorem}
-{\endinnertheorem}
-\makeatother
-
-\newtheorem{lemma}{Lemma}
-
-\theoremstyle{definition}
-
-\newtheorem{definition}{Definition}
-
-\newcounter{condition}
-\newtheorem{innercondition}{Condition}
-\makeatletter
-\newenvironment{condition}[2][]
-{\refstepcounter{condition}%
-\protected@edef\@currentlabelname{\value{condition}}%
-\ifthenelse{\equal{#2}{}}{\renewcommand\theinnercondition{{\thecondition#1}}}
-{\renewcommand\theinnercondition{{\thecondition#1 \textnormal{(#2)}}}}
-\innercondition}
-{\endinnercondition}
-\makeatother
-
-\newcounter{problem}
-\renewcommand\theproblem{\Alph{problem}}
-\newtheorem{innerproblem}{Problem}
-\makeatletter
-\newenvironment{problem}[1][]
-{\ifthenelse{\equal{#1}{}}
-{\refstepcounter{problem}%
-\protected@edef\@currentlabelname{\value{problem}}%
-\renewcommand\theinnerproblem{\theproblem}\innerproblem}
-{\renewcommand\theinnerproblem{#1}\innerproblem}}
-{\endinnerproblem}
-\makeatother
-
-\newtheorem{assumption}{Assumption}
-}
-\makeatother
-
 % \AtEndEnvironment{definitionc}{\null\hfill\qedsymbol}%
 
 % Boxes

@@ -68,6 +68,7 @@
 \usepackage[binary-units=true]{siunitx}
 \usepackage{chemformula}
 \usepackage[normalem]{ulem}
+\usepackage{cancel}
 \usepackage{accents}
 \makeatletter
 \@ifclassloaded{beamer}{\usepackage{multimedia}}{}
@@ -83,7 +84,9 @@
 %\usepackage{pdflscape} % writing (rotated PDF pages, don't need to twist head)
 \def\natbiboptions{numbers,sort}
 }{}
+\ifthenelse{\isundefined{\nobibpkg}}{
 \@ifclassloaded{ieeeconf}{}{\usepackage[\natbiboptions]{natbib}\nobibliography*}
+}{}
 \makeatother
 
 % Layout

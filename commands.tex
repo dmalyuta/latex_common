@@ -118,6 +118,7 @@
 \newcommand{\Matrix}[2][]{%
   \ifthenelse{\equal{#1}{}}{}{\setlength\arraycolsep{#1}}%
   \begin{bmatrix}#2\end{bmatrix}}
+\newcommand{\Mnl}{\protect\\} % protected newline
 
 % Generic math
 
@@ -247,163 +248,6 @@
   }%
 }
 
-% Optimization
-
-\DeclareMathOperator*{\argmax}{argmax}
-\DeclareMathOperator*{\argmin}{argmin}
-\DeclareMathOperator*{\minimize}{\mathrm{minimize}}
-\DeclareMathOperator*{\maximize}{\mathrm{maximize}}
-\DeclareMathOperator*{\find}{\mathrm{find}}
-
-\def\opticmd{\min}
-\newenvironment{optienvc}{\begin{align}}{\end{align}}
-\newenvironment{optienvl}{\begin{flalign}}{\end{flalign}}
-
-\newcommand{\optimal}[1]{#1^*}
-\newcommand{\sprocedure}{$\mathcal S$-procedure\xspace}
-
-\newcounter{l}
-\newcounter{j}
-\newcounter{k}
-
-\makeatletter
-\newenvironment{taggedsubequations}[1]
-{%
-  % \end{subequations} will advance `equation`
-  \addtocounter{equation}{-1}%
-  \begin{subequations}%
-    % set the current label
-    \def\@currentlabel{#1}%
-    % redefine \theequation
-    \renewcommand{\theequation}{#1.\alph{equation}}%
-  }
-  {\end{subequations}}
-\makeatother %not \makeatletter
-
-\newcommand{\lloptimization}[7][center]{
-  \setsepchar{\#}%
-  \readlist\mylist{#6}
-  \ifthenelse{\equal{#7}{}}{\begin{subequations}}{\begin{taggedsubequations}{#7}}
-    \ifthenelse{\equal{#2}{}}{}{\label{eq:#2}}
-    \ifthenelse{\equal{#1}{left}}{
-      \begin{flalign}
-        \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
-        \ifthenelse{\equal{#3}{}}{}{#3 = }
-        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
-        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-          \setcounter{j}{\value{k}+1}
-          \setcounter{l}{\value{k}+2}
-          \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_\alph{l}}}
-          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-            &\mylist[\arabic{j}]%
-          }{%
-            &\mylist[\arabic{j}] &&\\%
-          }%
-        }
-      \end{flalign}
-    }{\ifthenelse{\equal{#1}{center}}{
-      \begin{align}
-        \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
-        \ifthenelse{\equal{#3}{}}{}{#3 = }
-        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
-        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-          \setcounter{j}{\value{k}+1}
-          \setcounter{l}{\value{k}+2}
-          \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_\alph{l}}}
-          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-            &\mylist[\arabic{j}]%
-          }{%
-            &\mylist[\arabic{j}]\\%
-          }%
-        }
-      \end{align}}{\ifthenelse{\equal{#1}{left*}}{
-      \begin{flalign*}
-        \ifthenelse{\equal{#3}{}}{}{#3 = }
-        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
-        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-          \setcounter{j}{\value{k}+1}
-          \setcounter{l}{\value{k}+2}
-          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-            &\mylist[\arabic{j}]%
-          }{%
-            &\mylist[\arabic{j}] &&\\%
-          }%
-        }
-      \end{flalign*}
-    }{\begin{align*}
-        \ifthenelse{\equal{#3}{}}{}{#3 = }
-        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
-        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-          \setcounter{j}{\value{k}+1}
-          \setcounter{l}{\value{k}+2}
-          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-            &\mylist[\arabic{j}]%
-          }{%
-            &\mylist[\arabic{j}]\\%
-          }%
-        }
-      \end{align*}}}
-    }
-  \ifthenelse{\equal{#7}{}}{\end{subequations}}{\end{taggedsubequations}}
-}
-
-\newcommand{\llpoptimization}[8][left]{
-  \begin{problem}[#8]\ifthenelse{\equal{#2}{NoNe}}{}{\textbf{#2.}}%
-    \ifthenelse{\equal{#3}{}}{}{\label{problem:#3}}%
-    \lloptimization[#1]{#3}{#4}{#5}{#6}{#7}{#8}%
-  \end{problem}%
-}
-
-\NewEnviron{optimization}[6]{\lloptimization[#1]{#2}{#3}{#4}{#5}{\BODY}{#6}}
-\NewEnviron{foptimization}[7][NoNe]{%
-  \begin{mdframed}[default,linewidth=1pt]%
-    \llpoptimization[#2]{#1}{#3}{#4}{#5}{#6}{\BODY}{#7}%
-  \end{mdframed}%
-}
-\NewEnviron{poptimization}[7][NoNe]{%
-  \llpoptimization[#2]{#1}{#3}{#4}{#5}{#6}{\BODY}{#7}%
-}
-
-% Editing
-
-\definecolor{darkolivegreen}{rgb}{0.33, 0.6, 0.18}
-\definecolor{green}{rgb}{0, 0.5, 0}
-\definecolor{orange}{rgb}{1, 0.4, 0}
-\definecolor{darkgray}{rgb}{0.2, 0.2, 0.2}
-
-\newcommand{\seecode}{\textit{For code, see Appendix~\ref{sec:code}}.}
-\newcommand{\postmeeting}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{orange} #2}%
-  }{}%
-}
-\newcommand{\idea}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{orange} #2}%
-  }{}%
-}
-\newcommand{\todo}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{blue}%
-      \ifthenelse{\equal{#2}{}}{TODO}{(TODO: #2)}}%
-  }{}%
-}
-\newcommand{\question}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{darkolivegreen} (Q: #2)}%
-  }{}%
-}
-\newcommand{\fixme}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{red} (FIXME: #2)}%
-  }{}%
-}
-\newcommand{\mycomment}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{red} (C: #2)}%
-  }{}%
-}
-
 % Miscellaneous
 
 \newcommand{\PhD}{Ph.D.\xspace}
@@ -416,17 +260,7 @@
 \newcommand{\lcvx}{LCvx\xspace}
 \newcommand{\emphasize}[1]{\textit{#1}}
 \newcommand{\scvx}{SCvx\xspace}
-\newcommand\dangersign[1][2ex]{%
-  \renewcommand\stacktype{L}%
-  \scaleto{\stackon[1.3pt]{\color{red}$\triangle$}{\tiny !}}{#1}%
-}
-\newcommand{\marginwarning}[1]{\marginnote{\footnotesize\dangersign{\color{red}#1}}}
-\newcommand{\margindate}[1]{\marginnote{\footnotesize\color{red}\texttt{#1}}}
 \newcommand{\textsub}[1]{_{\mathrm{#1}}}
-\newcommand{\easy}{{\color{olive}[easy]}\xspace}
-\newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
-\newcommand{\hard}{{\color{red}[hard]}\xspace}
-\newcommand{\stoppedhere}{{\color{red}\bfseries STOPPED~HERE}\xspace}
 \newcommand{\defintext}[1]{\textbf{#1}}
 \newenvironment{qanswer}{\color{blue}}{}
 \newenvironment{unfinished}{\color{red}\itshape}{}

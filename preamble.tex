@@ -83,7 +83,9 @@
 %\usepackage{pdflscape} % writing (rotated PDF pages, don't need to twist head)
 \def\natbiboptions{numbers,sort}
 }{}
+\ifthenelse{\isundefined{\nobibpkg}}{
 \@ifclassloaded{ieeeconf}{}{\usepackage[\natbiboptions]{natbib}\nobibliography*}
+}{}
 \makeatother
 
 % Layout

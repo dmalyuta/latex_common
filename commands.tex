@@ -9,6 +9,7 @@
 \newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
 \newcommand{\eucledian}{\mathbb E}
 \newcommand{\reals}{\mathbb R}
+\newcommand{\extendedreals}{\overline\reals}
 \newcommand{\real}{\mathbb R}
 \newcommand{\pos}[1][R]{\mathbb #1_{++}}
 \newcommand{\nonneg}[1][\reals]{#1_{+}}
@@ -16,8 +17,8 @@
   % {x : ||x||_#1 <= 1}
   % #1: norm type
   \mathbb B_{#1}}
-\newcommand{\nat}{{\mbox{\bf N}}}
 \newcommand{\integers}{\mathbb Z}
+\newcommand{\naturals}{\mathbb N}
 \newcommand{\binary}{\mathbb I}
 \newcommand{\quaternion}{\mathbb Q}
 \newcommand{\symm}{\mathbb S}  % symmetric matrices
@@ -49,6 +50,8 @@
 \newcommand{\vertices}[1]{\vtcs\left(#1\right)}
 \DeclareMathOperator{\myfixedpointset}{fixed}
 \newcommand{\fixedpoint}[1]{\myfixedpointset\left(#1\right)}
+\DeclareMathOperator{\sublevelsetsymbol}{lev}
+\newcommand{\levelset}[2][]{\sublevelsetsymbol_{#1}#2}
 
 % Algorithms
 
@@ -105,10 +108,12 @@
 \DeclareMathOperator{\linspan}{span}
 \newcommand{\diag}[2][short]{\mathrm{diag}\ifthenelse{\equal{#1}{short}}{(#2)}{\left(#2\right)}}
 \DeclareMathOperator{\spec}{spec}
+\newcommand{\Spec}[1]{\spec\left(#1\right)}
 \newcommand{\rpinv}{^\dagger}
 \newcommand{\lpinv}{^\ddagger}
 \newcommand{\blkdiag}[1]{\mathrm{blkdiag}(#1)}
 \DeclareMathOperator{\trace}{trace}
+\newcommand{\Tr}[1]{\trace\left(#1\right)}
 \newcommand{\svmax}[1]{\bar\sigma(#1)}
 \newcommand{\Matrix}[2][]{%
   \ifthenelse{\equal{#1}{}}{}{\setlength\arraycolsep{#1}}%
@@ -121,8 +126,11 @@
 \newcommand{\CC}[1]{\mathcal C^{#1}}
 \newcommand{\inv}{^{-1}}
 \newcommand{\invT}{^{-\transp}}
+\newcommand{\invsq}{^{-\frac{1}{2}}}
+\newcommand{\powsq}{^{\frac{1}{2}}}
 \newcommand{\sign}{\mathrm{sgn}}
 \newcommand{\norm}[2][]{\left\|#2\right\|_{#1}}
+\newcommand{\dualnorm}[2][]{\norm[#1]{#2}^*}
 \newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1 
         \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
 \newcommand{\inorm}[2][]{\vertiii{#2}_{#1}}
@@ -157,7 +165,8 @@
 \newcommand{\NPcomplete}{$\mathcal{NP}$-complete\xspace}
 \newcommand{\transp}{{\scriptscriptstyle\mathsf{T}}}
 \newcommand{\T}{^\transp}
-\newcommand{\innerproduct}[2]{\langle#1,#2\rangle}
+\newcommand{\innerproduct}[3][]{\langle#2,#3\rangle_{#1}}
+\newcommand{\inner}[2][]{\langle#2\rangle_{#1}}
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\dt}{\dd t}
 \newcommand{\fromabove}{\downarrow}

@@ -1,10 +1,30 @@
+% Logic/scripting
+\usepackage{ifthen}
+\usepackage{pgffor}
+\usepackage{etoolbox}
+\usepackage{parselines}
+\usepackage{environ}
+\usepackage{keyval}
+\usepackage{listofitems}
+\usepackage{forloop}
+\usepackage{calc}
+\usepackage{xstring}
+\usepackage{changepage}
+\usepackage{scrextend}
+\usepackage{expl3}
+
 % Math
-\usepackage[fleqn]{amsmath}
-\usepackage{amssymb}
 \makeatletter
+\ifthenelse{\isundefined{\lefteqs}}{
+\usepackage{amsmath}
+\usepackage{mathtools}
+}{
+\usepackage[fleqn]{amsmath}
+\usepackage[fleqn]{mathtools}
+}
+\usepackage{amssymb}
 \@ifclassloaded{autart}{}{\usepackage{amsthm}}
 \makeatother
-\usepackage[fleqn]{mathtools}
 \usepackage{thmtools}
 \usepackage{ar}
 \usepackage{empheq}
@@ -21,21 +41,6 @@
 \@ifclassloaded{beamer}{}{
 \@ifclassloaded{standalone}{}{\usepackage[table]{xcolor}}}
 \makeatother
-
-% Logic/scripting
-\usepackage{ifthen}
-\usepackage{pgffor}
-\usepackage{etoolbox}
-\usepackage{parselines}
-\usepackage{environ}
-\usepackage{keyval}
-\usepackage{listofitems}
-\usepackage{forloop}
-\usepackage{calc}
-\usepackage{xstring}
-\usepackage{changepage}
-\usepackage{scrextend}
-\usepackage{expl3}
 
 % Figures
 \usepackage{graphicx}

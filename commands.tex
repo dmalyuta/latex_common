@@ -9,6 +9,7 @@
 \newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
 \newcommand{\eucledian}{\mathbb E}
 \newcommand{\reals}{\mathbb R}
+\newcommand{\extendedreals}{\overline\reals}
 \newcommand{\real}{\mathbb R}
 \newcommand{\pos}[1][R]{\mathbb #1_{++}}
 \newcommand{\nonneg}[1][\reals]{#1_{+}}
@@ -16,8 +17,8 @@
   % {x : ||x||_#1 <= 1}
   % #1: norm type
   \mathbb B_{#1}}
-\newcommand{\nat}{{\mbox{\bf N}}}
 \newcommand{\integers}{\mathbb Z}
+\newcommand{\naturals}{\mathbb N}
 \newcommand{\binary}{\mathbb I}
 \newcommand{\quaternion}{\mathbb Q}
 \newcommand{\symm}{\mathbb S}  % symmetric matrices
@@ -49,6 +50,8 @@
 \newcommand{\vertices}[1]{\vtcs\left(#1\right)}
 \DeclareMathOperator{\myfixedpointset}{fixed}
 \newcommand{\fixedpoint}[1]{\myfixedpointset\left(#1\right)}
+\DeclareMathOperator{\sublevelsetsymbol}{lev}
+\newcommand{\levelset}[2][]{\sublevelsetsymbol_{#1}#2}
 
 % Algorithms
 
@@ -105,10 +108,12 @@
 \DeclareMathOperator{\linspan}{span}
 \newcommand{\diag}[2][short]{\mathrm{diag}\ifthenelse{\equal{#1}{short}}{(#2)}{\left(#2\right)}}
 \DeclareMathOperator{\spec}{spec}
+\newcommand{\Spec}[1]{\spec\left(#1\right)}
 \newcommand{\rpinv}{^\dagger}
 \newcommand{\lpinv}{^\ddagger}
 \newcommand{\blkdiag}[1]{\mathrm{blkdiag}(#1)}
 \DeclareMathOperator{\trace}{trace}
+\newcommand{\Tr}[1]{\trace\left(#1\right)}
 \newcommand{\svmax}[1]{\bar\sigma(#1)}
 \newcommand{\Matrix}[2][]{%
   \ifthenelse{\equal{#1}{}}{}{\setlength\arraycolsep{#1}}%
@@ -122,8 +127,13 @@
 \newcommand{\CC}[1]{\mathcal C^{#1}}
 \newcommand{\inv}{^{-1}}
 \newcommand{\invT}{^{-\transp}}
+\newcommand{\invsq}{^{-\frac{1}{2}}}
+\newcommand{\powsq}{^{\frac{1}{2}}}
+\newcommand{\ceil}[1]{\left\lceil#1\right\rceil}
+\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
 \newcommand{\sign}{\mathrm{sgn}}
 \newcommand{\norm}[2][]{\left\|#2\right\|_{#1}}
+\newcommand{\dualnorm}[2][]{\norm[#1]{#2}^*}
 \newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1 
         \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
 \newcommand{\inorm}[2][]{\vertiii{#2}_{#1}}
@@ -158,7 +168,8 @@
 \newcommand{\NPcomplete}{$\mathcal{NP}$-complete\xspace}
 \newcommand{\transp}{{\scriptscriptstyle\mathsf{T}}}
 \newcommand{\T}{^\transp}
-\newcommand{\innerproduct}[2]{\langle#1,#2\rangle}
+\newcommand{\innerproduct}[3][]{\langle#2,#3\rangle_{#1}}
+\newcommand{\inner}[2][]{\langle#2\rangle_{#1}}
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\dt}{\dd t}
 \newcommand{\fromabove}{\downarrow}
@@ -245,155 +256,6 @@
 \DeclareMathOperator*{\maximize}{\mathrm{maximize}}
 \DeclareMathOperator*{\find}{\mathrm{find}}
 
-\def\opticmd{\min}
-\newenvironment{optienvc}{\begin{align}}{\end{align}}
-\newenvironment{optienvl}{\begin{flalign}}{\end{flalign}}
-
-\newcommand{\optimal}[1]{#1^*}
-\newcommand{\sprocedure}{$\mathcal S$-procedure\xspace}
-
-\newcounter{l}
-\newcounter{j}
-\newcounter{k}
-
-\makeatletter
-\newenvironment{taggedsubequations}[1]
-{%
-  % \end{subequations} will advance `equation`
-  \addtocounter{equation}{-1}%
-  \begin{subequations}%
-    % set the current label
-    \def\@currentlabel{#1}%
-    % redefine \theequation
-    \renewcommand{\theequation}{#1.\alph{equation}}%
-  }
-  {\end{subequations}}
-\makeatother %not \makeatletter
-
-\newcommand{\lloptimization}[7][center]{
-  \setsepchar{\#}%
-  \readlist\mylist{#6}
-  \ifthenelse{\equal{#7}{}}{\begin{subequations}}{\begin{taggedsubequations}{#7}}
-    \ifthenelse{\equal{#2}{}}{}{\label{eq:#2}}
-    \ifthenelse{\equal{#1}{left}}{
-      \begin{flalign}
-        \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
-        \ifthenelse{\equal{#3}{}}{}{#3 = }
-        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
-        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-          \setcounter{j}{\value{k}+1}
-          \setcounter{l}{\value{k}+2}
-          \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_\alph{l}}}
-          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-            &\mylist[\arabic{j}]%
-          }{%
-            &\mylist[\arabic{j}] &&\\%
-          }%
-        }
-      \end{flalign}
-    }{\ifthenelse{\equal{#1}{center}}{
-      \begin{align}
-        \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_a}}
-        \ifthenelse{\equal{#3}{}}{}{#3 = }
-        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
-        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-          \setcounter{j}{\value{k}+1}
-          \setcounter{l}{\value{k}+2}
-          \ifthenelse{\equal{#2}{}}{}{\label{eq:#2_\alph{l}}}
-          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-            &\mylist[\arabic{j}]%
-          }{%
-            &\mylist[\arabic{j}]\\%
-          }%
-        }
-      \end{align}}{\ifthenelse{\equal{#1}{left*}}{
-      \begin{flalign*}
-        \ifthenelse{\equal{#3}{}}{}{#3 = }
-        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
-        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-          \setcounter{j}{\value{k}+1}
-          \setcounter{l}{\value{k}+2}
-          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-            &\mylist[\arabic{j}]%
-          }{%
-            &\mylist[\arabic{j}] &&\\%
-          }%
-        }
-      \end{flalign*}
-    }{\begin{align*}
-        \ifthenelse{\equal{#3}{}}{}{#3 = }
-        &\opticmd_{\ifthenelse{\equal{#4}{}}{}{#4}}~ #5~\mathrm{s.t.}\hspace{-1mm} &&\\
-        \forloop{k}{0}{\arabic{k} < \listlen\mylist[]}{
-          \setcounter{j}{\value{k}+1}
-          \setcounter{l}{\value{k}+2}
-          \ifthenelse{\equal{\arabic{j}}{\listlen\mylist[]}}{%
-            &\mylist[\arabic{j}]%
-          }{%
-            &\mylist[\arabic{j}]\\%
-          }%
-        }
-      \end{align*}}}
-    }
-  \ifthenelse{\equal{#7}{}}{\end{subequations}}{\end{taggedsubequations}}
-}
-
-\newcommand{\llpoptimization}[8][left]{
-  \begin{problem}[#8]\ifthenelse{\equal{#2}{NoNe}}{}{\textbf{#2.}}%
-    \ifthenelse{\equal{#3}{}}{}{\label{problem:#3}}%
-    \lloptimization[#1]{#3}{#4}{#5}{#6}{#7}{#8}%
-  \end{problem}%
-}
-
-\NewEnviron{optimization}[6]{\lloptimization[#1]{#2}{#3}{#4}{#5}{\BODY}{#6}}
-\NewEnviron{foptimization}[7][NoNe]{%
-  \begin{mdframed}[default,linewidth=1pt]%
-    \llpoptimization[#2]{#1}{#3}{#4}{#5}{#6}{\BODY}{#7}%
-  \end{mdframed}%
-}
-\NewEnviron{poptimization}[7][NoNe]{%
-  \llpoptimization[#2]{#1}{#3}{#4}{#5}{#6}{\BODY}{#7}%
-}
-
-% Editing
-
-\definecolor{darkolivegreen}{rgb}{0.33, 0.6, 0.18}
-\definecolor{green}{rgb}{0, 0.5, 0}
-\definecolor{orange}{rgb}{1, 0.4, 0}
-\definecolor{darkgray}{rgb}{0.2, 0.2, 0.2}
-
-\newcommand{\seecode}{\textit{For code, see Appendix~\ref{sec:code}}.}
-\newcommand{\postmeeting}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{orange} #2}%
-  }{}%
-}
-\newcommand{\idea}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{orange} #2}%
-  }{}%
-}
-\newcommand{\todo}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{blue}%
-      \ifthenelse{\equal{#2}{}}{TODO}{(TODO: #2)}}%
-  }{}%
-}
-\newcommand{\question}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{darkolivegreen} (Q: #2)}%
-  }{}%
-}
-\newcommand{\fixme}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{red} (FIXME: #2)}%
-  }{}%
-}
-\newcommand{\mycomment}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{red} (C: #2)}%
-  }{}%
-}
-
 % Miscellaneous
 
 \newcommand{\PhD}{Ph.D.\xspace}
@@ -406,17 +268,7 @@
 \newcommand{\lcvx}{LCvx\xspace}
 \newcommand{\emphasize}[1]{\textit{#1}}
 \newcommand{\scvx}{SCvx\xspace}
-\newcommand\dangersign[1][2ex]{%
-  \renewcommand\stacktype{L}%
-  \scaleto{\stackon[1.3pt]{\color{red}$\triangle$}{\tiny !}}{#1}%
-}
-\newcommand{\marginwarning}[1]{\marginnote{\footnotesize\dangersign{\color{red}#1}}}
-\newcommand{\margindate}[1]{\marginnote{\footnotesize\color{red}\texttt{#1}}}
 \newcommand{\textsub}[1]{_{\mathrm{#1}}}
-\newcommand{\easy}{{\color{olive}[easy]}\xspace}
-\newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
-\newcommand{\hard}{{\color{red}[hard]}\xspace}
-\newcommand{\stoppedhere}{{\color{red}\bfseries STOPPED~HERE}\xspace}
 \newcommand{\defintext}[1]{\textbf{#1}}
 \newenvironment{qanswer}{\color{blue}}{}
 \newenvironment{unfinished}{\color{red}\itshape}{}

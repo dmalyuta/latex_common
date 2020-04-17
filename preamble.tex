@@ -19,7 +19,7 @@
 \usepackage{color}
 \makeatletter
 \@ifclassloaded{beamer}{}{
-\@ifclassloaded{standalone}{}{\usepackage[table]{xcolor}}}
+\usepackage[table]{xcolor}}
 \makeatother
 
 % Logic/scripting
@@ -118,8 +118,7 @@
 
 % Referencing
 \makeatletter
-\@ifclassloaded{standalone}{}{
-\@ifclassloaded{UWThesis/uwthesis}{}{\usepackage{hyperref}}}
+\@ifclassloaded{UWThesis/uwthesis}{}{\usepackage{hyperref}}
 \makeatother
 
 % General

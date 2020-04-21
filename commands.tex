@@ -27,11 +27,15 @@
 \newcommand{\dom}{\mathrm{dom}}
 \newcommand{\epi}{\mathrm{epi}}
 % \newcommand{\hypo}{\mathrm{hypo}}
-\newcommand{\interior}[1]{\mathrm{int}(#1)}
-\newcommand{\closure}[1]{\mathrm{cl}(#1)}
+% \newcommand{\interior}[1]{\mathrm{int}(#1)}
+\DeclareMathOperator{\interior}{int}
+\DeclareMathOperator{\relint}{ri}
+\DeclareMathOperator{\aff}{aff}
+\DeclareMathOperator{\bd}{bd}
+\DeclareMathOperator{\closure}{cl}
 \newcommand{\compl}[1]{#1^\mathrm{c}}
 \newcommand{\boundary}[1]{\mathrm{bdry}\left(#1\right)}
-\newcommand{\relint}{\mathrm{relint}}
+% \newcommand{\relint}{\mathrm{relint}}
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
 \newcommand{\bdry}{\partial}
 \newcommand{\image}[1]{\mathrm{im}(#1)}
@@ -128,6 +132,8 @@
 \newcommand{\inv}{^{-1}}
 \newcommand{\invT}{^{-\transp}}
 \newcommand{\invsq}{^{-\frac{1}{2}}}
+\newcommand{\polar}{^{\circ}}
+\newcommand{\ortho}{^{\perp}}
 \newcommand{\powsq}{^{\frac{1}{2}}}
 \newcommand{\ceil}[1]{\left\lceil#1\right\rceil}
 \newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
@@ -159,6 +165,10 @@
   \mathchoice{\underset{\t\f}{\proximal}}%
   {\proximal_{\t\f}}{\proximal_{\t\f}}{\proximal_{\t\f}}%
   \ifthenelse{\equal{#2}{}}{}{\left(#2\right)}%
+}
+\DeclareMathOperator{\distance}{dist}
+\newcommand{\dist}[2][]{%
+  \distance_{#1}\ifthenelse{\equal{#2}{}}{}{(#2)}
 }
 
 \newcommand{\Pre}{\mathop\text{Pre}}

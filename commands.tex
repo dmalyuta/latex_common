@@ -129,7 +129,7 @@
 \newcommand{\where}{:}
 \newcommand{\given}{\mid}
 \newcommand{\CC}[1]{\mathcal C^{#1}}
-\newcommand{\inv}{^{-1}}
+\newcommand{\inv}[1][]{\ifthenelse{\equal{#1}{}}{^{-1}}{^{-#1}}}
 \newcommand{\invT}{^{-\transp}}
 \newcommand{\invsq}{^{-\frac{1}{2}}}
 \newcommand{\polar}{^{\circ}}
@@ -234,6 +234,20 @@
 }
 \makeatother
 
+\makeatletter
+\newenvironment{taggedsubequations}[1]
+{%
+  % \end{subequations} will advance `equation`
+  \addtocounter{equation}{-1}%
+  \begin{subequations}%
+    % set the current label
+    \def\@currentlabel{#1}%
+    % redefine \theequation
+    \renewcommand{\theequation}{#1.\alph{equation}}%
+  }
+  {\end{subequations}}
+\makeatother %not \makeatletter
+
 % Geometry
 
 \newcommand{\fr}[1]{\mathcal{F}_{\mathcal{#1}}}
@@ -257,6 +271,14 @@
     }%
   }%
 }
+
+% Optimization
+
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\minimize}{\mathrm{minimize}}
+\DeclareMathOperator*{\maximize}{\mathrm{maximize}}
+\DeclareMathOperator*{\find}{\mathrm{find}}
 
 % Miscellaneous
 

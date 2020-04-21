@@ -16,6 +16,7 @@
 \usetikzlibrary{shapes.geometric}
 \usetikzlibrary{bending}
 \usetikzlibrary{decorations.markings}
+\usetikzlibrary{decorations.text}
 \usetikzlibrary{intersections}
 
 % curve through points: (A) to[curve through={(B) .. (C) .. (...)}] {Z};
@@ -926,6 +927,31 @@
   \foreach \@list@element in #1 {%
     \counter@increment[amount=1]{\@list@size}%
   }%
+}
+
+\newcommand{\list@find}[2]{
+  %
+  % Find the first matching element and return its index in \@idx.
+  %
+  % Inputs
+  % ------
+  % #1 : list
+  % #2 : element value to match
+  %
+  % Returns
+  % -------
+  % \@idx : index of first matching element (empty if none).
+  %
+  % -- Function body
+  \xdef\@@@counter{0}
+  \xdef\@idx{}
+  \foreach \@@@element in #1 {
+    \counter@increment{\@@@counter}
+    \ifthenelse{\equal{\@@@element}{#2}}{
+      \xdef\@idx{\@@@counter}
+      \breakforeach
+    }{}
+  }
 }
 
 \newcommand{\list@get}[3][]{%

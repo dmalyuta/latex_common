@@ -50,16 +50,21 @@
 
 \makeatletter
 
+\def\convertto#1#2{\strip@pt\dimexpr #2*65536/\number\dimexpr 1#1}
+
 \define@key{@dimensionalize@keys}{unit}{\def\@@@unit{#1}}
-\newcommand{\dimensionalize}[2][]{
+\newcommand{\dimensionalize}[2][]{%
   %
   % Append to #1 the unit \@@@unit.
   % Common use case is to append "pt" to a tikzmath output.
   %
   % -- Parameters
-  \setkeys{@dimensionalize@keys}{unit=pt,#1}
+  \setkeys{@dimensionalize@keys}{unit=pt,#1}%
   % -- Function body
-  \xdef#2{#2\@@@unit}
+  \tikzmath{\@@@@value=#2;} % to pt
+  \def\@pt@unit{pt}%
+  \xdef\@@@@tmp{\@@@@value\@pt@unit} % append "pt" unit
+  \xdef#2{\convertto{\@@@unit}{\@@@@tmp}\@@@unit} % convert to target unit
 }
 
 \newcommand{\rel@pos}[3][]{
@@ -104,6 +109,79 @@
   }
   \xdef\viewVector{\X,\Y,\Z}
 }
+
+%%%%%%%%%%%% Circle, partitioned into 2 if needed for cylinder drawing
+
+\makeatletter
+\define@key{@@circle@keys}{name}{\def\@name{#1}}
+\define@key{@@circle@keys}{center}{\def\@center{#1}}
+\define@key{@@circle@keys}{radius}{\def\@radius{#1}}
+\define@key{@@circle@keys}{split}{\def\@split{#1}}
+\define@key{@@circle@keys}{styles}{\def\@styles{#1}}
+\newcommand{\tiklz@circle}[1]{
+  %
+  % Draw a (partitioned) circle.
+  %
+  % Parameters
+  % ----------
+  %   center : circle center coordinates (default: 0,0).
+  %   radius : circle radius (default: 1).
+  %   split : tuple (start,end) angles at which to make the cut of the circle into
+  %           two halves.
+  %   styles : single or tuple, for each circle partition.
+  %
+  % -- Parameters
+  \setkeys{@@circle@keys}{name=circle,#1}
+  \setkeys{@@circle@keys}{center={0,0},#1}
+  \setkeys{@@circle@keys}{radius=1,#1}
+  \setkeys{@@circle@keys}{styles=,#1}
+  \setkeys{@@circle@keys}{split=,#1}
+  % -- Function body
+  \ifthenelse{\equal{\@split}{}}{
+    \draw[\@styles] (\@center) circle (\@radius);
+  }{
+    \list@get[@@ang@start]{\@split}{1}
+    \list@get[@@ang@end]{\@split}{2}
+
+    \list@get[@@style@one]{\@styles}{1}
+    \list@size{\@styles}
+    \ifthenelse{\equal{\@list@size}{1}}{
+      \xdef\@@style@two{\@@style@one}
+    }{
+      \list@get[@@style@two]{\@styles}{2}
+    }
+    % Naming
+    \xdef\@@@one{@one}
+    \xdef\@@@two{@two}
+    \xdef\@@@one@r{@one@r}
+    \xdef\@@@two@r{@two@r}
+    % First half
+    \edef\p@one{\@name_p1}
+    \edef\p@one@r{\@name_p1r}
+    \coordinate (\p@one) at ($(\@center)+(\@@ang@start:\@radius)$);
+    \coordinate (\p@one@r) at ($(\@center)+(\@@ang@end:\@radius)$);
+    \expandafter\xdef\csname \@name\@@@one\endcsname{
+      (\p@one) arc (\@@ang@start:\@@ang@end:\@radius)
+    }
+    \expandafter\xdef\csname \@name\@@@one@r\endcsname{
+      (\p@one@r) arc (\@@ang@end:\@@ang@start:\@radius)
+    }
+    \draw[\@@style@one] \csname\@name\@@@one\endcsname;
+    % Second half
+    \edef\p@two{\@name_p2}
+    \edef\p@two@r{\@name_p2r}
+    \coordinate (\p@two) at ($(\@center)+(\@@ang@end:\@radius)$);
+    \coordinate (\p@two@r) at ($(\@center)+(360+\@@ang@start:\@radius)$);
+    \expandafter\xdef\csname \@name\@@@two\endcsname{
+      (\p@two) arc (\@@ang@end:360+\@@ang@start:\@radius)
+    }
+    \expandafter\xdef\csname \@name\@@@two@r\endcsname{
+      (\p@two@r) arc (360+\@@ang@start:\@@ang@end:\@radius)
+    }
+    \draw[\@@style@two] \csname\@name\@@@two\endcsname;
+  }
+}
+\makeatother
 
 %%%%%%%%%%%% "Loop" block (used in ARC 2020 survey paper with Yue Yu)
 
@@ -572,6 +650,194 @@
   \xdef\QuadCounter{\QuadCounter}
 }
 
+%%%%%%%%%%%% Masten Xombie rocket
+
+\makeatletter
+
+\define@key{@xombie@keys}{pos}{\def\@pos{#1}}
+\define@key{@xombie@keys}{tilt}{\def\@tilt{#1}}
+\define@key{@xombie@keys}{gimbal}{\def\@gimbal{#1}}
+\newcommand{\xombie}[1][]{
+  \setkeys{@xombie@keys}{pos={(0,0)},#1}
+  \setkeys{@xombie@keys}{tilt=0,#1}
+  \setkeys{@xombie@keys}{gimbal=0,#1}
+
+  \tiklzcommonsettings
+
+  \xdef\@gold{yellow!85!black}
+  \xdef\@silver{black!20}
+  \xdef\@silver@darker{black!50}
+  \xdef\@fuel@duct{black}
+  \xdef\@radiator@top{black!70}
+  \xdef\@radiator@bottom{orange}
+  \xdef\@engine@cnxn{black!70}
+  \xdef\@engine@nozzle{black}
+  \xdef\@flame@inner{yellow}
+  \xdef\@flame{orange}
+  \xdef\@flame@outer{red}
+  \xdef\@tank{black!30}
+
+  \tikzset{
+    leg outer/.append style={
+      black!60!white,
+      line width=0.6mm
+    },
+    leg inner/.append style={
+      black!40!white,
+      line width=0.3mm
+    },
+    tank welds/.append style={
+      line width=0.3mm,
+      black!90
+    },
+    top bulkhead/.append style={
+      line width=0.5mm,
+      black!90
+    },
+    yellow bars/.append style={
+      yellow!80!black,
+      line width=0.4mm
+    },
+    radiator vent/.append style={
+      line width=0.05mm
+    }
+  }
+  
+  \begin{scope}[shift={\@pos},rotate=\@tilt]
+    \begin{scope}[xshift=-0.05cm]
+      % External tank rear
+      \begin{scope}[xshift=0.75cm]
+        \fill[\@tank] (-0.45,-0.1) rectangle (-0.05,0.95);
+        \fill[\@tank] (-0.45,-0.1) arc (-180:0:0.2 and 0.15);
+        \fill[\@tank] (-0.45,0.95) arc (180:0:0.2 and 0.15);
+        \draw[tank welds] (-0.45,-0.1) -- ++(0.4,0);
+        \draw[tank welds] (-0.45,0.95) -- ++(0.4,0);
+      \end{scope}
+
+      % Rear leg
+      \draw[leg outer] (-0.05,-0.2) -- (-0.35,-1.8);
+      \draw[leg inner] (0.,-0.7) -- (-0.325,-1.7);
+      \draw[leg inner] (-0.2,-0.7) -- (-0.325,-1.7);
+
+      % Engine nozzle
+      \def\@nozzle@width{0.2}
+      \def\@nozzle@height{0.35}
+      \def\@flame@height@inner{0.2}
+      \def\@flame@height{0.5}
+      \def\@flame@height@outer{0.8}
+      \begin{scope}[xshift=0.05cm,yshift=-0.95cm,rotate=\@gimbal]
+        \fill[\@flame@outer] (-\@nozzle@width/2,-\@nozzle@height)
+        -- (0,-\@nozzle@height-\@flame@height@outer)
+        -- (\@nozzle@width/2,-\@nozzle@height);
+        \fill[\@flame] (-\@nozzle@width/2,-\@nozzle@height)
+        -- (0,-\@nozzle@height-\@flame@height)
+        -- (\@nozzle@width/2,-\@nozzle@height);
+        \fill[\@flame@inner] (-\@nozzle@width/2,-\@nozzle@height)
+        -- (0,-\@nozzle@height-\@flame@height@inner)
+        -- (\@nozzle@width/2,-\@nozzle@height);
+        
+        \draw[fill=\@engine@nozzle] (\@nozzle@width/2,0)
+        rectangle
+        (-\@nozzle@width/2,-\@nozzle@height);
+      \end{scope}
+
+      % Bottom (engine) bulkhead
+      \draw[fill=\@gold] (-0.45,-0.65) arc (-180:0:0.5 and 0.3);
+
+      % Engine top housing
+      \draw[fill=\@engine@cnxn] (-0.15,-0.9)
+      arc (-180:0:0.2 and 0.04) -- ++(0,-0.1) 
+      arc (0:-180:0.2 and 0.02) --cycle;
+
+      % Bottom tank walls
+      \draw[fill=\@gold] (-0.45,-0.65) rectangle (0.55,0);
+      
+      % Center tank walls
+      \draw[fill=\@silver@darker] (-0.45,0) rectangle (0.55,1);
+
+      % Left leg
+      \draw[leg inner] (-0.4,-0.7) -- (-1.425,-1.7);
+      \draw[leg inner] (-0.3,-0.7) -- (-1.425,-1.7);
+
+      % Right leg
+      \draw[leg inner] (0.425,-0.7) -- (1.425,-1.7);
+      \draw[leg inner] (0.35,-0.7) -- (1.425,-1.7);
+
+      % Front leg
+      \draw[leg inner] (0.,-0.7) -- (0.425,-1.7);
+      \draw[leg inner] (0.15,-0.7) -- (0.425,-1.7);
+      \draw[leg outer] (0.1,-0.2) -- (0.45,-1.8);
+
+      % Left leg
+      \draw[leg outer] (-0.4,-0.2) -- (-1.5,-1.8);
+
+      % Right leg
+      \draw[leg outer] (0.45,-0.2) -- (1.5,-1.8);
+
+      % Top tank bulkhead
+      \draw[fill=\@silver] (-0.45,1) arc (180:0:0.5 and 0.3);
+      
+      % Bars connecting to top bulkhead
+      \draw[yellow bars] (-0.4,1) -- ++(0,0.75);
+      \draw[yellow bars] (-0.25,1) -- ++(0,0.75);
+      \draw[yellow bars] (0,1) -- ++(0,0.75);
+      \draw[yellow bars] (0.35,1) -- ++(0,0.75);
+      \draw[yellow bars] (0.45,1) -- ++(0,0.75);
+
+      % Payload bottom bulkhead
+      \draw[top bulkhead] (-0.45,1.3) -- ++(1,0);
+
+      % Middle bulkhead
+      \draw[top bulkhead] (-0.45,1) -- (0.55,1);
+      
+      % Middle bottom bulkhead
+      \draw[top bulkhead] (-0.45,0) -- (0.55,0);
+
+      % External tank front
+      \fill[\@tank] (-0.45,-0.1) rectangle (-0.05,0.95);
+      \fill[\@tank] (-0.45,-0.1) arc (-180:0:0.2 and 0.15);
+      \fill[\@tank] (-0.45,0.95) arc (180:0:0.2 and 0.15);
+      \draw[tank welds] (-0.45,-0.1) -- ++(0.4,0);
+      \draw[tank welds] (-0.45,0.95) -- ++(0.4,0);
+
+      % Top bulkhead
+      \draw[top bulkhead] (-0.45,1.75) -- (0.55,1.75);
+
+      % Side fuel duct
+      \fill[\@fuel@duct] (0.25,-0.55)
+      rectangle ++(0.1,1.45);
+      \fill[\@fuel@duct] (0.25,-0.55)
+      arc (-180:0:0.05);
+      \fill[\@fuel@duct] (0.25,0.9)
+      arc (180:0:0.05);
+
+      % Radiator top
+      \def\@radiator@vstep{0.02}
+      \def\@radiator@width{0.2}
+      \foreach \@i in {1,...,8} {
+        \tikzmath{
+          \@y = 0.9-(\@i-1)*\@radiator@vstep;
+        }
+        \draw[radiator vent,\@radiator@top]
+        (0,\@y) -- ++(\@radiator@width,0);
+      }
+      
+      % Radiator bottom
+      \def\@radiator@vstep{0.02}
+      \def\@radiator@width{0.4}
+      \foreach \@i in {1,...,8} {
+        \tikzmath{
+          \@y = -0.4-(\@i-1)*\@radiator@vstep;
+        }
+        \draw[radiator vent,\@radiator@bottom]
+        (-0.4,\@y) -- ++(\@radiator@width,0);
+      }
+    \end{scope}
+  \end{scope}
+}
+
+\makeatother
+
 %%%%%%%%%%%% Vector difference
 
 \newcommand{\vectorDiff}[2]{
@@ -716,10 +982,11 @@
 %%%%%%%%%%%% Center of gravity
 
 \makeatletter
-\define@key{cgKeys}{shift}{\def\shift{#1}}
-\makeatother
+\define@key{cgKeys}{sz}{\def\@cg@radius{#1}}
+\define@key{cgKeys}{pos}{\def\shift{#1}}
 \newcommand{\cg}[1][]{
-  \setkeys{cgKeys}{shift={(0,0)},#1}%
+  \setkeys{cgKeys}{sz=0.1,#1}%
+  \setkeys{cgKeys}{pos={(0,0)},#1}%
   \begin{scope}[shift={\shift}]
     % CG
     \tikzmath{
@@ -738,12 +1005,12 @@
         draw=black
       }
     }
-    \node[cg bg] at (0,0) {};
-    \draw[cg fg] ($(0,0)+(0:\cgR cm/2)$) arc (0:90:\cgR cm/2) to (0,0) --
-    cycle;
-    \draw[cg fg] ($(0,0)+(180:\cgR cm/2)$) arc (180:270:\cgR cm/2) to (0,0) -- cycle;
+    \draw[fill=white] (0,0) circle (\@cg@radius);
+    \fill[black] (\@cg@radius,0) arc (0:90:\@cg@radius) -- (0,0) --cycle;
+    \fill[black] (-\@cg@radius,0) arc (180:270:\@cg@radius) -- (0,0) --cycle;
   \end{scope}
 }
+\makeatother
 
 %%%%%%%%%%%% Cute clock
 
@@ -983,6 +1250,41 @@
     \counter@increment{\@@counter}%
   }%
 }
+\makeatother
+
+%%%%%%%%%%%% Vector math
+
+\makeatletter
+
+\newcommand{\vector@scale}[2]{
+  %
+  % Multiply vector #2 by scalar #1, sets list \@vector.
+  %
+  \list@size{#2}
+  \xdef\@scaled{}
+  \foreach \@@i in {1,...,\@list@size} {
+    \list@get[@a]{#2}{\@@i}
+    \tikzmath{\@b=#1*\@a;}
+    \list@append{\@scaled}{\@b}
+  }
+  \xdef\@vector{\@scaled}
+}
+
+\newcommand{\vector@add}[2]{
+  %
+  % Add two vectors, sets list \@vector.
+  %
+  \list@size{#1}
+  \xdef\@sum{}
+  \foreach \@@i in {1,...,\@list@size} {
+    \list@get[@a]{#1}{\@@i}
+    \list@get[@b]{#2}{\@@i}
+    \tikzmath{\@c=\@a+\@b;}
+    \list@append{\@sum}{\@c}
+  }
+  \xdef\@vector{\@sum}
+}
+
 \makeatother
 
 %%%%%%%%%%%% Helper grid

@@ -24,7 +24,8 @@
 
 %%%%%%%%%%%% Common settings
 
-\newcommand{\tiklzcommonsettings}{
+\makeatletter
+\newcommand{\tiklzcommonsettings}[1][]{
   \tikzset{
     every node/.append style={
       inner sep=0,
@@ -38,7 +39,18 @@
       outer sep=1
     }
   }
+
+  % Define 3D coordinate initial angles
+  % -- (Main frame)
+  \xdef\@tiklz@td@main@alt{0}
+  \xdef\@tiklz@td@main@azi{0}
+  \tdplotsetmaincoords{
+    \@tiklz@td@main@alt}{
+    \@tiklz@td@main@azi}
+  % -- (Rotated frame)
+  \xdef\@tiklz@td@rot@mat{{1,0,0},{0,1,0},{0,0,1}}
 }
+\makeatother
 
 %%%%%%%%%%%%  Floating point calculations
 
@@ -50,16 +62,21 @@
 
 \makeatletter
 
+\def\convertto#1#2{\strip@pt\dimexpr #2*65536/\number\dimexpr 1#1}
+
 \define@key{@dimensionalize@keys}{unit}{\def\@@@unit{#1}}
-\newcommand{\dimensionalize}[2][]{
+\newcommand{\dimensionalize}[2][]{%
   %
   % Append to #1 the unit \@@@unit.
   % Common use case is to append "pt" to a tikzmath output.
   %
   % -- Parameters
-  \setkeys{@dimensionalize@keys}{unit=pt,#1}
+  \setkeys{@dimensionalize@keys}{unit=pt,#1}%
   % -- Function body
-  \xdef#2{#2\@@@unit}
+  \tikzmath{\@@@@value=#2;} % to pt
+  \def\@pt@unit{pt}%
+  \xdef\@@@@tmp{\@@@@value\@pt@unit} % append "pt" unit
+  \xdef#2{\convertto{\@@@unit}{\@@@@tmp}\@@@unit} % convert to target unit
 }
 
 \newcommand{\rel@pos}[3][]{
@@ -86,24 +103,165 @@
 %%%%%%%%%%%% 3D coordinate system settings
 
 \makeatletter
+
 \define@key{coordKeys}{altitude}{\def\altitude{#1}}
 \define@key{coordKeys}{azimuth}{\def\azimuth{#1}}
-\makeatother
 \newcommand{\tiklzSetViewAngle}[1][]{
   \setkeys{coordKeys}{altitude=20,#1}%
   \setkeys{coordKeys}{azimuth=40,#1}%
   \tikzmath{
-    \tikzAltitude=90-\altitude;
-    \tikzAzimuth=90+\azimuth;
+    \@tiklz@td@main@alt=90-\altitude;
+    \@tiklz@td@main@azi=90+\azimuth;
   }
-  \tdplotsetmaincoords{\tikzAltitude}{\tikzAzimuth}
+  \tdplotsetmaincoords{
+    \@tiklz@td@main@alt}{
+    \@tiklz@td@main@azi}
+  \xdef\@tiklz@td@main@alt{\@tiklz@td@main@alt}
+  \xdef\@tiklz@td@main@azi{\@tiklz@td@main@azi}
+  % View vector
   \tikzmath{
     \X = cos(\altitude)*cos(\azimuth);
     \Y = cos(\altitude)*sin(\azimuth);
     \Z = sin(\altitude);
   }
   \xdef\viewVector{\X,\Y,\Z}
+  \xdef\@tiklz@tdplot@set{}
 }
+
+\define@key{@@rot@keys}{yaw}{\def\@yaw{#1}}
+\define@key{@@rot@keys}{pitch}{\def\@pitch{#1}}
+\define@key{@@rot@keys}{roll}{\def\@roll{#1}}
+\define@key{@@rot@keys}{reset}{\def\@reset{#1}}
+\newcommand{\tiklzSetRotatedCoord}[1][]{
+  \setkeys{@@rot@keys}{yaw=0,#1}
+  \setkeys{@@rot@keys}{pitch=0,#1}
+  \setkeys{@@rot@keys}{roll=0,#1}
+  \setkeys{@@rot@keys}{reset=false,#1}
+  % Compute rotation matrix
+  \tikzmath{
+    \@cy = cos(\@yaw);
+    \@sy = sin(\@yaw);
+    \@cp = cos(\@pitch);
+    \@sp = sin(\@pitch);
+    \@cr = cos(\@roll);
+    \@sr = sin(\@roll);
+  }
+  \def\@Rz{{\@cy,-\@sy,0},{\@sy,\@cy,0},{0,0,1}}
+  \def\@Ry{{\@cp,0,\@sp},{0,1,0},{-\@sp,0,\@cp}}
+  \def\@Rx{{1,0,0},{0,\@cr,-\@sr},{0,\@sr,\@cr}}
+  \matrix@mult{\@Ry}{\@Rx}
+  \matrix@mult{\@Rz}{\@matrix}
+  \ifthenelse{\equal{\@reset}{false}}{
+    \matrix@mult{\@tiklz@td@rot@mat}{\@matrix}
+  }{}
+  \xdef\@tiklz@td@rot@mat{\@matrix}
+  % Extract the roll, pitch and yaw
+  % Source: https://www.learnopencv.com/rotation-matrix-to-euler-angles/
+  \matrix@get[@a]{\@tiklz@td@rot@mat}{1}{1}
+  \matrix@get[@b]{\@tiklz@td@rot@mat}{2}{1}
+  \tikzmath{\@sy=\fpeval{sqrt((\@a)^2+(\@b)^2)};}
+  \pgfmathparse{\@sy<1e-4 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{
+    \matrix@get[@c]{\@tiklz@td@rot@mat}{2}{3}
+    \matrix@get[@d]{\@tiklz@td@rot@mat}{2}{2}
+    \matrix@get[@e]{\@tiklz@td@rot@mat}{3}{1}
+    \tikzmath{
+      \@roll = atan2(-\@c,\@d);
+      \@pitch = atan2(-\@e,\@sy);
+      \@yaw = 0;
+    }
+  }{
+    \matrix@get[@c]{\@tiklz@td@rot@mat}{3}{2}
+    \matrix@get[@d]{\@tiklz@td@rot@mat}{3}{3}
+    \matrix@get[@e]{\@tiklz@td@rot@mat}{3}{1}
+    \tikzmath{
+      \@roll = atan2(\@c,\@d);
+      \@pitch = atan2(-\@e,\@sy);
+      \@yaw = atan2(\@b,\@a);
+    }
+  }
+  \xdef\@yaw{\@yaw}
+  \xdef\@pitch{\@pitch}
+  \xdef\@roll{\@roll}
+  % Set the rotated frame
+  \convertTaitBryanToTikZ{\@yaw}{\@pitch}{\@roll}
+  \tdplotsetrotatedcoords{\TikZalpha}{\TikZbeta}{\TikZgamma}
+}
+
+\makeatother
+
+%%%%%%%%%%%% Circle, partitioned into 2 if needed for cylinder drawing
+
+\makeatletter
+\define@key{@@circle@keys}{name}{\def\@name{#1}}
+\define@key{@@circle@keys}{center}{\def\@center{#1}}
+\define@key{@@circle@keys}{radius}{\def\@radius{#1}}
+\define@key{@@circle@keys}{split}{\def\@split{#1}}
+\define@key{@@circle@keys}{styles}{\def\@styles{#1}}
+\newcommand{\tiklz@circle}[1]{
+  %
+  % Draw a (partitioned) circle.
+  %
+  % Parameters
+  % ----------
+  %   center : circle center coordinates (default: 0,0).
+  %   radius : circle radius (default: 1).
+  %   split : tuple (start,end) angles at which to make the cut of the circle into
+  %           two halves.
+  %   styles : single or tuple, for each circle partition.
+  %
+  % -- Parameters
+  \setkeys{@@circle@keys}{name=circle,#1}
+  \setkeys{@@circle@keys}{center={0,0},#1}
+  \setkeys{@@circle@keys}{radius=1,#1}
+  \setkeys{@@circle@keys}{styles=,#1}
+  \setkeys{@@circle@keys}{split=,#1}
+  % -- Function body
+  \ifthenelse{\equal{\@split}{}}{
+    \draw[\@styles] (\@center) circle (\@radius);
+  }{
+    \list@get[@@ang@start]{\@split}{1}
+    \list@get[@@ang@end]{\@split}{2}
+
+    \list@get[@@style@one]{\@styles}{1}
+    \list@size{\@styles}
+    \ifthenelse{\equal{\@list@size}{1}}{
+      \xdef\@@style@two{\@@style@one}
+    }{
+      \list@get[@@style@two]{\@styles}{2}
+    }
+    % Naming
+    \xdef\@@@one{@one}
+    \xdef\@@@two{@two}
+    \xdef\@@@one@r{@one@r}
+    \xdef\@@@two@r{@two@r}
+    % First half
+    \edef\p@one{\@name_p1}
+    \edef\p@one@r{\@name_p1r}
+    \coordinate (\p@one) at ($(\@center)+(\@@ang@start:\@radius)$);
+    \coordinate (\p@one@r) at ($(\@center)+(\@@ang@end:\@radius)$);
+    \expandafter\xdef\csname \@name\@@@one\endcsname{
+      (\p@one) arc (\@@ang@start:\@@ang@end:\@radius)
+    }
+    \expandafter\xdef\csname \@name\@@@one@r\endcsname{
+      (\p@one@r) arc (\@@ang@end:\@@ang@start:\@radius)
+    }
+    \draw[\@@style@one] \csname\@name\@@@one\endcsname;
+    % Second half
+    \edef\p@two{\@name_p2}
+    \edef\p@two@r{\@name_p2r}
+    \coordinate (\p@two) at ($(\@center)+(\@@ang@end:\@radius)$);
+    \coordinate (\p@two@r) at ($(\@center)+(360+\@@ang@start:\@radius)$);
+    \expandafter\xdef\csname \@name\@@@two\endcsname{
+      (\p@two) arc (\@@ang@end:360+\@@ang@start:\@radius)
+    }
+    \expandafter\xdef\csname \@name\@@@two@r\endcsname{
+      (\p@two@r) arc (360+\@@ang@start:\@@ang@end:\@radius)
+    }
+    \draw[\@@style@two] \csname\@name\@@@two\endcsname;
+  }
+}
+\makeatother
 
 %%%%%%%%%%%% "Loop" block (used in ARC 2020 survey paper with Yue Yu)
 
@@ -572,6 +730,227 @@
   \xdef\QuadCounter{\QuadCounter}
 }
 
+%%%%%%%%%%%% Masten Xombie rocket
+
+\makeatletter
+
+\define@key{@xombie@keys}{pos}{\def\@pos{#1}}
+\define@key{@xombie@keys}{tilt}{\def\@tilt{#1}}
+\define@key{@xombie@keys}{gimbal}{\def\@gimbal{#1}}
+\define@key{@xombie@keys}{scale}{\def\@scale{#1}}
+\newcommand{\xombie}[1][]{
+  \setkeys{@xombie@keys}{pos={0,0},#1}
+  \setkeys{@xombie@keys}{tilt=0,#1}
+  \setkeys{@xombie@keys}{gimbal=0,#1}
+  \setkeys{@xombie@keys}{scale=1,#1}
+
+  \xdef\@gold{yellow!85!black}
+  \xdef\@silver{black!20}
+  \xdef\@silver@darker{black!50}
+  \xdef\@fuel@duct{black}
+  \xdef\@radiator@top{black!70}
+  \xdef\@radiator@bottom{orange}
+  \xdef\@engine@cnxn{black!70}
+  \xdef\@engine@nozzle{black}
+  \xdef\@flame@inner{yellow}
+  \xdef\@flame{orange}
+  \xdef\@flame@outer{red}
+  \xdef\@tank{black!30}
+
+  \tikzset{
+    leg outer/.append style={
+      black!60!white,
+      line width=\@scale*0.6mm
+    },
+    leg inner/.append style={
+      black!40!white,
+      line width=\@scale*0.3mm
+    },
+    tank welds/.append style={
+      line width=\@scale*0.3mm,
+      black!90
+    },
+    top bulkhead/.append style={
+      line width=\@scale*0.5mm,
+      black!90
+    },
+    yellow bars/.append style={
+      yellow!80!black,
+      line width=\@scale*0.4mm
+    },
+    radiator vent/.append style={
+      line width=\@scale*0.05mm
+    }
+  }
+
+  \coordinate (Shift) at (\@pos);
+  \tdplotsetrotatedcoordsorigin{(Shift)}
+  \tiklzSetRotatedCoord[yaw=\@tilt]
+  \begin{scope}[tdplot_rotated_coords,scale=\@scale,
+    line width=\@scale*1pt]
+    % External tank rear
+    \coordinate (Shift) at (0.75,0,0);
+    \tdplotsetrotatedcoordsorigin{(Shift)}
+    \begin{scope}[tdplot_rotated_coords]
+      \fill[\@tank] (-0.45,-0.1)
+      -- (-0.05,-0.1) -- (-0.05,0.95)
+      -- (-0.45,0.95) --cycle;
+      \fill[\@tank] (-0.45,-0.1) arc (-180:0:0.2 and 0.15);
+      \fill[\@tank] (-0.45,0.95) arc (180:0:0.2 and 0.15);
+      \draw[tank welds] (-0.45,-0.1) -- ++(0.4,0);
+      \draw[tank welds] (-0.45,0.95) -- ++(0.4,0);
+    \end{scope}
+
+    % Rear leg
+    \draw[leg outer] (-0.05,-0.2) -- (-0.35,-1.8);
+    \draw[leg inner] (0.,-0.7) -- (-0.325,-1.7);
+    \draw[leg inner] (-0.2,-0.7) -- (-0.325,-1.7);
+
+    % Engine nozzle
+    \def\@nozzle@width{0.2}
+    \def\@nozzle@height{0.35}
+    \def\@flame@height@inner{0.2}
+    \def\@flame@height{0.5}
+    \def\@flame@height@outer{0.8}
+    \coordinate (Shift) at (0.05,-0.95,0);
+    \tdplotsetrotatedcoordsorigin{(Shift)}
+    \tiklzSetRotatedCoord[yaw=\@gimbal]
+    \begin{scope}[tdplot_rotated_coords]
+      \fill[\@flame@outer] (-\@nozzle@width/2,-\@nozzle@height)
+      -- (0,-\@nozzle@height-\@flame@height@outer)
+      -- (\@nozzle@width/2,-\@nozzle@height);
+      \fill[\@flame] (-\@nozzle@width/2,-\@nozzle@height)
+      -- (0,-\@nozzle@height-\@flame@height)
+      -- (\@nozzle@width/2,-\@nozzle@height);
+      \fill[\@flame@inner] (-\@nozzle@width/2,-\@nozzle@height)
+      -- (0,-\@nozzle@height-\@flame@height@inner)
+      -- (\@nozzle@width/2,-\@nozzle@height);
+      
+      \draw[fill=\@engine@nozzle] (\@nozzle@width/2,0)
+      -- (-\@nozzle@width/2,0)
+      -- (-\@nozzle@width/2,-\@nozzle@height)
+      -- (\@nozzle@width/2,-\@nozzle@height)
+      --cycle;
+    \end{scope}
+    \tiklzSetRotatedCoord[yaw=-\@gimbal]
+
+    % Bottom (engine) bulkhead
+    \draw[fill=\@gold] (-0.45,-0.65) arc (-180:0:0.5 and 0.3);
+
+    % Engine top housing
+    \draw[fill=\@engine@cnxn] (-0.15,-0.9)
+    arc (-180:0:0.2 and 0.04) -- ++(0,-0.1) 
+    arc (0:-180:0.2 and 0.02) --cycle;
+
+    % Bottom tank walls
+    \draw[fill=\@gold] (-0.45,-0.65)
+    -- (0.55,-0.65)
+    -- (0.55,0)
+    -- (-0.45,0)
+    --cycle;
+    
+    % Center tank walls
+    \draw[fill=\@silver@darker] (-0.45,0)
+    -- (0.55,0)
+    -- (0.55,1)
+    -- (-0.45,1)
+    --cycle;
+
+    % Left leg
+    \draw[leg inner] (-0.4,-0.7) -- (-1.425,-1.7);
+    \draw[leg inner] (-0.3,-0.7) -- (-1.425,-1.7);
+
+    % Right leg
+    \draw[leg inner] (0.425,-0.7) -- (1.425,-1.7);
+    \draw[leg inner] (0.35,-0.7) -- (1.425,-1.7);
+
+    % Front leg
+    \draw[leg inner] (0.,-0.7) -- (0.425,-1.7);
+    \draw[leg inner] (0.15,-0.7) -- (0.425,-1.7);
+    \draw[leg outer] (0.1,-0.2) -- (0.45,-1.8);
+
+    % Left leg
+    \draw[leg outer] (-0.4,-0.2) -- (-1.5,-1.8);
+
+    % Right leg
+    \draw[leg outer] (0.45,-0.2) -- (1.5,-1.8);
+
+    % Top tank bulkhead
+    \draw[fill=\@silver] (-0.45,1) arc (180:0:0.5 and 0.3);
+    
+    % Bars connecting to top bulkhead
+    \draw[yellow bars] (-0.4,1) -- ++(0,0.75);
+    \draw[yellow bars] (-0.25,1) -- ++(0,0.75);
+    \draw[yellow bars] (0,1) -- ++(0,0.75);
+    \draw[yellow bars] (0.35,1) -- ++(0,0.75);
+    \draw[yellow bars] (0.45,1) -- ++(0,0.75);
+
+    % Payload bottom bulkhead
+    \draw[top bulkhead] (-0.45,1.3) -- ++(1,0);
+
+    % Middle bulkhead
+    \draw[top bulkhead] (-0.45,1) -- (0.55,1);
+    
+    % Middle bottom bulkhead
+    \draw[top bulkhead] (-0.45,0) -- (0.55,0);
+
+    % External tank front
+    \fill[\@tank] (-0.45,-0.1)
+    -- (-0.05,-0.1) -- (-0.05,0.95)
+    -- (-0.45,0.95) --cycle;
+    \fill[\@tank] (-0.45,-0.1) arc (-180:0:0.2 and 0.15);
+    \fill[\@tank] (-0.45,0.95) arc (180:0:0.2 and 0.15);
+    \draw[tank welds] (-0.45,-0.1) -- ++(0.4,0);
+    \draw[tank welds] (-0.45,0.95) -- ++(0.4,0);
+
+    % Top bulkhead
+    \draw[top bulkhead] (-0.45,1.75) -- (0.55,1.75);
+
+    % Side fuel duct
+    \fill[\@fuel@duct] (0.25,-0.55)
+    -- ++(0.1,0) -- ++(0,1.45) --
+    ++(-0.1,0) --cycle;
+    \fill[\@fuel@duct] (0.25,-0.55)
+    arc (-180:0:0.05);
+    \fill[\@fuel@duct] (0.25,0.9)
+    arc (180:0:0.05);
+
+    % Radiator top
+    \def\@radiator@vstep{0.02}
+    \def\@radiator@width{0.2}
+    \foreach \@i in {1,...,8} {
+      \tikzmath{
+        \@y = 0.9-(\@i-1)*\@radiator@vstep;
+      }
+      \draw[radiator vent,\@radiator@top]
+      (0,\@y) -- ++(\@radiator@width,0);
+    }
+    
+    % Radiator bottom
+    \def\@radiator@vstep{0.02}
+    \def\@radiator@width{0.4}
+    \foreach \@i in {1,...,8} {
+      \tikzmath{
+        \@y = -0.4-(\@i-1)*\@radiator@vstep;
+      }
+      \draw[radiator vent,\@radiator@bottom]
+      (-0.4,\@y) -- ++(\@radiator@width,0);
+    }
+  \end{scope}
+  \tiklzSetRotatedCoord[yaw=-\@tilt]
+
+  
+  
+  % \begin{scope}[
+  %   shift={\@pos},
+  %   rotate=\@tilt,
+  %   xshift=-0.05cm]    
+    
+  % \end{scope}
+}
+
+\makeatother
+
 %%%%%%%%%%%% Vector difference
 
 \newcommand{\vectorDiff}[2]{
@@ -716,34 +1095,21 @@
 %%%%%%%%%%%% Center of gravity
 
 \makeatletter
-\define@key{cgKeys}{shift}{\def\shift{#1}}
-\makeatother
+\define@key{cgKeys}{sz}{\def\@cg@radius{#1}}
+\define@key{cgKeys}{pos}{\def\shift{#1}}
 \newcommand{\cg}[1][]{
-  \setkeys{cgKeys}{shift={(0,0)},#1}%
-  \begin{scope}[shift={\shift}]
-    % CG
-    \tikzmath{
-      \cgR = 0.15;
-    }
-    \tikzset{
-      cg bg/.append style={
-        circle,
-        fill=white,
-        draw=black,
-        minimum size=\cgR cm
-      },
-      cg fg/.append style={
-        circle,
-        fill=black,
-        draw=black
-      }
-    }
-    \node[cg bg] at (0,0) {};
-    \draw[cg fg] ($(0,0)+(0:\cgR cm/2)$) arc (0:90:\cgR cm/2) to (0,0) --
-    cycle;
-    \draw[cg fg] ($(0,0)+(180:\cgR cm/2)$) arc (180:270:\cgR cm/2) to (0,0) -- cycle;
+  \setkeys{cgKeys}{sz=0.1,#1}%
+  \setkeys{cgKeys}{pos={0,0},#1}%
+  % -- Function body
+  \coordinate (Shift) at (\shift);
+  \tdplotsetrotatedcoordsorigin{(Shift)}
+  \begin{scope}[tdplot_rotated_coords]
+    \draw[fill=white,semithick] (0,0) circle (\@cg@radius);
+    \fill[black] (\@cg@radius,0) arc (0:90:\@cg@radius) -- (0,0) --cycle;
+    \fill[black] (-\@cg@radius,0) arc (180:270:\@cg@radius) -- (0,0) --cycle;
   \end{scope}
 }
+\makeatother
 
 %%%%%%%%%%%% Cute clock
 
@@ -983,6 +1349,83 @@
     \counter@increment{\@@counter}%
   }%
 }
+\makeatother
+
+%%%%%%%%%%%% Vector math
+
+\makeatletter
+
+\newcommand{\vector@scale}[2]{
+  %
+  % Multiply vector #2 by scalar #1, sets list \@vector.
+  %
+  \list@size{#2}
+  \xdef\@scaled{}
+  \foreach \@@i in {1,...,\@list@size} {
+    \list@get[@a]{#2}{\@@i}
+    \tikzmath{\@b=#1*\@a;}
+    \list@append{\@scaled}{\@b}
+  }
+  \xdef\@vector{\@scaled}
+}
+
+\newcommand{\vector@add}[2]{
+  %
+  % Add two vectors, sets list \@vector.
+  %
+  \list@size{#1}
+  \xdef\@sum{}
+  \foreach \@@i in {1,...,\@list@size} {
+    \list@get[@a]{#1}{\@@i}
+    \list@get[@b]{#2}{\@@i}
+    \tikzmath{\@c=\@a+\@b;}
+    \list@append{\@sum}{\@c}
+  }
+  \xdef\@vector{\@sum}
+}
+
+\newcommand{\matrix@get}[4][]{
+  %
+  % Get element (#3,#4) from matrix #2. Store result in #1 (default:
+  % \@matrix@element).
+  %
+  \list@get[@@@element]{#2}{#3}
+  \list@get[@@@element]{\@@@element}{#4}
+  \ifthenelse{\equal{#1}{}}{%
+    \xdef\@matrix@element{\@@@element}%
+  }{%
+    \expandafter\xdef\csname#1\endcsname{\@@@element}%
+  }
+}
+
+\newcommand{\matrix@mult}[2]{
+  %
+  % Multiply two matrices #1*#2, sets list \@matrix.
+  %
+  \list@size{#1}
+  \xdef\@@m{\@list@size}
+  \list@get[@row]{#1}{1}
+  \list@size{\@row}
+  \xdef\@@n{\@list@size}
+  \xdef\@mult{}
+  \foreach \@@i in {1,...,\@@m} {
+    \xdef\@new@row{}
+    \list@get[@A]{#1}{\@@i}
+    \foreach \@@j in {1,...,\@@n} {
+      \xdef\@new@el{}
+      \foreach \@@k in {1,...,\@@n} {
+        \matrix@get[@b]{#2}{\@@k}{\@@j}
+        \list@get[@a]{\@A}{\@@k}
+        \tikzmath{\@new@el=\@new@el+\@a*\@b;}
+        \xdef\@new@el{\@new@el}
+      }
+      \list@append{\@new@row}{\@new@el}
+    }
+    \list@append{\@mult}{{\@new@row}}
+  }
+  \xdef\@matrix{\@mult}
+}
+
 \makeatother
 
 %%%%%%%%%%%% Helper grid

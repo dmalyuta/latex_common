@@ -397,7 +397,7 @@
 \newcommand{\cref}[1]{\PrintRefs{Chapter}{#1}}
 \newcommand{\appref}[1]{\PrintRefs{Appendix}{#1}}
 \newcommand{\figref}[1]{\PrintRefs{Figure}{#1}}
-\newcommand{\tabref}[1]{\PrintRefs{Table}{#1}}
+\newcommand{\tabref}[2][]{\PrintRefs[#1]{Table}{#2}}
 \renewcommand{\footref}[1]{\PrintRefs{Footnote}{#1}}
 \makeatletter
 \define@key{algKeys}{start}{\def\startline{#1}}

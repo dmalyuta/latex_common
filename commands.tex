@@ -77,21 +77,30 @@
 \newcommand{\bigO}[1]{\mathcal O\left(#1\right)}
 
 % Compute science
+\makeatletter
 \definecolor{listinggray}{gray}{0.9}
 \definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
 \colorlet{Darkgreen}{green!60!black}
+\lstdefinelanguage{Julia}%
+{morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+    end,export,false,for,function,immutable,import,importall,if,in,%
+    macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+    using,while},%
+  sensitive=true,%
+  alsoother={\$},%
+  morecomment=[l]\#,%
+  morecomment=[n]{\#=}{=\#},%
+  morestring=[s]{"}{"},%
+  morestring=[m]{'}{'},%
+}[keywords,comments,strings]
+%
 \lstset{
-  backgroundcolor=\color{lbcolor},
-  tabsize=4,    
-  % rulecolor=,
-  language=[GNU]C++,
   basicstyle=\scriptsize,
-  upquote=true,
+  backgroundcolor=\color{lbcolor},
+  tabsize=4,
   aboveskip={1.5\baselineskip},
-  columns=fixed,
-  showstringspaces=false,
-  extendedchars=false,
   breaklines=true,
+  upquote=true,
   prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
   frame=single,
   numbers=left,
@@ -103,9 +112,18 @@
   commentstyle=\color{Darkgreen},
   stringstyle=\color{red},
   numberstyle=\color[rgb]{0.205, 0.142, 0.73},
-  % \lstdefinestyle{C++}{language=C++,style=numbers}’.
 }
-\newcommand{\cppcode}[2][]{\lstinputlisting[language=C++,#1]{#2}}
+%
+\lstdefinestyle{listing@C++}{
+  language=[GNU]C++,
+}
+%
+\lstdefinestyle{listing@Julia}{%
+  language = Julia,
+}
+\newcommand{\cppcode}[2][]{\lstinputlisting[style=listing@C++,#1]{#2}}
+\newcommand{\juliacode}[2][]{\lstinputlisting[style=listing@Julia,#1]{#2}}
+\makeatother
 
 % Analysis
 

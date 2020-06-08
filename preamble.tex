@@ -92,7 +92,8 @@
 \def\natbiboptions{numbers,sort}
 }{}
 \ifthenelse{\isundefined{\nobibpkg}}{
-\@ifclassloaded{ieeeconf}{}{\usepackage[\natbiboptions]{natbib}\nobibliography*}
+\@ifclassloaded{ieeeconf}{}{
+\@ifclassloaded{elsarticle}{}{\usepackage[\natbiboptions]{natbib}\nobibliography*}}
 }{}
 \makeatother
 

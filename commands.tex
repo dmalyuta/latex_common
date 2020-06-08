@@ -15,9 +15,12 @@
 \newcommand{\Intersection}{\bigcap}
 \newcommand{\set}[1]{\mathcal #1}
 \newcommand{\setcomplement}[1]{#1^{\mathrm{c}}}
-\newcommand{\eucledian}{\mathbb E}
-\newcommand{\reals}{\mathbb R}
-\newcommand{\extendedreals}{\overline\reals}
+\newcommand{\eucledian}[1][]{\ifthenelse{\equal{#1}{}}{\mathbb E}{\mathbb #1}}
+\DeclareMathOperator{\@convhull}{conv}
+\newcommand{\reals}[1][]{%
+  \ifthenelse{\equal{#1}{extended}}{\overline}{}{\mathbb R}%
+}
+\newcommand{\extendedreals}{\overline\reals} % DEPRECATED
 \newcommand{\real}{\mathbb R}
 \newcommand{\pos}[1][R]{\mathbb #1_{++}}
 \newcommand{\nonneg}[1][\reals]{#1_{+}}
@@ -73,6 +76,37 @@
 \newcommand{\false}{\algvar{false}\xspace}
 \newcommand{\bigO}[1]{\mathcal O\left(#1\right)}
 
+% Compute science
+\definecolor{listinggray}{gray}{0.9}
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+\colorlet{Darkgreen}{green!60!black}
+\lstset{
+  backgroundcolor=\color{lbcolor},
+  tabsize=4,    
+  % rulecolor=,
+  language=[GNU]C++,
+  basicstyle=\scriptsize,
+  upquote=true,
+  aboveskip={1.5\baselineskip},
+  columns=fixed,
+  showstringspaces=false,
+  extendedchars=false,
+  breaklines=true,
+  prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+  frame=single,
+  numbers=left,
+  showtabs=false,
+  showspaces=false,
+  showstringspaces=false,
+  identifierstyle=\ttfamily,
+  keywordstyle=\color[rgb]{0,0,1},
+  commentstyle=\color{Darkgreen},
+  stringstyle=\color{red},
+  numberstyle=\color[rgb]{0.205, 0.142, 0.73},
+  % \lstdefinestyle{C++}{language=C++,style=numbers}’.
+}
+\newcommand{\cppcode}[2][]{\lstinputlisting[language=C++,#1]{#2}}
+
 % Analysis
 
 \newcommand{\Lone}[1]{\|#1\|_1}
@@ -103,12 +137,22 @@
 }
 \newcommand{\normalcone}[2]{\set{N}_{#1}(#2)}
 \DeclareMathOperator{\conehull}{cone}
-\DeclareMathOperator{\convhull}{conv}
+\makeatletter
+\DeclareMathOperator{\@convhull}{conv}
+\newcommand{\convhull}[1][]{%
+  \ifthenelse{\equal{#1}{closed}}{\overline}{}\@convhull%
+}
+\DeclareMathOperator{\@closed@convex@envelope}{\overline{co}}
+\newcommand{\cce}{\@closed@convex@envelope}
+\makeatother
 \DeclareMathOperator{\extreme}{ext}
 \newcommand{\indicator}[1]{\delta_{#1}}
 \newcommand{\support}[2][delta]{\ifthenelse{\equal{#1}{delta}}{%
     \delta^*_{#2}%
   }{\sigma_{#2}}}
+\newcommand{\conj}{^{*}}
+\newcommand{\conjj}{^{**}}
+\newcommand{\shuffle}{^{\uparrow}}
 
 % Functions
 
@@ -119,6 +163,8 @@
 \DeclareMathOperator{\nul}{null}
 \DeclareMathOperator{\rank}{rank}
 \DeclareMathOperator{\range}{range}
+\DeclareMathOperator{\gph}{gph}
+\DeclareMathOperator{\img}{img}
 \DeclareMathOperator{\linspan}{span}
 \newcommand{\diag}[2][short]{\mathrm{diag}\ifthenelse{\equal{#1}{short}}{(#2)}{\left(#2\right)}}
 \DeclareMathOperator{\spec}{spec}
@@ -136,6 +182,21 @@
   \ifthenelse{\equal{#1}{}}{}{\setlength\arraycolsep{#1}}%
   \begin{matrix}#2\end{matrix}}
 \newcommand{\Mnl}{\protect\\} % protected newline
+\newcommand{\linmap}{\mathcal}
+\makeatletter
+\newcommand{\toset}{%
+  \def\arr@offset{0.15em}
+  \def\arr@len{0.7em}
+  \def\arr@height{0.3em}
+  \tikz[minimum height=0ex,outer sep=0,inner sep=0]
+  \path[-{Latex[length=0.8mm]}]
+  node (a) at (0,0) {}
+  node (b) at (0,\arr@height) {}
+  (a) edge ++(\arr@len,0)
+  (b) edge ++(\arr@len,0)
+  (a) edge[draw=none] ++(0,-\arr@offset);%
+}
+\makeatother
 
 % Generic math
 
@@ -295,6 +356,7 @@
 \DeclareMathOperator*{\minimize}{\mathrm{minimize}}
 \DeclareMathOperator*{\maximize}{\mathrm{maximize}}
 \DeclareMathOperator*{\find}{\mathrm{find}}
+\DeclareMathOperator{\val}{val}
 
 % Miscellaneous
 
@@ -317,6 +379,7 @@
 % Referencing low-level code
 \def\SectionLabel{section}
 \def\SubsectionLabel{subsection}
+\def\SubsubsectionLabel{subsubsection}
 \def\ChapterLabel{chapter}
 \def\AppendixLabel{appendix}
 \def\FigureLabel{fig}
@@ -396,11 +459,12 @@
 }
 % Document section references
 \newcommand{\sref}[1]{\PrintRefs{Section}{#1}}
-\newcommand{\ssref}[1]{\PrintRefs[otherLabel=Subsection]{Section}{#1}}
+\newcommand{\ssref}[2][]{\PrintRefs[otherLabel=Subsection,#1]{Section}{#2}}
+\newcommand{\sssref}[2][]{\PrintRefs[otherLabel=Subsubsection,#1]{Section}{#2}}
 \newcommand{\cref}[1]{\PrintRefs{Chapter}{#1}}
 \newcommand{\appref}[1]{\PrintRefs{Appendix}{#1}}
 \newcommand{\figref}[1]{\PrintRefs{Figure}{#1}}
-\newcommand{\tabref}[1]{\PrintRefs{Table}{#1}}
+\newcommand{\tabref}[2][]{\PrintRefs[#1]{Table}{#2}}
 \renewcommand{\footref}[1]{\PrintRefs{Footnote}{#1}}
 \makeatletter
 \define@key{algKeys}{start}{\def\startline{#1}}

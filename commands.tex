@@ -132,6 +132,9 @@
 \newcommand{\Matrix}[2][]{%
   \ifthenelse{\equal{#1}{}}{}{\setlength\arraycolsep{#1}}%
   \begin{bmatrix}#2\end{bmatrix}}
+\renewcommand{\Array}[2][]{%
+  \ifthenelse{\equal{#1}{}}{}{\setlength\arraycolsep{#1}}%
+  \begin{matrix}#2\end{matrix}}
 \newcommand{\Mnl}{\protect\\} % protected newline
 
 % Generic math

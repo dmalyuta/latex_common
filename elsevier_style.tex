@@ -299,8 +299,12 @@ columnsep=\elsColSep]{geometry}
     \@node{info text} (keywords_prev) at ($(available.south west)+(0,-\@vsep@small)$)
     {\textit{Keywords:}};
 
-    \foreach \@key in \@keywords {
-      \@node{info text} (keywords_prev) at (keywords_prev.south west) {\@key};
+    \pykzmathinline{len([\@keywords])}
+    \xdef\keywordlen{\out}
+
+    \foreach \@i in {1,...,\keywordlen} {
+      \pykzmathinline{([\@keywords])[\@i-1]}
+      \@node{info text} (keywords_prev) at (keywords_prev.south west) {\out};
     }
 
     \@node{title} (abstract)

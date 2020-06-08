@@ -44,6 +44,9 @@ columnsep=\elsColSep]{geometry}
 %%%%%%%%%%%%%%%%%%%%%%%
 % Heading and footer
 %%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\newcommand{\listget}[3][]{\list@get[#1]{#2}{#3}}
+\makeatother
 \fancypagestyle{elsevierfancy}
 {
   \fancyhf{}
@@ -55,22 +58,21 @@ columnsep=\elsColSep]{geometry}
   \fancyhead[C]{
     \itshape
     \footnotesize
-    \makeatletter
-    \xdef\@counter{1}
-    \xdef\@maxauthor{3}
-    \foreach \authorfullname in \elsauthorlist {%
+    \xdef\elscounter{1}
+    \xdef\elsmaxauthor{3}
+    \foreach \authorfullnameaffil in \elsauthorlist {%
+      \listget[authorfullname]{\authorfullnameaffil}{2}%
       \StrLeft{\authorfullname}{1}[\authornamefirstchar]%
       \authornamefirstchar.~% % first name
       \elsgetlistelement{\authorfullname}{2}% % last name
-      \pgfmathparse{\@counter==\@maxauthor ? 1:0}%
+      \pgfmathparse{\elscounter==\elsmaxauthor ? 1:0}%
       \ifthenelse{\pgfmathresult>0}{~et al.\breakforeach}{}%
-      \pgfmathparse{\@counter<min(\@maxauthor,\elsauthorcount)-1 ? 1:0}%
+      \pgfmathparse{\elscounter<min(\elsmaxauthor,\elsauthorcount)-1 ? 1:0}%
       \ifthenelse{\pgfmathresult>0}{,~}{}%
-      \pgfmathparse{\@counter==min(\@maxauthor,\elsauthorcount)-1 ? 1:0}%
+      \pgfmathparse{\elscounter==min(\elsmaxauthor,\elsauthorcount)-1 ? 1:0}%
       \ifthenelse{\pgfmathresult>0}{~and~}{}%
-      \elsaddtocounter{\@counter}%
+      \elsaddtocounter{\elscounter}%
     }
-    \makeatother
     / Annual Reviews in Control
   }
 }
@@ -98,11 +100,11 @@ columnsep=\elsColSep]{geometry}
 % Document head
 %%%%%%%%%%%%%%%%%%%%%%%
 
+\makeatletter
 \newcommand{\elstitle}[1]{
-  \makeatletter
   \def\@elstitle{#1}
-  \makeatother
 }
+\makeatother
 
 \newcommand{\elsappendtolist}[2]{
   % #1: list
@@ -110,57 +112,236 @@ columnsep=\elsColSep]{geometry}
   \ifthenelse{\equal{#1}{}}{\xdef#1{#2}}{\xdef#1{#1,#2}}
 }
 
+\makeatletter%
 \newcommand{\elsgetlistelement}[2]{%
   % #1: list
   % #2: element index (1-indexing)
-  \makeatletter%
   \xdef\@@counter{1}%
   \foreach \element in #1 {%
     \pgfmathparse{\@@counter==#2 ? 1:0}%
     \ifthenelse{\pgfmathresult>0}{\element\breakforeach}{}%
     \elsaddtocounter{\@@counter}%
   }%
-  \makeatother%
 }
+\makeatother%
 
+\makeatletter%
 \newcommand{\elsaddtocounter}[2][]{%
-  \makeatletter%
   \xdef\@increment{1}%
   \ifthenelse{\equal{#1}{}}{}{\xdef\@increment{#1}}%
   \tikzmath{#2=int(#2+\@increment);}%
   \xdef#2{#2}%
-  \makeatother%
 }
+\makeatother%
 
 \xdef\elsauthorlist{}
+\xdef\elsaffiliationlist{}
 \xdef\elsauthorcount{0}
-\newcommand{\elsauthor}[1]{%
-  \elsappendtolist{\elsauthorlist}{{#1}}%
+\xdef\elsaffiliationcount{0}
+\newcommand{\elsauthor}[2]{%
+  \elsappendtolist{\elsauthorlist}{{#1,{#2}}}%
   \elsaddtocounter{\elsauthorcount}%
 }
+\newcommand{\elsaffiliation}[2]{%
+  \elsappendtolist{\elsaffiliationlist}{{#1,{#2}}}%
+  \elsaddtocounter{\elsaffiliationcount}%
+}
 
-\newcommand{\elspaperhead}{
+\makeatletter
+\define@key{@elspaperhead@keys}{received}{\def\@receive@date{#1}}
+\define@key{@elspaperhead@keys}{revised}{\def\@revised@date{#1}}
+\define@key{@elspaperhead@keys}{accepted}{\def\@accepted@date{#1}}
+\define@key{@elspaperhead@keys}{available}{\def\@available@date{#1}}
+\define@key{@elspaperhead@keys}{keywords}{\def\@keywords{#1}}
+\NewEnviron{elspaperhead}[1][]{
+  \setkeys{@elspaperhead@keys}{received=,#1}
+  \setkeys{@elspaperhead@keys}{revised=,#1}
+  \setkeys{@elspaperhead@keys}{accepted=,#1}
+  \setkeys{@elspaperhead@keys}{available=,#1}
+  \setkeys{@elspaperhead@keys}{keywords=,#1}
+  
   \twocolumn[
+  \begin{pykzpicture}{latex_common/PykZ}
+
+    \def\@vshift{4mm}
+    \def\@logo@height{2cm}
+
+    \tikzset{
+      separator/.append style={
+        line width=0.1mm
+      },
+      fatbar/.append style={
+        line width=1mm,
+        line cap=rect
+      },
+      review/.append style={
+        scale=1.2,
+        anchor=north west
+      }
+    }
+    
+    \@node{
+      anchor=north west,
+      yshift=-\@vshift
+    } (elslogo) at (0,0)
+    {\includegraphics[height=\@logo@height]{latex_common/media/elsevier_logo.pdf}};
+
+    \@node{
+      anchor=south east
+    } (arcfp) at (\textwidth,-\@logo@height-\@vshift)
+    {\includegraphics[height=\@logo@height+\@vshift]{latex_common/media/arc_fp.pdf}};
+
+    \path let \p1=(arcfp.east), \p2=(arcfp.west) in \pgfextra{
+      \tikzmath{\@H = \textwidth-(\x1-\x2)-\@vshift;}
+      \dimensionalize{\@H}
+      \@draw{separator} (0,0) -- ++(\@H,0) node(tmp){};
+    };
+
+    \path let \p1=(elslogo.south east), \p2=(tmp) in \pgfextra{
+      \@draw{
+        fill=black!20,
+        draw=none} (\x1+\@vshift,\y1) rectangle (\x2,\y2-\@vshift);
+      \@node{scale=1.7} at ({(\x1+\@vshift+\x2)/2},{(\y1+\y2-\@vshift)/2})
+      {Annual Reviews in Control};
+    };
+    
+    \@draw{fatbar} ($(elslogo.south west)+(0,-\@vshift)$) node(tmp){} -- ++(\textwidth,0);
+    \@node{review} at ($(tmp)+(0,-5mm)$) {Review};
+  \end{pykzpicture}
+  
   \vspace{5mm}
   \thispagestyle{empty}
-  \makeatletter
   {\LARGE\@elstitle}\medskip
 
   \xdef\@counter{1}
-  \foreach \authorfullname in \elsauthorlist {%
+  \foreach \authorfullnameaffil in  \elsauthorlist {%
+    \list@get[affiliation]{\authorfullnameaffil}{1}%
+    \list@get[authorfullname]{\authorfullnameaffil}{2}%
     \large%
     {\color{black!50}\elsgetlistelement{\authorfullname}{1}}~% % first name
-    \elsgetlistelement{\authorfullname}{2}% % last name
+    \elsgetlistelement{\authorfullname}{2}$^{\text{
+        \hyperlink{affil\affiliation}{\affiliation}
+      }}$% % last name
     \pgfmathparse{\@counter<\elsauthorcount-1 ? 1:0}%
     \ifthenelse{\pgfmathresult>0}{,~}{}%
     \pgfmathparse{\@counter==\elsauthorcount-1 ? 1:0}%
     \ifthenelse{\pgfmathresult>0}{~and~}{}%
     \elsaddtocounter{\@counter}%
   }
-  \makeatother
+  \vspace{3mm}
+
+  \foreach \affiliation@details in \elsaffiliationlist {%
+    \list@get[@letter]{\affiliation@details}{1}
+    \list@get[@text]{\affiliation@details}{2}
+    {\footnotesize\hypertarget{affil\@letter}{$^{\text{\@letter}}$}~\textit{\@text}}
+  }
   \vspace{5mm}
+  
+  \def\@vsep@big{0.7cm}
+  \def\@vsep@small{0.6*\@vsep@big}
+  \def\@kw@width{0.25\textwidth}
+  \def\@hsep{0.1\textwidth}
+
+  \tikzmath{\@abstract@width=(\textwidth-\@kw@width-\@hsep)/0.9;}
+  \dimensionalize{\@abstract@width}
+
+  \newsavebox\Abstract
+  \begin{lrbox}{\Abstract}
+    \begin{minipage}{\@abstract@width}
+      \BODY
+    \end{minipage}
+  \end{lrbox}
+
+  \begin{pykzpicture}{latex_common/PykZ}
+
+    \tikzset{
+      separator/.append style={
+        line width=0.1mm
+      },
+      title/.append style={
+        anchor=north west,
+        scale=0.9
+      },
+      info text/.append style={
+        scale=0.8,
+        anchor=north west,
+        yshift=-1mm
+      },
+      abstract/.append style={
+        anchor=north west,
+        align=left,
+        yshift=-1mm,
+        scale=0.9
+      }
+    }
+
+    \@draw{separator} (0,0) -- ++(\textwidth,0);
+
+    \@node{title} (info) at (0,-\@vsep@big) {A~R~T~I~C~L~E~~~~I~N~F~O};
+
+    \@draw{separator}
+    ($(info.south west)+(0,-\@vsep@small)$) --
+    ++(\@kw@width,0);
+
+    \@node{info text} (history) at ($(info.south west)+(0,-\@vsep@small)$)
+    {\textit{Article history:}};
+    \@node{info text} (received) at (history.south west) {Received
+      \@receive@date};
+    \@node{info text} (revised) at (received.south west) {Revised
+      \@revised@date};
+    \@node{info text} (accepted) at (revised.south west) {Accepted
+      \@accepted@date};
+    \@node{info text} (available) at (accepted.south west) {Available
+      \@available@date};
+
+    \@draw{separator} ($(available.south west)+(0,-\@vsep@small)$) --
+    ++(\@kw@width,0);
+    \@node{info text} (keywords_prev) at ($(available.south west)+(0,-\@vsep@small)$)
+    {\textit{Keywords:}};
+
+    \foreach \@key in \@keywords {
+      \@node{info text} (keywords_prev) at (keywords_prev.south west) {\@key};
+    }
+
+    \@node{title} (abstract)
+    at (\@kw@width+\@hsep,-\@vsep@big) {A~B~S~T~R~A~C~T};
+    
+    \@draw{separator} ($(info.south west)+(\@kw@width+\@hsep,-\@vsep@small)$) --
+    ++(\textwidth-\@kw@width-\@hsep,0);
+
+    \@node{abstract} (abstract) at ($(info.south west)+(\@kw@width+\@hsep,-\@vsep@small)$)
+    {\usebox\Abstract};
+
+    \@node{scale=0.9,anchor=north east,yshift=-1mm}
+    (copyright)
+    at (abstract.south east)
+    {{\small\copyright}~ 2020 Elsevier Ltd. All rights reserved.};
+
+    \@draw{separator} ($(copyright.north east)+(0,-\@vsep@big)$)
+    -- ++(-\textwidth,0);
+    
+  \end{pykzpicture}
+
+  \renewcommand*\l@section{\@dottedtocline{3}{0.5em}{2.3em}}
+  \renewcommand\@dotsep{3}
+  \renewcommand\tableofcontents{%
+    \titleformat{\section}{\normalfont\bfseries\normalsize}{}{0cm}{Contents}
+    \section*{\contentsname
+      \@mkboth{%
+        \MakeUppercase\contentsname}{\MakeUppercase\contentsname}}%
+    \@starttoc{toc}%
+  }
+  % \renewcommand\cftchapafterpnum{\vskip10pt}
+  \renewcommand\cftsecafterpnum{\vskip3pt}
+  
+  \tableofcontents
+
+  \vspace{7mm}
   ]
 }
+\newcommand{\@node}[1]{\node[#1]}
+\newcommand{\@draw}[1]{\draw[#1]}
+\makeatother
 
 %%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography

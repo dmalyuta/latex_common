@@ -8,10 +8,12 @@
 /**/*.aux
 /**/*.snm
 /**/*.toc
-/**/*pdf
+#/**/*pdf
 /**/#*#
 /**/*.synctex.gz
 /**/auto/
+/tiklz_canvas/*pdf
 /tiklz_canvas/canvases/*
 !/tiklz_canvas/canvases/beamer_example.tex
 !/tiklz_canvas/canvases/standalone_example.tex
+!/media

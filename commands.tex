@@ -4,6 +4,7 @@
 \newcommand{\EE}{\expectation}
 \DeclareMathOperator{\variance}{\mathrm{Var}}
 \newcommand{\Var}{\variance}
+\newcommand{\Prob}{\mathbb P}
 
 % Sets
 
@@ -378,6 +379,7 @@
 % Referencing low-level code
 \def\SectionLabel{section}
 \def\SubsectionLabel{subsection}
+\def\SubsubsectionLabel{subsubsection}
 \def\ChapterLabel{chapter}
 \def\AppendixLabel{appendix}
 \def\FigureLabel{fig}
@@ -457,11 +459,12 @@
 }
 % Document section references
 \newcommand{\sref}[1]{\PrintRefs{Section}{#1}}
-\newcommand{\ssref}[1]{\PrintRefs[otherLabel=Subsection]{Section}{#1}}
+\newcommand{\ssref}[2][]{\PrintRefs[otherLabel=Subsection,#1]{Section}{#2}}
+\newcommand{\sssref}[2][]{\PrintRefs[otherLabel=Subsubsection,#1]{Section}{#2}}
 \newcommand{\cref}[1]{\PrintRefs{Chapter}{#1}}
 \newcommand{\appref}[1]{\PrintRefs{Appendix}{#1}}
 \newcommand{\figref}[1]{\PrintRefs{Figure}{#1}}
-\newcommand{\tabref}[1]{\PrintRefs{Table}{#1}}
+\newcommand{\tabref}[2][]{\PrintRefs[#1]{Table}{#2}}
 \renewcommand{\footref}[1]{\PrintRefs{Footnote}{#1}}
 \makeatletter
 \define@key{algKeys}{start}{\def\startline{#1}}

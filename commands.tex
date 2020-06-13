@@ -414,6 +414,7 @@
 \def\DefinitionLabel{definition}
 \def\LemmaLabel{lemma}
 \def\ExampleLabel{example}
+\def\ListingLabel{listing}
 \newcommand{\GetLabel}[1]{\expandafter\csname #1Label\endcsname}
 \makeatletter
 \define@key{printRefKeys}{otherLabel}{\def\otherLabel{#1}}
@@ -511,6 +512,8 @@
 \newcommand{\dref}[2][]{\PrintRefs[#1]{Definition}{#2}}
 \newcommand{\lref}[2][]{\PrintRefs[#1]{Lemma}{#2}}
 \newcommand{\eref}[2][]{\PrintRefs[#1]{Example}{#2}}
+% Other references
+\newcommand{\lstref}[2][]{\PrintRefs[#1]{Listing}{#2}}
 
 % % Tables
 

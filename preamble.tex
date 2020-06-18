@@ -12,6 +12,7 @@
 \usepackage{changepage}
 \usepackage{scrextend}
 \usepackage{expl3}
+\usepackage{stackengine}
 
 % Math
 \makeatletter
@@ -65,9 +66,9 @@
 \usepackage{tikz-3dplot}
 \makeatletter
 \@ifclassloaded{standalone}{}{\usepackage[tikz]{mdframed}}
+\@ifclassloaded{beamer}{}{\usepackage{tocloft}}
+\@ifclassloaded{beamer}{}{\usepackage{enumitem}}
 \makeatother
-\usepackage{tocloft}
-\usepackage{enumitem}
 \usepackage{listings}
 \usepackage{algorithm, algorithmicx}
 \usepackage{algpseudocode}%[noend]
@@ -127,12 +128,17 @@
 
 % Referencing
 \makeatletter
-\@ifclassloaded{UWThesis/uwthesis}{}{\usepackage[breaklinks=true]{hyperref}
+\@ifclassloaded{UWThesis/uwthesis}{}{
+\@ifclassloaded{beamer}{
+\usepackage{hyperref}
+}{
+\usepackage[breaklinks=true]{hyperref}
 % Fix the following error from sometimes appearing:
 %   latex pdfTeX error (ext4): \pdfendlink ended up in different nesting level than \pdfstartlink.
 % Fix from David Carlisle's comment on https://github.com/latex3/hyperref/issues/19
 \patchcmd\@combinedblfloats{\box\@outputbox}{\unvbox\@outputbox}{}{%
 \errmessage{\noexpand\@combinedblfloats could not be patched}%
+}
 }%
 }
 \makeatother

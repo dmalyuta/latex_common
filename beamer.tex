@@ -54,44 +54,30 @@
 \footlineon
 
 \setbeamertemplate{footline}{
-  \begin{tikzpicture}[
-    overlay,
-    remember picture
-    ]
-    \tiklzcommonsettings
+  \begin{pykzpicture}[overlay,remember picture]
     \tikzset{
       progressbar/.append style={
-        red!50,
-        opacity=0.5
-      },
-      progressbar top/.append style={
-        red!70!black,
-        line width=0.5mm,
-        opacity=0.5
+        red!50
       },
       progresstext/.append style={
+        label,
         black,
-        xshift=-1mm
+        anchor=south west,
+        scale=0.8
       }
     }
     \tikzmath{
-      \barh = 3mm;
+      \barh = 1.5mm;
       \progress = \insertframenumber/\inserttotalframenumber;
     }
     \fill[progressbar]
     (current page.south west)
     rectangle
     ++(\progress\paperwidth,\barh*1pt);
-    \draw[progressbar top]
-    ($(current page.south west)+(0,\barh*1pt)$)
-    --
-    ++(\progress\paperwidth,0);
-    \node[progresstext,anchor=east]
-    at ($(current page.south west)+(\progress\paperwidth,\barh/2*1pt)$)
+    \node[progresstext]
+    at ($(current page.south west)+(\progress\paperwidth,0)$)
     {\insertframenumber/\inserttotalframenumber};
-    \cuteclock[shift={($(current page.south west)+(\progress\paperwidth+3mm,\barh/2*1pt+0.2mm)$)},
-    scale=0.5,every node/.append style={transform shape}]
-  \end{tikzpicture}
+  \end{pykzpicture}
   % \leavevmode%
   % \hbox{%
   % \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{section in head/foot}%

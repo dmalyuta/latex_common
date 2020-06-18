@@ -515,26 +515,23 @@
 % Other references
 \newcommand{\lstref}[2][]{\PrintRefs[#1]{Listing}{#2}}
 
-% % Tables
+% Miscallaneous
 
-% \makeatletter
-
-% \define@key{@table@keys}{type}{\def\@type{#1}}
-% \define@key{@table@keys}{columns}{\def\@columns{#1}}
-% \newcommand{\customcell}[2][]{%
-%   %
-%   % Changes particular cell to type of cell using \multicolumn.
-%   %
-%   % Inputs
-%   % ------
-%   % #1 (optional): parameters
-%   % #2: cell text
-%   \setkeys{@table@keys}{type=c,#1}%
-%   \setkeys{@table@keys}{columns=1,#1}%
-%   \multicolumn{\@columns}{\@type}{#2}%
-% }
-
-% \makeatother
+\makeatletter
+\xdef\@content@box@counter{0}
+\newenvironment{contentbox}
+{
+  \expandafter\newsavebox\csname @content\@content@box@counter\endcsname
+  \lrbox{\csname @content\@content@box@counter\endcsname}
+}{
+  \endlrbox
+  \counter@increment{\@content@box@counter}
+}
+\newcommand{\usecontent}{
+  \tikzmath{\@counter=int(\@content@box@counter-1);}
+  \expandafter\usebox\csname @content\@counter\endcsname
+}
+\makeatother
 
 %%% Local Variables:
 %%% mode: latex

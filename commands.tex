@@ -50,8 +50,6 @@
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
 \newcommand{\bdry}{\partial}
 \newcommand{\image}[1]{\mathrm{im}(#1)}
-\DeclareMathOperator{\comain}{dom}
-\newcommand{\domain}[1]{\comain(#1)}
 \newcommand{\setHtwo}{\set{H}_2}
 \newcommand{\setLinfty}{\set{L}_\infty}
 \newcommand{\Ellipsoid}[1]{\mathcal E_{#1}}
@@ -520,16 +518,22 @@
 \makeatletter
 \xdef\@content@box@counter{0}
 \newenvironment{contentbox}
-{
-  \expandafter\newsavebox\csname @content\@content@box@counter\endcsname
-  \lrbox{\csname @content\@content@box@counter\endcsname}
+{%
+  \xdef\box@number{\@content@box@counter}%
+  \counter@increment{\@content@box@counter}%
+  \expandafter\newsavebox\csname @content\box@number\endcsname%
+  \lrbox{\csname @content\box@number\endcsname}%
 }{
-  \endlrbox
-  \counter@increment{\@content@box@counter}
+  \endlrbox%
 }
-\newcommand{\usecontent}{
-  \tikzmath{\@counter=int(\@content@box@counter-1);}
-  \expandafter\usebox\csname @content\@counter\endcsname
+\newcommand{\usecontent}[1][]{%
+  \ifthenelse{\equal{#1}{}}{%
+    \tikzmath{\@counter=int(\@content@box@counter-1);}%
+    \xdef\@counter{\@counter}%
+  }{%
+    \xdef\@counter{#1}%
+  }%
+  \expandafter\usebox\csname @content\@counter\endcsname%
 }
 \makeatother
 

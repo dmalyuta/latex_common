@@ -1,0 +1,666 @@
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Fonts ::..
+% See fonts at: https://www.tug.org/pracjourn/2006-1/hartke/hartke.pdf
+% \usepackage{mathpple}
+% \usepackage{pxfonts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Initialization function which must be called ::..
+\def\csm@refs{} % {label:reftext} associations
+\newcommand{\csm@load@ref}{%
+  \pykzmathinline[@refs@cache@exists]{'true' if os.path.exists('../../refs.txt')%
+    else 'false'}%
+  \ifthenelse{\boolean{\@refs@cache@exists}}{%
+    \pykzexec{f=open('../../refs_cache.tex','w');
+      f.write(chr(92)+'xdef'+chr(92)+'out'+chr(123));
+      f.write(open('../../refs.txt','r').read());
+      f.write(chr(125));
+      f.close()}%
+    \input{refs_cache.tex}%
+    \xdef\csm@refs{\out}
+  }{%
+    \xdef\csm@refs{}%
+  }%
+}
+\newcommand{\csm@add@ref}[1]{%
+  \ifthenelse{\equal{\csm@refs}{}}{%
+    \xdef\csm@refs{'\@key@label':#1}%
+  }{%
+    \pykzexec{reflist=eval('{'+open('../../refs.txt','r').read()+'}')}%
+    \pykzmathinline[@label@exists]{'true' if '\@key@label' in reflist.keys()%
+      else 'false'}%
+    \ifthenelse{\boolean{\@label@exists}}{}{%
+      \xdef\csm@refs{\csm@refs,'\@key@label':#1}
+    }%
+  }%
+\begin{@pie@shell}
+printf "\csm@refs" > refs.txt
+\end{@pie@shell}%
+}
+\newcommand{\csm@init@bib}{%
+\begin{@pie@shell}
+printf '[]' > main_bib.txt &&
+printf '[]' > sb_bib.txt
+\end{@pie@shell}%
+}
+\newcommand{\csminit}{
+  \csm@load@ref{}
+  \csm@init@bib{}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% ..:: Page geometry ::..
+\usepackage{geometry}
+\def\side@margin{1.5cm}
+\def\top@margin{2.2cm}
+\def\bot@margin{1.6cm}
+\def\foot@margin{6mm}
+\def\column@sep{3mm}
+\geometry{
+  papersize={200mm,273mm},
+  left=\side@margin,
+  right=\side@margin,
+  top=\top@margin,
+  bottom=\bot@margin,
+  footskip=\foot@margin,
+  twocolumn,
+  columnsep=\column@sep
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Section titles ::..
+\usepackage{helvet}
+\titleformat{\section}{\normalfont\fontsize{10}{12}\sffamily\bfseries\uppercase}{}{0cm}{#1}
+\titlespacing*{\section}{0cm}{4mm}{0mm}
+\titleformat{\subsection}{\normalfont\fontsize{10}{12}\sffamily\bfseries\slshape}{}{0cm}{#1}
+\titlespacing*{\subsection}{0cm}{4mm}{0mm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Header/footer ::..
+\def\csm@pubdate{}
+\newcommand{\csmdate}[1]{\xdef\csm@pubdate{#1}}
+\usepackage{fontawesome}
+\fancypagestyle{csmfancy}
+{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyfoot[LO]{
+    \sffamily
+    \fontsize{9}{11}
+    \textbf{\thepage}~~%
+    \fontsize{6}{8}
+    \uppercase{\bfseries IEEE Control Systems}~~%
+    \tikz[outer sep=0,inner sep=0]{%
+      \node[scale=0.8] at (0,0) {\faChevronRight};
+      \node[scale=0.8] at (0.4em,0) {\faChevronRight};}
+    {\normalfont\sffamily\MakeUppercase\csm@pubdate}
+  }%
+  \fancyfoot[RE]{
+    \fontsize{6}{8}
+    \sffamily
+    {\MakeUppercase\csm@pubdate}
+    \tikz[outer sep=0,inner sep=0]{
+      \node[scale=0.8] at (0,0) {\faChevronLeft};
+      \node[scale=0.8] at (0.4em,0) {\faChevronLeft};}
+    \uppercase{\bfseries IEEE Control Systems}~~%
+    \fontsize{9}{11}
+    \textbf{\thepage}%
+  }%
+}
+\pagestyle{csmfancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Equations ::..
+\allowdisplaybreaks
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Bibliography ::..
+\renewcommand*{\bibfont}{\scriptsize}
+\setlength{\bibsep}{1pt}
+\renewcommand{\bibsection}{}
+\setlength{\bibhang}{0pt}
+\nobibliography*
+% >> Customized citation for main body/sidebar distinguishing <<
+\gdef\citations@sb@count{0}
+\let\origcite\cite
+\renewcommand{\cite}[2][]{%
+  \pykzmathinline[num@cites]{len('#2'.split(','))}%
+  \gdef\cite@count{0}%
+  \foreach \@citation in {#2} {%
+    \counter@increment{\cite@count}%
+    % >> Check if citation is in "main" list <<
+    \pykzexec{main_bib=eval(open('../../main_bib.txt','r').read())}%
+    \pykzmathinline[citation@number]{next((i for i,x in
+      enumerate(main_bib) if x=='\@citation'),-2)+1}%
+    \pykzmathinline[citation@in@main]{'true' if \citation@number>-1 else 'false'}%
+    \ifthenelse{\boolean{\citation@in@main}}{%
+      \csm@cite[#1]{\@citation}{\citation@number}%
+    }{}%
+    % >> Check if citation is in "sidebar" list <<
+    \ifthenelse{\not\boolean{\citation@in@main}}{%
+      \pykzexec{sb_bib=eval(open('../../sb_bib.txt','r').read())}%
+      \pykzmathinline[citation@number]{next((i for i,x in
+        enumerate(sb_bib) if x=='\@citation'),-2)+1}%
+      \pykzmathinline[citation@in@sb]{'true' if \citation@number>-1 else 'false'}%
+      \ifthenelse{\boolean{\citation@in@sb}}{%
+        \csm@cite[#1]{\@citation}{S\citation@number}%
+      }{}%
+    }{%
+      \gdef\citation@in@sb{false}%
+    }%
+    % >> Add citation to list, if does not yet exist <<
+    \pykzmathinline[citation@exists]{'true' if ('\citation@in@main'=='true'%
+      or '\citation@in@sb'=='true') else 'false'}%
+    \ifthenelse{\boolean{\citation@exists}}{}{%
+      \ifthenelse{\not\boolean{\@inside@sb}}{%
+        \pykzexec{main_bib=main_bib+['\@citation']}%
+        \pykzmathinline[citations@main@count]{len(main_bib)}%
+        \csm@cite[#1]{\@citation}{\citations@main@count}%
+        % >> Write to file <<
+        \pykzexec{f=open('../../main_bib.txt','w');f.write(str(main_bib));f.close()}%
+      }{%
+        \pykzexec{sb_bib=sb_bib+['\@citation']}%
+        \pykzmathinline[citations@sb@count]{len(sb_bib)}%
+        \csm@cite[#1]{\@citation}{S\citations@sb@count}%
+        % >> Write to file <<
+        \pykzexec{f=open('../../sb_bib.txt','w');f.write(str(sb_bib));f.close()}%
+      }%
+    }%
+    \pgfmathparse{\cite@count<\num@cites ? 1:0}%
+    \ifthenelse{\pgfmathresult>0}{%
+      , %
+    }{}%
+  }%
+}
+\newcommand{\csm@cite}[3][]{[\hyperlink{#2}{#3}]}
+\newcommand{\csmbibliography}[2][]{%
+  \scriptsize%
+  \ifthenelse{\equal{#2}{main}}{%
+    \def\citation@list{main_bib.txt}
+  }{%
+    \def\citation@list{sb_bib.txt}
+  }%
+  \pykzexec{bib=eval(open('../../\citation@list','r').read())}%
+  \ifthenelse{\equal{#1}{}}{%
+    \pykzmathinline[@bibitems]{len(bib)}%
+    \xdef\bib@range{1,...,\@bibitems}%
+  }{%
+    \xdef\bib@range{#1}%
+  }%
+  \foreach \@i in \bib@range {%
+    \pykzmathinline[@citation]{bib[\@i-1]}%
+    \ifthenelse{\boolean{\@inside@sb}}{%
+      \noindent [S\hypertarget{\@citation}{{\@i}}]~~\bibentry{\@citation}.%
+    }{%
+      \noindent [\hypertarget{\@citation}{{\@i}}]~~\bibentry{\@citation}.%
+    }%
+    
+  }%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Figures ::..
+% >> Re-define figure environment to expand its optional argument first <<
+% Src: https://tex.stackexchange.com/questions/11336/macro-for-figure-position
+\let\origfigure\figure
+\let\endorigfigure\endfigure
+\renewenvironment{figure}[1][]{%
+  \expandafter\origfigure\expandafter[#1]%
+}{%
+  \endorigfigure
+}
+% >> CSM-aesthetic figure <<
+\newcounter{csmsubfigure}
+\gdef\@csm@caption@vsep{2mm}
+\gdef\@csm@figure@vpad{4mm}
+\gdef\@inside@figure{false}
+\definecolor{csm@figure@text}{HTML}{186cb6}
+\definecolor{csm@figure@bg}{HTML}{dde4f3}
+\define@key{@csm@keys}{caption}{\def\@key@caption{#1}}
+\define@key{@csm@keys}{label}{\def\@key@label{#1}}
+\define@key{@csm@keys}{columns}{\def\@key@columns{#1}}
+\define@key{@csm@keys}{position}{\def\@key@position{#1}}
+\newenvironment{csmfigure}[1][]
+{%
+  \setkeys{@csm@keys}{caption=,#1}
+  \setkeys{@csm@keys}{label=,#1}
+  \setkeys{@csm@keys}{columns=1,#1}
+  \setkeys{@csm@keys}{position=,#1}
+  %
+  \ifthenelse{\equal{\@key@columns}{1}}{
+    \def\@csm@fig@baselinewidth{\columnwidth}
+  }{
+    \def\@csm@fig@baselinewidth{\textwidth}
+  }
+  %
+  \setcounter{csmsubfigure}{0}%
+  \refstepcounter{figure}
+  %
+  \xdef\@this@fig@count{\@content@box@counter}
+  \begin{contentbox}
+    \begin{minipage}{\@csm@fig@baselinewidth}
+      \centering
+    }
+    % BODY
+    {
+    \end{minipage}
+  \end{contentbox}
+  %
+  \select@figure[\@key@position]{begin}{\@key@columns}
+  \pgfdeclarelayer{bg}
+  \pgfsetlayers{bg,main}
+  \begin{pykzpicture}
+    \tikzset{
+      csm figure/.append style={
+        text width=\@csm@fig@baselinewidth,
+        align=center
+      },
+      csm caption/.append style={
+        text width=\@csm@fig@baselinewidth,
+        align=left,
+        anchor=north west,
+        font={\sffamily\small},
+        yshift={-\@csm@figure@vpad-\@csm@caption@vsep}
+      },
+      csm figure background/.append style={
+        csm@figure@bg,
+        rounded corners=1mm
+      }
+    }
+    % >> Figure picture <<
+    \node[csm figure] (fig) at (0,0) {\usecontent[\@this@fig@count]};
+    % >> Background <<
+    \begin{pgfonlayer}{bg}
+      \fill[csm figure background]
+      ($(fig.south west)+(0,-\@csm@figure@vpad)$)
+      rectangle
+      ($(fig.north east)+(0,\@csm@figure@vpad)$);
+    \end{pgfonlayer}
+    % >> Caption <<
+    \node[csm caption] at (fig.south west)
+    {{\bfseries\color{csm@figure@text} FIGURE \thefigure}~\@key@caption};
+    \label{\@key@label}
+    \csm@add@ref{'\thefigure'}
+  \end{pykzpicture}
+  \select@figure{end}{\@key@columns}
+}
+\newcommand{\select@figure}[3][]{%
+  \ifthenelse{\equal{#2}{begin}}{%
+    \ifthenelse{\equal{#3}{1}}{\begin{figure}[#1]}{%
+        \ifthenelse{\equal{#1}{t}}{\begin{figure*}[t]}{%
+            \ifthenelse{\equal{#1}{b}}{\begin{figure*}[b]}{\begin{figure*}}}}%
+        }{\ifthenelse{\equal{#3}{1}}{\end{figure}}{\end{figure*}}}%
+}
+\define@key{@csm@keys}{width}{\def\@key@width{#1}}
+\newenvironment{csmsubfigure}[1][]
+{%
+  \setkeys{@csm@keys}{width=\textwidth,#1}%
+  \setkeys{@csm@keys}{caption=,#1}%
+  \setkeys{@csm@keys}{label=,#1}%
+  %
+  \begin{contentbox}
+    \begin{minipage}[t]{\@key@width}
+      \centering
+    }
+    % BODY
+    {
+    \end{minipage}%
+  \end{contentbox}%
+  \begin{pykzpicture}
+    \tikzset{
+      csm caption/.append style={
+        text width=\@key@width,
+        align=center,
+        anchor=north west,
+        font={\sffamily\footnotesize},
+        yshift=-\@csm@caption@vsep
+      }
+    }
+    % >> Figure picture <<
+    \node (fig) at (0,0) {\usecontent};
+    % >> Caption <<
+    \refstepcounter{csmsubfigure}
+    \node[csm caption] at (fig.south west) {(\alph{csmsubfigure})~\@key@caption};
+    \label{\@key@label}
+    \csm@add@ref{'\thefigure(\alph{csmsubfigure})'}
+  \end{pykzpicture}%
+}
+\newcommand\SLASH{\textbackslash}
+\newcommand{\csmfigref}[1]{%
+  \pykzexec{reflist=eval('{'+open('../../refs.txt','r').read()+'}')}%
+  \pykzmathinline[@fig@reftext]{reflist['fig:#1']}%
+  Figure~\hyperref[fig:#1]{\@fig@reftext}%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Sidebars ::..
+\newcounter{csmsidebar}
+\newcounter{csmsidebarequation}
+\newcounter{csmsidebarfigure}
+\setcounter{csmsidebar}{0}
+\setcounter{csmsidebarequation}{0}
+\setcounter{csmsidebarfigure}{0}
+\definecolor{csm@sidebar@bg}{HTML}{f2e9c4}
+\gdef\@inside@sb{false}
+\gdef\@csm@sidebar@pad{3mm}
+\gdef\@csm@sidebar@title@vsep{1mm}
+\define@key{@csm@keys}{title}{\def\@key@title{#1}}
+\define@key{@csm@keys}{banner}{\def\@key@banner{#1}}
+\newenvironment{csmsidebar}[1][]
+{%
+  \setkeys{@csm@keys}{title=,#1}
+  \setkeys{@csm@keys}{label=,#1}
+  \setkeys{@csm@keys}{columns=2,#1} % 1|2|4
+  \setkeys{@csm@keys}{banner=,#1} % 1|2|4
+  \setkeys{@csm@keys}{position=t,#1} % 1|2|4
+  %
+  \tikzmath{\@pages=int(max(1,floor(\@key@columns/2)));}
+  \ifthenelse{\equal{\@key@columns}{1}}{%
+    \def\@csm@fig@baselinewidth{\columnwidth}
+  }{
+    \tikzmath{\@csm@fig@baselinewidth=\@pages*\textwidth;}
+    \dimensionalize{\@csm@fig@baselinewidth}
+  }
+  %
+  \refstepcounter{csmsidebar}
+  \xdef\@this@sidebar@count{\@content@box@counter}
+  \begin{contentbox}%
+    \tikzmath{%
+      \@cols=int(\@key@columns);%
+      \page@width=\@csm@fig@baselinewidth-2*\@csm@sidebar@pad;%
+    }%
+    \dimensionalize{\page@width}%
+    % >> Set equation numbering to sidebar equations <<
+    \xdef\cur@eq@count{\arabic{equation}}%
+    \renewcommand{\theequation}{\sffamily S\arabic{equation}}%
+    \setcounter{equation}{\arabic{csmsidebarequation}}%
+    % >> Set figure numbering to sidebar figures <<
+    \xdef\cur@fig@count{\arabic{figure}}%
+    \renewcommand{\thefigure}{S\arabic{figure}}%
+    \setcounter{figure}{\arabic{csmsidebarfigure}}%
+    %
+    \gdef\@inside@sb{true}%
+    \xdef\sb@citation@start{\citations@sb@count}%
+    %
+    \xdef\currentpagewidth{\page@width}%
+    \begin{minipage}{\page@width}%
+      \fontsize{9}{13}\sffamily\sansmath%
+      \ifthenelse{\equal{\@cols}{1}}{%
+        \@key@banner%
+        
+      }{%
+        \begin{multicols}{\@cols}[\@key@banner]%
+        }%
+      }%
+      % BODY
+      {%
+        % >> Print references <<
+        \xdef\sb@citation@end{\citations@sb@count}%
+        \pgfmathparse{\sb@citation@end-\sb@citation@start>0 ? 1:0}%
+        \ifthenelse{\pgfmathresult>0}{%
+          \tikzmath{\sb@citation@start=int(\sb@citation@start+1);}%
+          \section{References}%
+          
+          \csmbibliography[\sb@citation@start,...,\sb@citation@end]{sb}%
+        }{}%
+        %
+      \ifthenelse{\equal{\@cols}{1}}{}{\end{multicols}}%
+      % >> Set equation, figure numbering back to global <<
+      \setcounter{csmsidebarequation}{\arabic{equation}}%
+      \setcounter{equation}{\cur@eq@count}%
+      \setcounter{csmsidebarfigure}{\arabic{figure}}%
+      \setcounter{figure}{\cur@fig@count}%
+      %
+      \gdef\@inside@sb{false}
+      %
+    \end{minipage}%
+  \end{contentbox}
+  %
+  \def\sb@corner@fillet{1mm}
+  \tikzset{
+    csm sidebar content/.append style={
+      text width=\@csm@fig@baselinewidth,
+      align=center,
+      % fill=red,
+      % fill opacity=0.2,
+      anchor=north west
+    },
+    csm sidebar title/.append style={
+      % text width=\@csm@fig@baselinewidth-2*\@csm@sidebar@pad,
+      font={\normalfont\fontsize{12}{14}\sffamily\bfseries},
+      % fill=yellow,
+      xshift=\@csm@sidebar@pad,
+      anchor=south west
+    },
+    csm sidebar background/.append style={
+      csm@sidebar@bg,
+      rounded corners=\sb@corner@fillet
+    }
+  }
+  %
+  \select@figure[\@key@position]{begin}{\@key@columns}
+  %
+  \pgfdeclarelayer{bg}
+  \pgfdeclarelayer{fg}
+  \pgfsetlayers{bg,main,fg}
+  \begin{pykzpicture}
+    % >> Sidebar title <<
+    % \begin{pgfonlayer}{fg}
+    %   \node[circle,fill=red,minimum size=1mm] at (0,0) {};
+    % \end{pgfonlayer}
+    \coordinate (origin) at (0,0);
+    \node[csm sidebar title] (sb title) at (0,0)
+    {\@key@title};
+    \label{\@key@label}
+    \csm@add@ref{'\@key@title'}
+    % >> Sidebar content <<
+    \node[csm sidebar content] (sb content) at (0,-\@csm@sidebar@title@vsep)
+    {\usecontent[\@this@sidebar@count]};
+    \path let \p1=(sb content.north), \p2=(sb content.south east) in \pgfextra{
+      \tikzmath{
+        \@sb@content@width=\x2-\x1;
+        \@sb@content@height=\y1-\y2;
+      }
+      \dimensionalize{\@sb@content@width,\@sb@content@height}
+    };
+    \pgfmathparse{\@pages>1 ? 1:0}
+    \ifthenelse{\pgfmathresult>0}{%
+      \fill[csm sidebar background]
+      ($(sb content.south)+(0,-\@csm@sidebar@pad)$)
+      rectangle ($(sb content.north east)+(0,\@csm@sidebar@pad)$);
+    }{}
+    % >> Sidebar background <<
+    \begin{pgfonlayer}{bg}
+      \fill[csm sidebar background]
+      ($(sb content.south west)+(0,-\@csm@sidebar@pad)$)
+      rectangle
+      ($(sb title.north east-|sb content.north east)+(0,\@csm@sidebar@pad)$);
+    \end{pgfonlayer}
+  \end{pykzpicture}
+  % 
+  \select@figure{end}{\@key@columns}
+  % 
+  \pgfmathparse{\@pages>1 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{%
+    % 
+    \select@figure[\@key@position]{begin}{\@key@columns}
+    %
+    \pgfdeclarelayer{bg}
+    \pgfdeclarelayer{fg}
+    \pgfsetlayers{bg,main,fg}
+    \begin{pykzpicture}
+      % >> Sidebar title <<
+      % \begin{pgfonlayer}{fg}
+      %   \node[circle,fill=red,minimum size=1mm] at (0,0) {};
+      % \end{pgfonlayer}
+      \coordinate (origin) at (0,0);
+      \node[csm sidebar title] (sb title) at (0,0)
+      {\phantom\@key@title};
+      % >> Sidebar content <<
+      \begin{scope}[local bounding box={sb content}]
+        \path[clip] (0,-\@csm@sidebar@title@vsep) rectangle
+        ++(\@sb@content@width-\column@sep/2,-\@sb@content@height);
+        \node[csm sidebar content,anchor=north] at
+        (-\column@sep/2,-\@csm@sidebar@title@vsep)
+        {\usecontent[\@this@sidebar@count]};
+      \end{scope}
+      % \pgfmathparse{\@pages>1 ? 1:0}
+      % \ifthenelse{\pgfmathresult>0}{%
+      % \fill[csm sidebar background] (sb content.south) rectangle (sb
+      % content.north east);
+      % }{}
+      %   >> Sidebar background <<
+      \begin{pgfonlayer}{bg}
+        \fill[csm sidebar background]
+        ($(sb content.south west)+
+        (-\@csm@sidebar@pad,-\@csm@sidebar@pad)$)
+        node(sb bg sw){} rectangle
+        ($(sb title.north east-|sb content.north east)+
+        (\@csm@sidebar@pad,\@csm@sidebar@pad)$)
+        node(sb bg ne){};
+      \end{pgfonlayer}
+      % >> Page margin fill <<
+      \begin{scope}[remember picture,overlay]
+        \node[circle,fill=red,minimum size=1mm] at (-1cm,0) {};
+        \fill[csm sidebar background]
+        ($(sb bg sw)+(2*\sb@corner@fillet,0)$) --
+        ($(sb bg sw|-sb bg ne)+(2*\sb@corner@fillet,0)$) --
+        ++(-2*\side@margin,0) |-cycle;
+      \end{scope}
+    \end{pykzpicture}
+    % 
+    \select@figure{end}{\@key@columns}
+    % 
+  }{}
+}
+\newcommand{\csmsbref}[1]{%
+  \pykzexec{reflist=eval('{'+open('../../refs.txt','r').read()+'}')}%
+  \pykzmathinline[@sb@reftext]{reflist['sb:#1']}%
+  ``\hyperref[sb:#1]{\@sb@reftext}''%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Mathematical text environments (theorem, etc.) ::..
+\gdef\@csm@thm@kinds{}
+\define@key{@csm@keys}{kind}{\def\@key@kind{#1}}
+\newenvironment{csmtheorem}[1][]
+{%
+  \setkeys{@csm@keys}{kind=theorem,#1}%
+  \setkeys{@csm@keys}{title=\@key@kind,#1}%
+  \pykzmathinline[@key@title]{'\@key@title'[0].upper()+'\@key@title'[1:]}
+  %
+  \pykzmathinline[kind@known]{'true' if '\@key@kind' in [\@csm@thm@kinds] else%
+    'false'}%
+  \ifthenelse{\boolean{\kind@known}}{}{%
+    \pykzmathinline[@csm@thm@kinds]{str([\@csm@thm@kinds]+['\@key@kind'])[1:-1]}%
+    \newcounter{csm@\@key@kind}%
+    \setcounter{csm@\@key@kind}{0}%
+  }%
+  \refstepcounter{csm@\@key@kind}%
+  \vspace{4mm}%
+  \noindent%
+  {\fontsize{10}{12}\sffamily%
+    \@key@title~\arabic{csm@\@key@kind}\newline}%
+}
+% BODY
+{}
+% >> Specific instances of csmtheorem <<
+\newenvironment{theorem}[1][]{\begin{csmtheorem}[kind=theorem,#1]}{\end{csmtheorem}}
+\newenvironment{assumption}[1][]{\begin{csmtheorem}[kind=assumption,#1]}{\end{csmtheorem}}
+\newenvironment{condition}[1][]{\begin{csmtheorem}[kind=condition,#1]}{\end{csmtheorem}}
+\newenvironment{definition}[1][]{\begin{csmtheorem}[kind=definition,#1]}{\end{csmtheorem}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Nomenclature custom sidebars ::..
+\newcommand{\csmsymbols}{
+  \begin{csmsidebar}[
+    title={List of Symbols},
+    columns=1,
+    position=H
+    ]%
+    \pykzexec{syms=eval(open('../../syms.txt','r').read())}%
+    \pykzmathinline[@num@sym@defs]{len(syms)-1}%
+    \pykzexec{f=open('../../sym_table.tex','w');
+      print(chr(92)+'begin{tabularx}{'+chr(92)+'textwidth}{lX}',file=f)}%
+    \foreach \@i in {0,...,\@num@sym@defs} {%
+      \pykzexec{print((syms[\@i][0]+' '+chr(38)+' '+syms[\@i][1]+' '+
+        chr(92)*2).replace(':::',chr(36)).replace('@',chr(92)),file=f)}%
+    }%
+    \pykzexec{print(chr(92)+'end{tabularx}',file=f);f.close()}%    
+    \input{sym_table.tex}%
+  \end{csmsidebar}%
+}
+\newcommand{\csmabbreviations}{
+  \begin{csmsidebar}[
+    title={List of Abbreviations},
+    columns=1,
+    position=H
+    ]%
+    \pykzexec{abbrevs=eval(open('../../abbrevs.txt','r').read())}%
+    \pykzmathinline[@num@abbrev@defs]{len(abbrevs)-1}%
+    \pykzexec{f=open('../../abbrev_table.tex','w');
+      print(chr(92)+'begin{tabularx}{'+chr(92)+'textwidth}{lX}',file=f)}%
+    \foreach \@i in {0,...,\@num@abbrev@defs} {%
+      \pykzexec{print((abbrevs[\@i][0]+' '+chr(38)+' '+abbrevs[\@i][1]+' '+
+        chr(92)*2).replace(':::',chr(36)).replace('@',chr(92)),file=f)}%
+    }%
+    \pykzexec{print(chr(92)+'end{tabularx}',file=f);f.close()}%    
+    \input{abbrev_table.tex}%
+  \end{csmsidebar}%
+}
+\newcommand{\defsym}[2]{%
+  % Encode $-->::: to not be misread by shell
+  \noexpandarg
+  \StrSubstitute{#1}{^^24}{^^3a^^3a^^3a}[\sym@name]
+  \StrSubstitute{#2}{^^24}{^^3a^^3a^^3a}[\sym@desc]
+  \normalexpandarg
+  % Encode \-->@
+  \replace@BS{\sym@name}{\sym@name}
+  \replace@BS{\sym@desc}{\sym@desc}
+  %
+  \pykzmathinline[@sym@cache@exists]{'true' if os.path.exists('../../syms.txt')%
+    else 'false'}%
+  \ifthenelse{\boolean{\@sym@cache@exists}}{}{%
+\begin{@pie@shell}
+printf '[]' > syms.txt
+\end{@pie@shell}%
+  }
+  %
+  \pykzexec{syms=eval(open('../../syms.txt','r').read())}%
+  \pykzmathinline[@def@idx]{next((i for i,symdef in enumerate(syms)
+    if '\sym@name'==symdef[0]),-1)}%
+  \ifthenelse{\equal{\@def@idx}{-1}}{%
+    \pykzexec{syms.append(('\sym@name','\sym@desc'))}%
+  }{%
+    \pykzexec{syms[\@def@idx]=('\sym@name','\sym@desc')}%
+  }%
+  \pykzexec{f=open('../../syms.txt','w');f.write(str(syms));f.close()}%
+}
+\newcommand{\defabbrev}[2]{%
+  % Encode $-->::: to not be misread by shell
+  \noexpandarg
+  \StrSubstitute{#1}{^^24}{^^3a^^3a^^3a}[\abbrev@name]
+  \StrSubstitute{#2}{^^24}{^^3a^^3a^^3a}[\abbrev@desc]
+  \normalexpandarg
+  % Encode \-->@
+  \replace@BS{\abbrev@name}{\abbrev@name}
+  \replace@BS{\abbrev@desc}{\abbrev@desc}
+  %
+  \pykzmathinline[@abbrev@cache@exists]{'true' if os.path.exists('../../abbrevs.txt')%
+    else 'false'}%
+  \ifthenelse{\boolean{\@abbrev@cache@exists}}{}{%
+\begin{@pie@shell}
+printf '[]' > abbrevs.txt
+\end{@pie@shell}%
+  }
+  %
+  \pykzexec{abbrevs=eval(open('../../abbrevs.txt','r').read())}%
+  \pykzmathinline[@def@idx]{next((i for i,abbrevdef in enumerate(abbrevs)
+    if '\abbrev@name'==abbrevdef[0]),-1)}%
+  \ifthenelse{\equal{\@def@idx}{-1}}{%
+    \pykzexec{abbrevs.append(('\abbrev@name','\abbrev@desc'))}%
+  }{%
+    \pykzexec{abbrevs[\@def@idx]=('\abbrev@name','\abbrev@desc')}%
+  }%
+  \pykzexec{f=open('../../abbrevs.txt','w');f.write(str(abbrevs));f.close()}%
+}
+\newcommand{\replace@BS}[2]{{\escapechar=`@
+    \xdef#2{\detokenize\expandafter{#1}\@empty}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\makeatother
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

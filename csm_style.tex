@@ -528,7 +528,8 @@ printf '[]' > sb_bib.txt
 }
 \newcommand{\csmsbref}[1]{%
   \pykzexec{reflist=eval('{'+open('../../refs.txt','r').read()+'}')}%
-  \pykzmathinline[@sb@reftext]{reflist['sb:#1']}%
+  \pykzmathinline[@sb@reftext]{reflist['sb:#1'] if 'sb:#1' in reflist.keys()
+    else '??'}%
   ``\hyperref[sb:#1]{\@sb@reftext}''%
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,137 +1,542 @@
-% \usetheme{metropolis}
+\makeatletter
 
-% \AtBeginSection[]
-% {
-% \begin{frame}<beamer>
-% \frametitle{Overview}
-% \tableofcontents[
-%   currentsection,
-%   sectionstyle=show/shaded,
-%   subsectionstyle=show/hide/hide
-% ]
-% \end{frame}
-% }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Colors ::..
+\definecolor{beamerDarkBlue}{HTML}{26415d}
+\definecolor{beamerBlue}{HTML}{356397}
+\definecolor{beamerGreen}{HTML}{5da9a1}
+\definecolor{beamerYellow}{HTML}{f1d46a}
+\definecolor{beamerRed}{HTML}{db6245}
+\definecolor{beamerBlack}{HTML}{000000}
+\definecolor{beamerGrey}{HTML}{acacac}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% % Reduce list left margin
-% \setlength{\leftmargini}{0pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Font ::..
+% Font size
+\usepackage{scrextend}
+\changefontsizes{8pt}
 
-% % \setbeamercolor{block title}{use=structure,fg=white,bg=purple!75!black}
-% % \setbeamercolor{block body}{use=structure,fg=black,bg=white!20!white}
-% \metroset{block=fill, progressbar=foot}
+% Check and cross marks
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\goodmark}{{\color{beamerGreen}\cmark}}
+\newcommand{\badmark}{{\color{beamerRed}\xmark}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% formatting
-
-\mode<presentation>
-{
-  \usetheme{default}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Text highlighting ::..
+% From answer: https://tex.stackexchange.com/a/7545/90535
+\newlength{\hl@depth@ref}
+\settodepth{\hl@depth@ref}{g}
+\newlength{\hl@height@ref}
+\settoheight{\hl@height@ref}{T}
+\newlength{\hl@width}%
+\newcommand{\beamerhighlight}[2][beamerYellow]%
+{%
+  \settowidth{\hl@width}{#2}%
+  \colorbox{#1}%
+  {%      
+    \raisebox{-\hl@depth@ref}%
+    {%
+      \parbox[b][\hl@height@ref+\hl@depth@ref][c]{\hl@width}{\centering#2}%
+    }%
+  }%
 }
-\setbeamertemplate{navigation symbols}{}
-\usecolortheme[rgb={0.13,0.28,0.59}]{structure}
-% \setbeamertemplate{itemize subitem}{--}
-\setbeamertemplate{frametitle} {
-  \begin{center}
-    {\large\bf \insertframetitle}
-  \end{center}
-}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\setbeamertemplate{theorems}[numbered]
-
-\setbeamertemplate{bibliography item}{\insertbiblabel}
-
-\newcommand\footlineon{
-  \setbeamertemplate{footline} {
-    \vskip 0.1cm
-    \begin{beamercolorbox}[ht=2.5ex,dp=1.125ex,leftskip=.8cm,rightskip=.6cm]{structure}
-      \footnotesize \insertsection
-      \hfill
-      % Danylo Malyuta and \Behcet{} \Acikmese{}
-      \hfill
-      {\insertframenumber/\inserttotalframenumber}
-    \end{beamercolorbox}
-    % \vskip 0.45cm
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: TikZ elements ::..
+% Hyperlinkable nodes
+% from: https://tex.stackexchange.com/a/36111/90535
+\tikzset{
+  hyperlink node/.style={
+    alias=sourcenode,
+    append after command={
+      let     \p1 = (sourcenode.north west),
+      \p2=(sourcenode.south east),
+      \n1={\x2-\x1},
+      \n2={\y1-\y2} in
+      node [inner sep=0pt, outer sep=0pt,anchor=north west,at=(\p1)]
+      {\hyperlink{#1}{\XeTeXLinkBox{\phantom{\rule{\n1}{\n2}}}}}
+    }
   }
 }
-\footlineon
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Footer: progress bar and sections list ::..
+\setbeamertemplate{navigation symbols}{}
+% >> Progress variables <<
+\newcommand{\slidefooter}[1]{
+  \def\slidefooter@text{#1}
+}
+\def\footer@text@xshift{1mm}
+\def\pagecounter@top{}
+% >> Section list variables <<
+\def\short@section{}
+\def\beamer@sections{}
+\def\saved@beamer@sections{}
+\def\beamer@appendices{}
+\def\saved@beamer@appendices{}
+\def\appendix@started{false}
+\def\appendix@start@slide{}
+\def\saved@appendix@start@slide{-1}
+\newcommand{\beamersection}[2][]{
+  % Add a new section to the slides
+  \pykzexec{options='#1'.split(',')}
+  \pykzmathinline[is@appendix]{'true' if 'appendix' in options else 'false'}
+  \pykzmathinline[short@section]{''.join(s for s in options if s!='appendix')}
+  \ifthenelse{\equal{\short@section}{}}{
+    \xdef\short@section{#2}
+  }{}
+  \ifthenelse{\equal{\is@appendix}{false} \AND \equal{\appendix@started}{true}}{
+    \PackageError{beamer}{Cannot have non-appendix sections after appendix has
+      started}{Include the appendix optional argument}
+  }{
+    \ifthenelse{\equal{\is@appendix}{true} \AND \equal{\appendix@started}{false}}{
+      % Sets the state of the presentation into appendix mode
+      \xdef\appendix@start@slide{\insertframenumber}
+      \xdef\appendix@started{true}
+      % Create an appendix demarcation slide
+      \begin{frame}
+        \tikzset{
+          appendix text/.style={}
+        }
+        \begin{beamertikzpicture}
+          \getframecoord{0,0}
+          \node[appendix text] at (\framecoord) {%
+            \beamerhighlight[beamerDarkBlue]{\color{white}Appendices}};
+        \end{beamertikzpicture}
+      \end{frame}
+    }{}
+  }
+  \section{#2}
+  % Add to list of all sections
+  \ifthenelse{\equal{\appendix@started}{false}}{
+    \tikzmath{
+      \current@slide@number = \insertframenumber;
+    }
+    \xdef\@variable{beamer@sections}
+  }{
+    \tikzmath{
+      \current@slide@number = int(\insertframenumber-\appendix@start@slide);
+    }
+    \xdef\@variable{beamer@appendices}
+  }
+  \ifthenelse{\equal{\csname \@variable\endcsname}{}}{
+    \expandafter\xdef\csname \@variable\endcsname{
+      \short@section/\current@slide@number}
+  }{
+    \expandafter\xdef\csname \@variable\endcsname{
+      \short@section/\current@slide@number,\csname \@variable\endcsname}
+  }
+}
+%%%%%%%%%%%%%%%%%
+% Make the footer
+%%%%%%%%%%%%%%%%%
+\newcommand{\get@section@color}[1]{\pykzmathinline[this@section@color]{
+    section_color_wheel[\section@counter-(\section@counter//n_section_colors)*n_section_colors]}}
+\newcommand{\load@aux}{
+  % >> Load sections from aux file <<
+  \ifthenelse{\equal{\insertframenumber}{1}}{
+    % Load sections
+    \pykzexec{f = open('../../beamersections.aux','r')}
+    \pykzexec{raw_sections = f.read()}
+    \pykzexec{sections = raw_sections.split(',')}
+    \pykzmathinline[saved@beamer@sections]{raw_sections}
+    \pykzexec{f.close()}
+    
+    % Load appendices
+    \pykzexec{f = open('../../beamerappendices.aux','r')}
+    \pykzexec{raw_appendices = f.read()}
+    \pykzexec{appendices = raw_appendices.split(',')}
+    \pykzmathinline[saved@beamer@appendices]{raw_appendices}
+    \pykzexec{f.close()}
+    \pykzexec{f = open('../../appendixstart.aux','r')}
+    \pykzmathinline[saved@appendix@start@slide]{f.read()}
+    \pykzexec{f.close()}
+  }{}
+}
 \setbeamertemplate{footline}{
-  \begin{pykzpicture}[overlay,remember picture]
+  \load@aux
+  
+  % >> Write sections to aux file <<
+  \ifthenelse{\equal{\insertframenumber}{\inserttotalframenumber}}{
+    % Write sections
+    \pykzexec{f = open('../../beamersections.aux','w')}
+    \pykzexec{print('\beamer@sections',file=f,end='')}
+    \pykzexec{f.close()}
+
+    % Write appendices
+    \pykzexec{f = open('../../beamerappendices.aux','w')}
+    \pykzexec{print('\beamer@appendices',file=f,end='')}
+    \pykzexec{f.close()}
+    \pykzexec{f = open('../../appendixstart.aux','w')}
+    \ifthenelse{\equal{\appendix@start@slide}{}}{
+      \pykzexec{print('\inserttotalframenumber',file=f,end='')}
+    }{
+      \pykzexec{print('\appendix@start@slide',file=f,end='')}
+    }
+    \pykzexec{f.close()}
+  }{}
+
+  % >> TikZ styles <<
+  \tikzset{
+    every node/.append style= {
+      inner sep=0,
+      outer sep=0
+    },
+    progress line/.style = {
+      draw=black,
+      line width=0.15mm
+    },
+    appendix line/.style={
+      dashed
+    },
+    progress tip/.style = {
+      circle,
+      draw=black,
+      fill=black,
+      minimum size=1mm
+    },
+    section checkpoint/.style={
+      circle,
+      draw=##1!70,
+      fill=##1!30,
+      line width=0.2mm,
+      minimum size=1.4mm
+    },
+    page counter/.style = {
+      anchor=south east
+    },
+    footer text/.style = {
+      anchor=south west,
+      align=left,
+      scale=0.8
+    },
+    section color bubble/.style = {
+      circle,
+      inner sep=0,
+      outer sep=0.2mm,
+      minimum size=0.5mm,
+      fill=##1
+    }
+  }
+  
+  % >> Progress bar <<  
+  \def\progressline@xpad@west{1mm}
+  \def\progressline@xpad@east{2mm}
+  \def\footer@text@yshift{1mm}
+  \pgfdeclarelayer{bg}
+  \pgfsetlayers{bg,main}
+  \begin{tikzpicture}[overlay,remember picture,shift={(current page.south west)}]
+    %
+    % @ Footer text @
+    \node[footer text] (text)
+    at (\footer@text@xshift,\footer@text@yshift)
+    {\slidefooter@text};
+    \path let \p1=(text.east) in \pgfextra{
+      \xdef\progressline@x{\x1}
+      \xdef\left@lim{\x1}
+    };
+    % @ Page counter @
+    \ifthenelse{\equal{\appendix@started}{false}}{
+      \tikzmath{
+        \current@slide@number = \insertframenumber;
+        \total@slide@number = \saved@appendix@start@slide;
+      }
+    }{
+      \tikzmath{
+        \current@slide@number = int(\insertframenumber-\saved@appendix@start@slide);
+        \total@slide@number = int(\inserttotalframenumber-\saved@appendix@start@slide);
+      }
+    }
+    \node[page counter] (counter) at
+    ($(current page.south east)+(-\footer@text@xshift,\footer@text@yshift)$)
+    {\current@slide@number/\total@slide@number};
+    \path let
+    \p1=(counter.east),
+    \p2=(counter.north) in \pgfextra{
+      \xdef\progressline@y{\y1}
+      \xdef\right@lim{\x1-5mm}
+      \xdef\pagecounter@top{\y2}
+    };
+    % @ Section checkpoints @
+    \pykzexec{section_color_wheel=['beamerGreen','beamerBlue','beamerYellow','beamerRed'];
+      n_section_colors=len(section_color_wheel)}
+    \tikzmath{
+      \width = \right@lim-\left@lim-\progressline@xpad@west-\progressline@xpad@east;
+    }
+    \coordinate (progress line start) at
+    (\progressline@x+\progressline@xpad@west,\progressline@y);    
+    \def\section@counter{0}
+    \ifthenelse{\equal{\appendix@started}{false}}{
+      \xdef\saved@sections{\saved@beamer@sections}
+    }{
+      \xdef\saved@sections{\saved@beamer@appendices}
+    }
+    \foreach \section/\section@page in \saved@sections {
+      \tikzmath{
+        \progress = (\section@page+1)/\total@slide@number*\width;
+      }
+      \get@section@color{\section@counter}
+      \node[section checkpoint=\this@section@color,
+      hyperlink node=\section] at
+      ($(progress line start)+(\progress*1pt,0)$) {};
+      \counter@increment{\section@counter}
+    }
+    % @ Progress line @
+    \tikzmath{
+      \progress = \current@slide@number/\total@slide@number*\width;
+    }
+    \begin{pgfonlayer}{bg}
+      \ifthenelse{\equal{\appendix@started}{false}}{
+        \draw[progress line] (progress line start) -- ++(\progress*1pt,0) node(tip){};
+      }{
+        \draw[progress line,appendix line] (progress line start) --
+        ++(\progress*1pt,0) node(tip){};
+      }
+    \end{pgfonlayer}
+    \node[progress tip] at (tip) {};
+  \end{tikzpicture}
+
+  % >> Section list <<
+  \def\list@begin@yshift{0.7em}
+  \def\list@dy{1em}
+  \begin{tikzpicture}[overlay,remember picture,shift={(current page.south east)}]
     \tikzset{
-      progressbar/.append style={
-        red!50
-      },
-      progresstext/.append style={
-        label,
-        black,
-        anchor=south west,
+      sections list element/.style={
+        anchor=east,
         scale=0.8
       }
     }
-    \tikzmath{
-      \barh = 1.5mm;
-      \progress = \insertframenumber/\inserttotalframenumber;
+    \def\section@counter{0}
+    \ifthenelse{\equal{\appendix@started}{false}}{
+      \xdef\saved@sections{\saved@beamer@sections}
+      \xdef\@variable{sections}
+    }{
+      \xdef\saved@sections{\saved@beamer@appendices}
+      \xdef\@variable{appendices}
     }
-    \fill[progressbar]
-    (current page.south west)
-    rectangle
-    ++(\progress\paperwidth,\barh*1pt);
-    \node[progresstext]
-    at ($(current page.south west)+(\progress\paperwidth,0)$)
-    {\insertframenumber/\inserttotalframenumber};
-  \end{pykzpicture}
-  % \leavevmode%
-  % \hbox{%
-  % \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{section in head/foot}%
-  %   \usebeamerfont{section in head/foot}\hspace*{1cm}\today
-  % \end{beamercolorbox}%
-  % \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,right]{section in head/foot}%
-  %   \usebeamerfont{section in head/foot} \insertsection\hspace*{1cm}
-  % \end{beamercolorbox}}%
-  % \vskip0pt%
+    \foreach \section/\section@page in \saved@sections {
+      \tikzmath{
+        \current@y = \pagecounter@top+\list@begin@yshift+\section@counter*\list@dy;
+      }
+      \ifthenelse{\equal{\short@section}{}}{
+        \xdef\this@section{0}
+      }{
+        \pykzmathinline[this@section]{['\short@section' in section
+          for section in \@variable].index(True)+1}
+      }
+      \pgfmathparse{\this@section==\section@counter+1 ? 1:0}
+      \ifthenelse{\pgfmathresult>0}{
+        \xdef\sectioncolor{beamerRed}
+      }{
+        \xdef\sectioncolor{beamerGrey}
+      }
+      \node[sections list element,
+      color=\sectioncolor] (section text) at
+      (-\footer@text@xshift,\current@y*1pt) {\hyperlink{\section}{\section}};
+      \get@section@color{\section@counter}
+      \node[section color bubble=\this@section@color,
+      anchor=west] at (section text.east) {};
+      \counter@increment{\section@counter}
+    }
+  \end{tikzpicture}
+  
 }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\AtBeginSection[] 
-{ 
-  \begin{frame}<beamer> 
-    \frametitle{Outline} 
-    \tableofcontents[currentsection,currentsubsection] 
-  \end{frame} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Hyperlinks to slides ::..
+\setbeamertemplate{headline}{
+  \load@aux
+  \ifthenelse{\equal{\short@section}{}}{}{
+    \ifthenelse{\equal{\appendix@started}{false}}{
+      \xdef\@variable{sections}
+    }{
+      \xdef\@variable{appendices}
+    }
+    \pykzexec{start_page = int(\@variable[['\short@section' in section
+      for section in \@variable].index(True)].split('/')[1])+1}
+    \ifthenelse{\equal{\appendix@started}{false}}{
+      \tikzmath{
+        \current@slide@number = \insertframenumber;
+      }
+    }{
+      \tikzmath{
+        \current@slide@number = int(\insertframenumber-\saved@appendix@start@slide);
+      }
+    }
+    \pykzexec{is_start = start_page==\current@slide@number}
+    \pykzmathinline[is@start]{'true' if is_start else 'false'}
+    \ifthenelse{\equal{\is@start}{true}}{
+      \hypertarget{\short@section}{}
+    }{}
+  }
 }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Slides title ::..
 \setbeamercolor{frametitle}{fg=black}
-
-\makeatletter
+\setbeamerfont{frametitle}{size=\LARGE}
 \setbeamertemplate{frametitle}{
-  \ifbeamercolorempty[bg]{frametitle}{}{\nointerlineskip}%
-  \@tempdima=\textwidth%
-  \advance\@tempdima by\beamer@leftmargin%
-  \advance\@tempdima by\beamer@rightmargin%
-  \vspace*{-0.1cm} %%%%%%%%%%%%% For example insert shift to right
-  \large
-  \begin{beamercolorbox}[sep=0.3cm,center,wd=\the\@tempdima]{frametitle}
-    \usebeamerfont{frametitle}%
-    \vbox{}\vskip-1ex%
-    \if@tempswa\else\csname beamer@ftecenter\endcsname\fi%
-    \strut\insertframetitle\strut\par%
-    {%
-      \ifx\insertframesubtitle\@empty%
-      \else%
-      {\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}\insertframesubtitle\strut\par}%
-      \fi
-    }%
-    \vskip-1ex%
-    \if@tempswa\else\vskip-.3cm\fi% set inside beamercolorbox... evil here...
-  \end{beamercolorbox}%
+  \def\frametitle@yshift{-5mm}
+  \tikzset{
+    frametitle style/.style={
+      scale = 0.8,
+      yshift = \frametitle@yshift,
+      font = \bfseries
+    }
+  }
+  \begin{tikzpicture}[overlay,remember picture,shift={(current page.north)}]
+    \node[frametitle style] at (0,0) {\insertframetitle};
+  \end{tikzpicture}
 }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Page placement ::..
+\def\slide@pad@sw{3mm,3mm}
+\def\slide@pad@ne{3mm,3mm}
+\newcommand{\getframecoord}[2][]{
+  % Get absolute coordinate on slide, from fractional coordinate
+  % Note that to make sense, the tikzpicture must be shifted to
+  % (current page.south west)
+  \xdef\frame@count{0}
+  \foreach \val in {#2} {
+    \pgfmathparse{\frame@count==0 ? 1:0}
+    \ifthenelse{\pgfmathresult>0}{
+      \xdef\c@x{\val}
+    }{
+      \xdef\c@y{\val}
+    }
+    \counter@increment{\frame@count}
+  }
+  \tikzmath{
+    \Lx = \paperwidth/2;
+    \Ly = \paperheight/2;
+    \@x = \Lx*(1+\c@x);
+    \@y = \Ly*(1+\c@y);
+  }
+  \xdef\framecoord{\@x*1pt,\@y*1pt}
+  \ifthenelse{\equal{#1}{}}{}{\expandafter\xdef\csname #1\endcsname{\framecoord}}%
+}
+\newcommand{\beamergridoverlay}{
+  % Overlay a grid to aid in element placement
+  \begin{tikzpicture}[overlay,remember picture,shift={(current page.south west)}]
+    \def\grid@dx{0.2}
+    \def\grid@dy{0.2}
+    \tikzmath{
+      \x@next = -1+\grid@dx;
+      \y@next = -1+\grid@dx;
+    }
+    \tikzset{
+      grid line/.style={
+        draw = black!30,
+        line width=0.1mm,
+        opacity=0.5
+      },
+      axis tick label/.style={
+        text = black!30,
+        fill = white,
+        inner sep=0.5mm,
+        scale = 0.8
+      }
+    }
+    % X lines
+    \foreach \x in {-1,\x@next,...,1} {
+      \getframecoord[coord@bottom]{\x,-1}
+      \pgfmathparse{abs(\x)<1e-3 ? 1:0}
+      \ifthenelse{\pgfmathresult>0}{
+        \draw[grid line,dashed] (\coord@bottom) -- ++(0,\paperheight);
+      }{
+        \draw[grid line] (\coord@bottom) -- ++(0,\paperheight);
+      }
+    }
+    % Y lines
+    \foreach \y in {-1,\y@next,...,1} {
+      \getframecoord[coord@bottom]{-1,\y}
+      \pgfmathparse{abs(\y)<1e-3 ? 1:0}
+      \ifthenelse{\pgfmathresult>0}{
+        \draw[grid line,dashed] (\coord@bottom) -- ++(\paperwidth,0);
+      }{
+        \draw[grid line] (\coord@bottom) -- ++(\paperwidth,0);
+      }
+    }
+    % X labels
+    \foreach \x in {-1,\x@next,...,1} {
+      \pgfmathparse{abs(\x)>1e-3 && abs(\x)<1-1e-3 ? 1 : 0}
+      \ifthenelse{\pgfmathresult>0}{
+        \getframecoord[coord@bottom]{\x,0}
+        \pgfmathprintnumberto[precision=2]{\x}{\x@rounded}
+        \node[axis tick label] at (\coord@bottom) {\x@rounded};
+      }{}
+    }
+    % Y labels
+    \foreach \y in {-1,\x@next,...,1} {
+      \pgfmathparse{abs(\y)>1e-3 && abs(\y)<1-1e-3 ? 1 : 0}
+      \ifthenelse{\pgfmathresult>0}{
+        \getframecoord[coord@bottom]{0,\y}
+        \pgfmathprintnumberto[precision=2]{\y}{\y@rounded}
+        \node[axis tick label] at (\coord@bottom) {\y@rounded};
+      }{}
+    }
+  \end{tikzpicture}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Default TikZ environment ::..
+\newenvironment{beamertikzpicture}[1][]{%
+  \tikzset{%
+    apply style/.code={%
+      \tikzset{#1}%
+    }%
+  }%
+  \begin{tikzpicture}[overlay,
+    remember picture,
+    shift={(current page.south west)},
+    apply style/.expand once=#1]
+}{\end{tikzpicture}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Itemize bullets ::..
+\tikzset{
+  beamer bullet point/.style={
+    circle,
+    fill=#1,
+    minimum size=0.35em
+  }
+}
+\def\item@y@offset{0.3em}
+\setlist[itemize,1]{label={
+    \begin{tikzpicture}[inner sep=0,outer sep=0,minimum size=0]
+      \node at (0,0) {};
+      \node[beamer bullet point=beamerDarkBlue] at (0,\item@y@offset) {};
+    \end{tikzpicture}
+  }}
+\setlist[itemize,2]{label={
+    \begin{tikzpicture}[inner sep=0,outer sep=0,minimum size=0]
+      \node at (0,0) {};
+      \node[beamer bullet point=beamerBlue] at (0,\item@y@offset) {};
+    \end{tikzpicture}
+  }}
+\setlist[itemize,3]{label={
+    \begin{tikzpicture}[inner sep=0,outer sep=0,minimum size=0]
+      \node at (0,0) {};
+      \node[beamer bullet point=beamerGreen] at (0,\item@y@offset) {};
+    \end{tikzpicture}
+  }}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
 \makeatother
 
-\setbeamertemplate{itemize items}[circle]
-
-\setbeamerfont{bibliography item}{size=\footnotesize}
-\setbeamerfont{bibliography entry author}{size=\footnotesize}
-\setbeamerfont{bibliography entry title}{size=\footnotesize}
-\setbeamerfont{bibliography entry location}{size=\footnotesize}
-\setbeamerfont{bibliography entry note}{size=\footnotesize}
-\setbeamertemplate{frametitle continuation}{%
-    \ifnum\insertcontinuationcount>1
-    \insertcontinuationcount
-    \fi}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

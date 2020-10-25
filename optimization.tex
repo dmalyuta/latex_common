@@ -184,7 +184,7 @@
   #4_{\setBound[#1]{variables.south west}#5\setBound[#1]{bottom}}#6%
   \setBound[#1]{cost.south east}%
   \ifthenelse{\equal{#3}{true}}{%
-    ~\mathrm{s.t.}\setBound[#1]{cost.south east}
+    ~\textnormal{s.t.}\setBound[#1]{cost.south east}
   }{}%
   % determine width of the "result =" part
   \begin{tikzpicture}[remember picture,overlay]%

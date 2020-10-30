@@ -37,14 +37,14 @@
 {%
   \settowidth{\hl@width}{#2}%
   \colorbox{#1}%
-  {%      
+  {%
     \raisebox{-\hl@depth@ref}%
     {%
       \parbox[b][\hl@height@ref+\hl@depth@ref][c]{\hl@width}{\centering#2}%
     }%
   }%
 }
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ..:: TikZ elements ::..
@@ -147,7 +147,7 @@
     \pykzexec{sections = raw_sections.split(',')}
     \pykzmathinline[saved@beamer@sections]{raw_sections}
     \pykzexec{f.close()}
-    
+
     % Load appendices
     \pykzexec{f = open('../../beamerappendices.aux','r')}
     \pykzexec{raw_appendices = f.read()}
@@ -161,7 +161,7 @@
 }
 \setbeamertemplate{footline}{
   \load@aux
-  
+
   % >> Write sections to aux file <<
   \ifthenelse{\equal{\insertframenumber}{\inserttotalframenumber}}{
     % Write sections
@@ -224,8 +224,8 @@
       fill=##1
     }
   }
-  
-  % >> Progress bar <<  
+
+  % >> Progress bar <<
   \def\progressline@xpad@west{1mm}
   \def\progressline@xpad@east{2mm}
   \def\footer@text@yshift{1mm}
@@ -270,7 +270,7 @@
       \width = \right@lim-\left@lim-\progressline@xpad@west-\progressline@xpad@east;
     }
     \coordinate (progress line start) at
-    (\progressline@x+\progressline@xpad@west,\progressline@y);    
+    (\progressline@x+\progressline@xpad@west,\progressline@y);
     \def\section@counter{0}
     \ifthenelse{\equal{\appendix@started}{false}}{
       \xdef\saved@sections{\saved@beamer@sections}
@@ -345,7 +345,7 @@
       \counter@increment{\section@counter}
     }
   \end{tikzpicture}
-  
+
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -377,7 +377,7 @@
     }{}
   }
 }
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ..:: Slides title ::..
@@ -514,25 +514,23 @@
   }
 }
 \def\item@y@offset{0.3em}
-\setlist[itemize,1]{label={
+\foreach \@name/\@color in {
+  one/beamerDarkBlue,two/beamerBlue,three/beamerGreen} {
+  \expandafter\newsavebox\csname bullet@\@name\endcsname
+  \begin{lrbox}{\csname bullet@\@name\endcsname}
     \begin{tikzpicture}[inner sep=0,outer sep=0,minimum size=0]
       \node at (0,0) {};
-      \node[beamer bullet point=beamerDarkBlue] at (0,\item@y@offset) {};
+      \node[beamer bullet point=\@color] at (0,\item@y@offset) {};
     \end{tikzpicture}
-  }}
-\setlist[itemize,2]{label={
-    \begin{tikzpicture}[inner sep=0,outer sep=0,minimum size=0]
-      \node at (0,0) {};
-      \node[beamer bullet point=beamerBlue] at (0,\item@y@offset) {};
-    \end{tikzpicture}
-  }}
-\setlist[itemize,3]{label={
-    \begin{tikzpicture}[inner sep=0,outer sep=0,minimum size=0]
-      \node at (0,0) {};
-      \node[beamer bullet point=beamerGreen] at (0,\item@y@offset) {};
-    \end{tikzpicture}
-  }}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+  \end{lrbox}
+  \global
+  \expandafter\setbox\csname bullet@\@name\endcsname
+  \expandafter\box\csname bullet@\@name\endcsname
+}
+\setlist[itemize,1]{label={\usebox\bullet@one}}
+\setlist[itemize,2]{label={\usebox\bullet@two}}
+\setlist[itemize,3]{label={\usebox\bullet@three}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \makeatother
 

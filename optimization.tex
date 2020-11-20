@@ -1,3 +1,39 @@
+\ExplSyntaxOn
+
+\tl_new:N \l_opti_label_tl
+\tl_new:N \l_opti_vars_tl
+\tl_new:N \l_opti_cost_tl
+
+\makeatletter
+\define@key{optim@keys}{label}{\tl_set:Nn \l_opti_label_tl {#1}}
+\define@key{optim@keys}{variables}{\tl_set:Nn \l_opti_vars_tl {#1}}
+\define@key{optim@keys}{cost}{\tl_set:Nn \l_opti_cost_tl {#1}}
+\makeatother
+
+\newenvironment{optimization}[1][]{
+  \makeatletter
+  \setkeys{optim@keys}{label=,#1}
+  \setkeys{optim@keys}{variables=,#1}
+  \setkeys{optim@keys}{cost=,#1}
+  \makeatother
+  \subequations
+  \label{problem:\tl_use:N \l_opti_label_tl}
+  \align
+  \optilabel{cost}
+  \min\c_math_subscript_token
+  {\tl_use:N \l_opti_vars_tl}\textnormal{\ }
+  & \tl_use:N \l_opti_cost_tl \\
+  \mathrm{s.t.}\textnormal{\ }
+}{
+  \endalign
+  \endsubequations
+}
+
+\newcommand{\optilabel}[2][eq]{\label{#1:\tl_use:N \l_opti_label_tl _#2}}
+\newcommand{\optieqref}[2]{\eqref{eq:#1_#2}}
+
+\ExplSyntaxOff
+
 \makeatletter
 
 \def\emptyCaption{{\color{white}?}}

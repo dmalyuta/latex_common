@@ -1,4 +1,5 @@
-% Logic/scripting
+% ..:: Logic/scripting ::..
+
 \usepackage{ifthen}
 \usepackage{pgffor}
 \usepackage{etoolbox}
@@ -14,7 +15,8 @@
 \usepackage{expl3}
 \usepackage{stackengine}
 
-% Math
+% ..:: Math ::..
+
 \makeatletter
 \ifthenelse{\isundefined{\lefteqs}}{
 \usepackage{amsmath}
@@ -37,14 +39,16 @@
 \let\ltxxlabel\ltx@label
 \makeatother
 
-% Colors
+% ..:: Colors ::..
+
 \usepackage{color}
 \makeatletter
 \@ifclassloaded{beamer}{}{
 \usepackage[table]{xcolor}}
 \makeatother
 
-% Figures
+% ..:: Figures ::..
+
 \usepackage{graphicx}
 \makeatletter
 \@ifclassloaded{UWThesis/uwthesis}{
@@ -53,7 +57,8 @@
 \makeatother
 \usepackage{caption}
 
-% Tables
+% ..:: Tables ::..
+
 \usepackage{tabularx}
 \usepackage{adjustbox}
 \usepackage{multicol}
@@ -62,9 +67,25 @@
 \usepackage{makecell} % \makecell[l|r|c]{line 1 \\ line 2}
 \usepackage{arydshln}
 
-% Document elements
+% ..:: Drawing ::..
+
 \usepackage{tikz}
 \usepackage{tikz-3dplot}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{arrows}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{intersections}
+\usetikzlibrary{math}
+\usetikzlibrary{shapes}
+\usetikzlibrary{positioning}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{decorations.text}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{fadings}
+
+% ..:: Document elements ::..
+
 \makeatletter
 \@ifclassloaded{standalone}{}{\usepackage[tikz]{mdframed}}
 \@ifclassloaded{beamer}{}{\usepackage{tocloft}}
@@ -87,20 +108,10 @@
 \usepackage{import}
 \usepackage{nicematrix}
 \usepackage{bibentry} % use \bibentry{...} for in-text citation
-\makeatletter
-\ifthenelse{\isundefined{\natbiboptions}}{
-%\usepackage{lscape} % production (non-rotated PDF pages)
-%\usepackage{pdflscape} % writing (rotated PDF pages, don't need to twist head)
-\def\natbiboptions{numbers,sort}
-}{}
-\ifthenelse{\isundefined{\nobibpkg}}{
-\@ifclassloaded{ieeeconf}{}{
-\@ifclassloaded{elsarticle}{}{\usepackage[\natbiboptions]{natbib}\nobibliography*}}
-}{}
-\makeatother
-\usepackage[resetlabels,labeled]{multibib}
+\usepackage[backend=biber,style=numeric,sorting=none,url=false]{biblatex}
 
-% Layout
+% ..:: Layout ::..
+
 \usepackage{float}
 \usepackage{afterpage}
 \ifthenelse{\isundefined{\landscapemode}}{
@@ -128,23 +139,10 @@
 \usepackage{fancyhdr}
 \usepackage{nameref}
 
-% Referencing
-\usepackage{hyperref}
-% \makeatletter
-% \@ifclassloaded{UWThesis/uwthesis}{}{
-% \@ifclassloaded{beamer}{
-% \usepackage{hyperref}
-% }{
-% \usepackage[breaklinks=true]{hyperref}
-% % Fix the following error from sometimes appearing:
-% %   latex pdfTeX error (ext4): \pdfendlink ended up in different nesting level than \pdfstartlink.
-% % Fix from David Carlisle's comment on https://github.com/latex3/hyperref/issues/19
-% \patchcmd\@combinedblfloats{\box\@outputbox}{\unvbox\@outputbox}{}{%
-% \errmessage{\noexpand\@combinedblfloats could not be patched}%
-% }
-% }%
-% }
-% \makeatother
+% ..:: Referencing ::..
 
-% General
+\usepackage{hyperref}
+
+% ..:: General ::..
+
 \usepackage{xspace}

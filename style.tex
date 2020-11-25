@@ -1,48 +1,16 @@
-% No paragraph indentation
-\setlength\parindent{0pt}
-
-% Paragraph spacing
-\setlength{\parskip}{4pt}
-
-% List spacing
-% \setlist{itemsep=0pt}
+\setlength\parindent{0pt} % No paragraph indentation
+\setlength{\parskip}{4pt} % Paragraph spacing
+\allowdisplaybreaks       % Allow breaking long equations across pages
 
 % Hyperlinks
-\hypersetup{
-  colorlinks,
-  linkcolor={red},
-  citecolor={green},
-  urlcolor={blue}
-}
+\hypersetup{colorlinks,linkcolor={red},citecolor={green},urlcolor={blue}}
 
-\setcounter{MaxMatrixCols}{20}
-
-% Units
-\DeclareSIUnit\century{century}
-\DeclareSIUnit\year{yr}
-\DeclareSIUnit\pound{lb}
-\DeclareSIUnit\mile{mi}
-\DeclareSIUnit\byte{B}
-
-% Equation box style
-\tcbset{highlight math style={enhanced,
-colframe=red!60!black,colback=yellow!50!white,arc=4pt,boxrule=1pt,
-drop fuzzy shadow}}
-
-% Table column types
-\renewcommand\tabularxcolumn[1]{m{#1}} % Vertical centering
-\newcolumntype{C}{>{\centering\arraybackslash}X}
-\newcolumntype{L}{>{\raggedright\arraybackslash}X}
-\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
-
-% Theorem environments
+% ..:: Theorem environments ::..
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
 \newtheorem{proposition}{Proposition}
-
 \theoremstyle{definition}
-
 \newtheorem{remark}{Remark}
 \newtheorem{property}{Property}
 \newtheorem{condition}{Condition}
@@ -51,113 +19,6 @@ drop fuzzy shadow}}
 \newtheorem{problem}{Problem}
 \newtheorem{definition}{Definition}
 \newtheorem{assumption}{Assumption}
-
-\theoremstyle{empty}
-
-\newtheorem{refproof}{Proof}
-
-\declaretheoremstyle[
-  headfont=\color{black}\normalfont\bfseries,
-  bodyfont=\color{darkgray}\normalfont,
-]{colored}
-
-\declaretheorem[style=colored,name=Definition]{definitionc}
-% \AtEndEnvironment{definitionc}{\null\hfill\qedsymbol}%
-\declaretheorem[style=colored,name=Condition]{conditionc}
-\declaretheorem[style=colored,name=Assumption]{assumptionc}
-\declaretheorem[style=colored,name=Remark]{remarkc}
-\declaretheorem[style=colored,name=Theorem]{theoremc}
-% \AtEndEnvironment{definitionc}{\null\hfill\qedsymbol}%
-
-% Boxes
-\newmdenv[
-outerlinewidth = 1,%
-linewidth = 0pt,%
-roundcorner = 2pt,%
-leftmargin = 20,%
-rightmargin = 0,%
-backgroundcolor = lightgray!10,%
-outerlinecolor = gray!50,%
-innertopmargin = \topskip,%
-splittopskip = \topskip,%
-frametitle = Summary,%
-frametitlebelowskip = 0pt,%
-]{summary_box}
-
-\newmdenv[
-outerlinewidth = 1,%
-linewidth = 0pt,%
-roundcorner = 2pt,%
-leftmargin = 60,%
-rightmargin = 60,%
-backgroundcolor = yellow!40,%
-outerlinecolor = black!50,%
-innertopmargin = \topskip,%
-splittopskip = \topskip,%
-]{highlight_box}
-
-% Nomenclature
-
-\newif\ifnomentry
-\renewcommand{\nomlabel}[1]{#1\hfill\hspace{\labelsep}\ifnomentry$=$\fi}
-\newlength{\nomwidest}
-\renewcommand{\nomgroup}[1]{%
-\nomentryfalse
-\ifthenelse{\equal{#1}{V}}{\item[\textbf{Variables}]}{%
-\ifthenelse{\equal{#1}{A}}{\item[\textbf{Abbreviations}]}{%
-\ifthenelse{\equal{#1}{E}}{\item[\textbf{Equations}]}{}}}
-\nomentrytrue
-}
-\setlength{\nomitemsep}{-\parsep} 
-\newcommand{\defvar}[3][show]{\nomenclature[V]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#2}{}}
-\newcommand{\defabbrev}[3][show]{\nomenclature[A]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#3 (#2)}{}}
-\newcommand{\defeq}[2]{\nomenclature[E]{#1}{#2}}
-
-% \setlength{\nomlabelwidth}{3cm}
-% \renewcommand{\nomlabel}[1]{#1\hfill\hspace{\labelsep}\ifnomentry$=$\fi}
-% \newlength{\nomwidest}
-% \renewcommand{\nomgroup}[1]{%
-% \nomentryfalse
-% \ifthenelse{\equal{#1}{V}}{\item[\textbf{Variables}]}{%
-% \ifthenelse{\equal{#1}{A}}{\item[\textbf{Abbreviations}]}{%
-% \ifthenelse{\equal{#1}{E}}{\item[\textbf{Equations}]}{}}}
-% \nomentrytrue
-% }
-% \setlength{\nomitemsep}{-\parsep} 
-% \newcommand{\defvar}[3][show]{\nomenclature[V]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#2}{}}
-% \newcommand{\defabbrev}[3][show]{\nomenclature[A]{#2}{#3}\ifthenelse{\equal{#1}{show}}{#3 (#2)}{}}
-% \newcommand{\defeq}[2]{\nomenclature[E]{#1}{#2}}
-
-% Algorithms
-
-\algrenewcommand\algorithmicindent{1em}
-\algrenewcommand\alglinenumber[1]{{\sf\footnotesize#1}}
-\algtext*{EndWhile}% Remove "end while" text
-\algtext*{EndIf}% Remove "end if" text
-\algtext*{EndFor}% Remove "end for" text
-
-\algrenewcommand\algorithmicrequire{\textbf{Precondition:}}
-\algrenewcommand\algorithmicensure{\textbf{Postcondition:}}
-\algnewcommand\algorithmicinput{\textbf{Input:}}
-\algnewcommand\Input{\item[\algorithmicinput]}
-\algnewcommand\algorithmicfunctions{\textbf{Lambda Functions:}}
-\algnewcommand\Functions{\item[\algorithmicfunctions]}
-\algnewcommand\Stop[1][]{\State \textbf{STOP} {\color{green} \ul{#1}}}
-\algnewcommand\Break{\State \textbf{break}}
-\algnewcommand\Continue{\State \textbf{continue}\xspace}
-\algnewcommand\Error[1][]{\State \textbf{error} {\color{red} \uwave{#1}}}
-\algrenewcommand\algorithmiccomment[1]{\hfill {\color{gray} \(\triangleright\) #1}}
-\makeatletter
-\algnewcommand\Section[1]{\Statex \hskip\ALG@thistlm \textbf{\color{gray} \(\triangleright\) #1}}
-\makeatother
-\algdef{SE}[PARAMETERS]{Parameters}{EndParameters}
-   {\algorithmicparameters}
-   {\algorithmicend\ \algorithmicparameters}
-\algnewcommand{\algorithmicparameters}{\textbf{parameters}}
-\newcommand{\algorithmiclambda}[3][]{\ifthenelse{\equal{#1}{}}{\texttt{#2}(#3)}{$\texttt{#2}\gets\textbf{lambda}~#3:~#1$}}
-
-% Allow breaking long equations across pages
-\allowdisplaybreaks
 
 %%% Local Variables:
 %%% mode: plain-tex

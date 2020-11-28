@@ -265,7 +265,7 @@
 \newcommand{\sign}{\mathrm{sgn}}
 \newcommand{\norm}[2][]{\left\|#2\right\|_{#1}}
 \newcommand{\dualnorm}[2][]{\norm[#1]{#2}^*}
-\newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1 
+\newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1
         \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
 \newcommand{\inorm}[2][]{\vertiii{#2}_{#1}}
 \newcommand{\seq}[1]{\{#1\}}
@@ -482,15 +482,6 @@
       \tikzmath{\MyCounter=int(\MyCounter+1);}%
       \xdef\MyCounter{\MyCounter}%
       \ifthenelse{\equal{\concatenate}{true}}{%
-        % \pgfmathparse{\MyCounter==1 ? 1 : 0}%
-        % \ifthenelse{\pgfmathresult>0}{%
-        %   \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}-%
-        % }{%
-        %   % \pgfmathparse{\MyCounter==\myRefCount ? 1 : 0}%
-        %   \ifthenelse{\equal{\MyCounter}{\myRefCount}}{%
-        %     \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
-        %   }{}%
-        %   }%
         \pgfmathparse{\MyCounter==1 ? 1 : 0}%
         \ifthenelse{\pgfmathresult>0}{%
           \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}-%
@@ -514,7 +505,7 @@
         }%
       }%
     }%
-  }%  
+  }%
 }
 % Document section references
 \newcommand{\sref}[1]{\PrintRefs{Section}{#1}}
@@ -554,6 +545,8 @@
 \newcommand{\eref}[2][]{\PrintRefs[#1]{Example}{#2}}
 % Other references
 \newcommand{\lstref}[2][]{\PrintRefs[#1]{Listing}{#2}}
+
+\newcommand{\figlabel}[1]{\label{fig:#1}}
 
 % Miscallaneous
 

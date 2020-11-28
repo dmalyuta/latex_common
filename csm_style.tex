@@ -83,40 +83,23 @@
 \ExplSyntaxOn
 \makeatletter
 
-\cs_set:Npn \csm_print_fig:n #1 {%
-  Figure~\ref{#1}%
-}
-\newcommand{\csmfigref}[1]{\csm_print_fig:n {#1}}
-
-% Generic n-column figure
-\newenvironment{csmfigure@internal}[2][]{%
-  \def\begin@fig{\begin{#2}[}%
-      \def\end@fig{\end{#2}}%
-  \expandafter\begin@fig#1]%
-  }{%
-  \end@fig
-}
-
 % One-column figure
-\newenvironment{csmfigure}[1][]{
-  \begin{csmfigure@internal}[#1]{figure}
-  }{
-  \end{csmfigure@internal}
-}
+\renewenvironment{figure}[1][tbp]
+{\@float{figure}[#1]}
+{\end@float}
 
 % Two-column figure
-\newenvironment{csmfigure*}[1][]{
-  \begin{csmfigure@internal}[#1]{figure*}
-  }{
-  \end{csmfigure@internal}
-}
+\renewenvironment{figure*}[1][tbp]
+{\@dblfloat{figure}[#1]}
+{\end@dblfloat}
 
-% Subfigure
-\newenvironment{csmsubfigure}[2][]{
-  \begin{subfigure}[#1]{#2}
-  }{
-  \end{subfigure}
-}
+% Figure selector
+\newenvironment{figure@internal}[2][tbp]{%
+  \def\fig@width{#2}%
+  \ifthenelse{\equal{\fig@width}{}}{%
+    \begin{figure}[#1]}{\begin{figure*}[#1]}}{%
+      \ifthenelse{\equal{\fig@width}{}}{%
+      \end{figure}}{\end{figure*}}}
 
 \makeatother
 \ExplSyntaxOff
@@ -162,7 +145,7 @@
 
 \newsavebox{\sidebar@box}
 
-\newenvironment{csmsidebar}[1][]{%
+\newenvironment{sidebar}[1][]{%
   \setkeys{csm@sidebar@keys}{title=,#1}%
   \setkeys{csm@sidebar@keys}{label=,#1}%
   \setkeys{csm@sidebar@keys}{position=,#1}%
@@ -170,11 +153,12 @@
   \edef\fig@pos{\tl_use:N \l_csm_sidebar_pos_tl}
   \pgfmathparse{\tl_use:N \l_csm_sidebar_cols_tl ==1 ? 1:0}
   \ifthenelse{\pgfmathresult>0}{%
-    \gdef\figure@type{figure}
+    \gdef\figure@width{}
   }{%
-    \gdef\figure@type{figure*}
+    \gdef\figure@width{dbl}
   }
-  \begin{csmfigure@internal}[\fig@pos]{\figure@type}%
+  \edef\begin@sidebar@cmd{{figure@internal}[\fig@pos}
+  \expandafter\begin\begin@sidebar@cmd]{\figure@width}%
     \begin{lrbox}{\sidebar@box}
       \begin{minipage}{\linewidth}%
         % >>> Reset equation, table, and figure counters and make labels start
@@ -201,7 +185,7 @@
         \xdef\sidebar@title{\tl_use:N \l_csm_sidebar_title_tl}
         \xdef\sidebar@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}
         % ..:: Sidebar text begin ::..
-        \ifthenelse{\equal{\figure@type}{figure}}{%
+        \ifthenelse{\equal{\figure@width}{}}{%
           \textbf{\sffamily~%
             Sidebar:~\hypertarget{\sidebar@label}{\sidebar@title}}%
         }{%
@@ -214,7 +198,7 @@
           \edef\sidebar@bib@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}
           \def\bib@print@cmd{\printbibliography[keyword=}
           \expandafter\bib@print@cmd\sidebar@bib@label]
-          \ifthenelse{\equal{\figure@type}{figure}}{}{%
+          \ifthenelse{\equal{\figure@width}{figure}}{}{%
           \end{multicols}%
         }%
         % >>> Reset equation, table, and figure counters to body text values
@@ -225,13 +209,13 @@
       \end{minipage}%
     \end{lrbox}%
     \fbox{\usebox{\sidebar@box}}%
-  \end{csmfigure@internal}%
+  \end{figure@internal}%
 }
 
 \makeatother
 \ExplSyntaxOff
 
-\newcommand{\csmsbref}[1]{``\csmhyperlink{sidebar:#1}''}
+\newcommand{\sbref}[1]{``\csmhyperlink{sidebar:#1}''}
 
 % ..:: Bibliography ::..
 

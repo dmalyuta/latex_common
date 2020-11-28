@@ -20,6 +20,28 @@
 \newtheorem{definition}{Definition}
 \newtheorem{assumption}{Assumption}
 
+\makeatletter
+\newcounter{env@count}
+\setcounter{env@count}{0}
+\def\thmenvs{theorem,lemma,corollary,proposition,remark,property,%
+  condition,method,example,problem,definition,assumption}
+\foreach \@te in \thmenvs {
+  \bgroup
+  \globaldefs=1
+  % Save the original definition
+  \expandafter\let\csname o\@te\expandafter\endcsname\csname\@te\endcsname
+  \expandafter\let\csname eo\@te\expandafter\endcsname\csname end\@te\endcsname
+  % Re-define the environment
+  \renewenvironment{\@te}[1][]{%
+    \csname o\@currenvir\endcsname%
+    \ifthenelse{\equal{##1}{}}{}{\label{\@currenvir:##1}}
+  }{%
+    \expandafter\csname eo\@currenvir\endcsname%
+  }
+  \egroup
+}
+\makeatother
+
 %%% Local Variables:
 %%% mode: plain-tex
 %%% TeX-master: t

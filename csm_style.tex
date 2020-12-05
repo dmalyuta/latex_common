@@ -182,8 +182,9 @@
         % {\usebibmacro{postnote}}%
         \DeclareFieldFormat{labelnumberwidth}{S##1.}%
         % <<<
-        \xdef\sidebar@title{\tl_use:N \l_csm_sidebar_title_tl}
-        \xdef\sidebar@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}
+        \xdef\sidebar@title{\tl_use:N \l_csm_sidebar_title_tl}%
+        \xdef\sidebar@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
+        \label{\sidebar@label}%
         % ..:: Sidebar text begin ::..
         \ifthenelse{\equal{\figure@width}{}}{%
           \textbf{\sffamily~%
@@ -212,10 +213,18 @@
   \end{figure@internal}%
 }
 
+\newcommand{\sbref}[1]{%
+  \xdef\sb@page@number{\getpagerefnumber{sidebar:#1}}%
+  \pgfmathparse{\sb@page@number==0 ? 1:0}%
+  \ifthenelse{\pgfmathresult>0}{%
+    ``\textbf{??}''%
+  }{%
+    ``\csmhyperlink{sidebar:#1}''%
+  }%
+}
+
 \makeatother
 \ExplSyntaxOff
-
-\newcommand{\sbref}[1]{``\csmhyperlink{sidebar:#1}''}
 
 % ..:: Bibliography ::..
 

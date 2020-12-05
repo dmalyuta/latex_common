@@ -477,7 +477,11 @@
     #2~\ref{\GetLabel{\MyModifiedLabel}:#3}%
   }{%
     \xdef\MyCounter{0}%
-    #2s~%
+    \ifthenelse{\equal{#2}{Corollary}}{%
+      Corollaries%
+    }{%
+      #2s%
+    }~%
     \foreach \AlgRef in {#3} {%
       \tikzmath{\MyCounter=int(\MyCounter+1);}%
       \xdef\MyCounter{\MyCounter}%

@@ -1,6 +1,8 @@
 \ExplSyntaxOn
 \makeatletter
 
+\def\objective@label{objective}
+
 \tl_new:N \l_opti_label_tl
 \tl_new:N \l_opti_vars_tl
 \tl_new:N \l_opti_objective_tl
@@ -16,7 +18,7 @@
   \subequations
   \label{problem:\tl_use:N \l_opti_label_tl}
   \align
-  \optilabel{objective}
+  \optilabel{\objective@label}
   \min\c_math_subscript_token
   {\tl_use:N \l_opti_vars_tl}\textnormal{\ }
   & \tl_use:N \l_opti_objective_tl \\
@@ -28,6 +30,7 @@
 
 \newcommand{\optilabel}[2][eq]{\label{#1:\tl_use:N \l_opti_label_tl _#2}}
 \newcommand{\optieqref}[2]{\eqref{eq:#1_#2}}
+\newcommand{\optiobjref}[1]{\eqref{eq:#1_\objective@label}}
 
 \makeatother
 \ExplSyntaxOff

@@ -1,3 +1,15 @@
+% ..:: Colors ::..
+
+\makeatletter
+
+\definecolor{csm@sidebar@bg}{HTML}{f2e9c4}
+\definecolor{csm@fig@bg}{HTML}{e6f7fe}
+\definecolor{csm@sidebar@first@char}{HTML}{a08c2f}
+\definecolor{csm@fig@label@body}{HTML}{26baf2}
+\definecolor{csm@fig@label@sidebar}{HTML}{c8b03b}
+
+\makeatother
+
 % ..:: Page geometry ::..
 
 \usepackage{geometry}
@@ -83,15 +95,37 @@
 \ExplSyntaxOn
 \makeatletter
 
-% One-column figure
-\renewenvironment{figure}[1][tbp]
-{\@float{figure}[#1]}
-{\end@float}
+\tl_new:N \l_csm_figure_label_tl
+\tl_new:N \l_csm_figure_caption_tl
+\tl_new:N \l_csm_figure_pos_tl
+\tl_new:N \l_csm_figure_cols_tl
 
-% Two-column figure
-\renewenvironment{figure*}[1][tbp]
-{\@dblfloat{figure}[#1]}
-{\end@dblfloat}
+\newtcolorbox{figurebox}{
+  % Drawing engine
+  enhanced~jigsaw,
+  % Sizes
+  width=\linewidth,
+  arc=2mm,
+  boxrule=0pt,
+  titlerule=0pt,
+  left=3mm,
+  right=3mm,
+  bottom=3mm,
+  top=3mm,
+  boxsep=\tcb@boxsep,
+  % Colors
+  colback=csm@fig@bg,
+  colbacktitle=csm@fig@bg
+}
+
+\define@key{csm@figure@keys}{label}{\tl_set:Nn \l_csm_figure_label_tl {#1}}
+\define@key{csm@figure@keys}{caption}{\tl_set:Nn \l_csm_figure_caption_tl {#1}}
+\define@key{csm@figure@keys}{position}{\tl_set:Nn \l_csm_figure_pos_tl {#1}}
+\define@key{csm@figure@keys}{columns}{\tl_set:Nn \l_csm_figure_cols_tl {#1}}
+
+% Caption style
+\captionsetup[figure]{font={footnotesize,sf},labelfont={},
+  name={\bfseries\color{csm@fig@label@body}FIGURE~},labelsep=space}
 
 % Figure selector
 \newenvironment{figure@internal}[2][tbp]{%
@@ -100,6 +134,31 @@
     \begin{figure}[#1]}{\begin{figure*}[#1]}}{%
       \ifthenelse{\equal{\fig@width}{}}{%
       \end{figure}}{\end{figure*}}}
+
+\newenvironment{csmfigure}[1][]{%
+  % Options
+  \setkeys{csm@figure@keys}{label=,#1}%
+  \setkeys{csm@figure@keys}{caption=,#1}%
+  \setkeys{csm@figure@keys}{position=tbp,#1}%
+  \setkeys{csm@figure@keys}{columns=1,#1}%
+  % Parse options
+  \edef\csm@fig@pos{\tl_use:N \l_csm_figure_pos_tl}%
+  \pgfmathparse{\tl_use:N \l_csm_figure_cols_tl ==1 ? 1:0}%
+  \ifthenelse{\pgfmathresult>0}{%
+    \gdef\csm@figure@width{}%
+  }{%
+    \gdef\csm@figure@width{dbl}%
+  }%
+  % Make igure
+  \edef\begin@figure@cmd{{figure@internal}[\csm@fig@pos}%
+  \expandafter\begin\begin@figure@cmd]{\csm@figure@width}%
+    \begin{figurebox}
+    }{%
+    \end{figurebox}
+    \caption{\tl_use:N \l_csm_figure_caption_tl}
+    \figlabel{\tl_use:N \l_csm_figure_label_tl}
+  \end{figure@internal}
+}
 
 \makeatother
 \ExplSyntaxOff
@@ -131,92 +190,244 @@
 
 \tl_new:N \l_csm_sidebar_title_tl
 \tl_new:N \l_csm_sidebar_label_tl
+\tl_new:N \l_csm_sidebar_side_tl
 \tl_new:N \l_csm_sidebar_pos_tl
 \tl_new:N \l_csm_sidebar_cols_tl
 
 \define@key{csm@sidebar@keys}{title}{\tl_set:Nn \l_csm_sidebar_title_tl {#1}}
 \define@key{csm@sidebar@keys}{label}{\tl_set:Nn \l_csm_sidebar_label_tl {#1}}
+\define@key{csm@sidebar@keys}{side}{\tl_set:Nn \l_csm_sidebar_side_tl {#1}}
 \define@key{csm@sidebar@keys}{position}{\tl_set:Nn \l_csm_sidebar_pos_tl {#1}}
 \define@key{csm@sidebar@keys}{columns}{\tl_set:Nn \l_csm_sidebar_cols_tl {#1}}
 
-\newcounter{equation@mem}%
-\newcounter{table@mem}%
-\newcounter{figure@mem}%
+\newcounter{sidebar@equation}%
+\newcounter{sidebar@table}%
+\newcounter{sidebar@figure}%
+\newcounter{subsidebar@counter}
 
-\newsavebox{\sidebar@box}
+\setcounter{subsidebar@counter}{0}
+
+\newsavebox{\sidebar@box@full}
+\newsavebox{\sidebar@box@left}
+\newsavebox{\sidebar@box@right}
+
+\def\tcb@left{1em}
+\def\tcb@right{1em}
+\def\tcb@bottom{1em}
+\def\tcb@boxsep{0pt}
+\def\tcb@leftfill{0cm}
+\def\tcb@rightfill{0cm}
+
+\def\continued@message{\textit{(continued...)}}
+
+\newtcolorbox{sidebarbox}[1][]{
+  % Drawing engine
+  enhanced~jigsaw,
+  % Fonts
+  fonttitle=\sffamily\bfseries\large,
+  % Sizes
+  width=\textwidth,
+  arc=2mm,
+  boxrule=0pt,
+  titlerule=0pt,
+  toptitle=2mm,
+  left=\tcb@left,
+  right=\tcb@right,
+  bottom=\tcb@bottom,
+  boxsep=\tcb@boxsep,
+  leftrule=\tcb@leftfill,
+  grow~to~left~by=\tcb@leftfill,
+  rightrule=\tcb@rightfill,
+  grow~to~right~by=\tcb@rightfill,
+  % Colors
+  colback=csm@sidebar@bg,
+  colframe=csm@sidebar@bg,
+  colbacktitle=csm@sidebar@bg,
+  coltitle=black,
+  % Other options
+  #1
+}
 
 \newenvironment{sidebar}[1][]{%
+  % Raw options
   \setkeys{csm@sidebar@keys}{title=,#1}%
   \setkeys{csm@sidebar@keys}{label=,#1}%
-  \setkeys{csm@sidebar@keys}{position=,#1}%
+  \setkeys{csm@sidebar@keys}{side=odd,#1}%
+  \setkeys{csm@sidebar@keys}{position=t,#1}%
   \setkeys{csm@sidebar@keys}{columns=2,#1}%
-  \edef\fig@pos{\tl_use:N \l_csm_sidebar_pos_tl}
-  \pgfmathparse{\tl_use:N \l_csm_sidebar_cols_tl ==1 ? 1:0}
+  % Parse options
+  \edef\sidebar@side{\tl_use:N \l_csm_sidebar_side_tl}%
+  \edef\fig@pos{\tl_use:N \l_csm_sidebar_pos_tl}%
+  \pgfmathparse{\tl_use:N \l_csm_sidebar_cols_tl ==1 ? 1:0}%
   \ifthenelse{\pgfmathresult>0}{%
-    \gdef\figure@width{}
+    \gdef\figure@width{}%
+    \tikzmath{\sidebar@width=\columnwidth-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \xdef\sidebar@width{\sidebar@width pt}%
   }{%
-    \gdef\figure@width{dbl}
-  }
-  \edef\begin@sidebar@cmd{{figure@internal}[\fig@pos}
+    \gdef\figure@width{dbl}%
+    \tikzmath{\sidebar@width=\textwidth-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \xdef\sidebar@width{\sidebar@width pt}%
+  }%
+  % Create the box
+  \begin{subsidebar}[reset]%
+  }{%
+  \end{subsidebar}%
+  % Draw sidebar
+  \pgfmathparse{\value{subsidebar@counter}==1 ? 1:0}%
+  \ifthenelse{\pgfmathresult>0}{%
+    % Show full content in one sidebar
+    \sidebar@draw{none}{\sidebar@box@full}%
+  }{%
+    % Show left and right content in separate sidebars
+    \ifthenelse{\equal{\sidebar@side}{odd}}{%
+      \def\sidebar@side@other{even}%
+    }{%
+      \def\sidebar@side@other{odd}%
+    }%
+    \sidebar@draw{\sidebar@side}{\sidebar@box@left}%
+    \sidebar@draw[notitle]{\sidebar@side@other}{\sidebar@box@right}%
+  }%
+  % Reset counter
+  \setcounter{subsidebar@counter}{0}
+}
+
+\newcommand{\sidebar@draw}[3][title]{
+  \xdef\sidebar@title{\tl_use:N \l_csm_sidebar_title_tl}%
+  \xdef\sidebar@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
+  \edef\begin@sidebar@cmd{{figure@internal}[\fig@pos}%
   \expandafter\begin\begin@sidebar@cmd]{\figure@width}%
-    \begin{lrbox}{\sidebar@box}
-      \begin{minipage}{\linewidth}%
-        % >>> Reset equation, table, and figure counters and make labels start
-        % with an "S"
-        \setcounter{equation@mem}{\value{equation}}%
-        \setcounter{table@mem}{\value{table}}%
-        \setcounter{figure@mem}{\value{figure}}%
-        \setcounter{equation}{0}%
-        \setcounter{table}{0}%
-        \setcounter{figure}{0}%
-        \renewcommand{\theequation}{S\arabic{equation}}%
-        \renewcommand{\thetable}{S\arabic{table}}%
-        \renewcommand{\thefigure}{S\arabic{figure}}%
-        % <<<
-        % >>> Make bibliography citations start with an "S"
-        \renewbibmacro*{cite}{\printtext[bibhyperref]{%
-            \printfield{labelprefix}S\printfield{labelnumber}%
-            \ifbool{bbx:subentry}{\printfield{entrysetcount}}{}}}%
-        % \DeclareCiteCommand{\cite}[\mkbibbrackets]{\usebibmacro{prenote}}%
-        % {S\usebibmacro{citeindex}\usebibmacro{cite}}{\multicitedelim}%
-        % {\usebibmacro{postnote}}%
-        \DeclareFieldFormat{labelnumberwidth}{S##1.}%
-        % <<<
-        \xdef\sidebar@title{\tl_use:N \l_csm_sidebar_title_tl}%
-        \xdef\sidebar@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
-        \label{\sidebar@label}%
-        % ..:: Sidebar text begin ::..
-        \ifthenelse{\equal{\figure@width}{}}{%
-          \textbf{\sffamily~%
-            Sidebar:~\hypertarget{\sidebar@label}{\sidebar@title}}%
-        }{%
-          \begin{multicols}{2}[%
-            \textbf{\sffamily Sidebar:~%
-              \hypertarget{\sidebar@label}{\sidebar@title}}]%
-          }%
-        }{%
-          % Print the bibliography
-          \edef\sidebar@bib@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}
-          \def\bib@print@cmd{\printbibliography[keyword=}
-          \expandafter\bib@print@cmd\sidebar@bib@label]
-          \ifthenelse{\equal{\figure@width}{figure}}{}{%
-          \end{multicols}%
-        }%
-        % >>> Reset equation, table, and figure counters to body text values
-        \setcounter{equation}{\value{equation@mem}}%
-        \setcounter{table}{\value{table@mem}}%
-        \setcounter{figure}{\value{figure@mem}}%
-        % <<<
-      \end{minipage}%
-    \end{lrbox}%
-    \fbox{\usebox{\sidebar@box}}%
+    \ifthenelse{\equal{#1}{title}}{%
+      \tcbset{%
+        title={\hypertarget{\sidebar@label}{\sidebar@title}}
+      }%
+    }{}%
+    \ifthenelse{\equal{#2}{none}}{%
+      \def\tcb@leftfill{0cm}%
+      \def\tcb@rightfill{0cm}%
+    }{%
+      \ifthenelse{\equal{#2}{odd}}{%
+        \def\tcb@leftfill{0cm}%
+        \def\tcb@rightfill{10cm}%
+      }{%
+        \def\tcb@leftfill{10cm}%
+        \def\tcb@rightfill{0cm}%
+      }%
+    }%
+    \begin{sidebarbox}%
+      \usebox{#3}%
+    \end{sidebarbox}%
   \end{figure@internal}%
 }
 
-\newcommand{\sbref}[1]{%
-  \xdef\sb@page@number{\getpagerefnumber{sidebar:#1}}%
-  \pgfmathparse{\sb@page@number==0 ? 1:0}%
+\newenvironment{subsidebar}[1][noreset]{
+  % Options
+  \def\sidebar@reset{#1}
+  % Check if too many subsidebars
+  \pgfmathparse{\value{subsidebar@counter}>=3 ? 1:0}%
   \ifthenelse{\pgfmathresult>0}{%
+    \PackageError{CSM~style}{Only~two~subsidebars~are~allowed}{}%
+  }{}%
+  % Get the box name to save content to
+  \pgfmathparse{\value{subsidebar@counter}==0 ? 1:0}%
+  \ifthenelse{\pgfmathresult>0}{%
+    \def\sidebar@box{sidebar@box@full}%
+  }{%
+    \pgfmathparse{\value{subsidebar@counter}==1 ? 1:0}%
+    \ifthenelse{\pgfmathresult>0}{%
+      \def\sidebar@box{sidebar@box@left}%
+    }{%
+      \def\sidebar@box{sidebar@box@right}%
+    }%
+  }%
+  % Increment the counter
+  \stepcounter{subsidebar@counter}%
+  % Create the box
+  \begin{lrbox}{\csname\sidebar@box\endcsname}%
+    \begin{minipage}{\sidebar@width}%
+      \ifthenelse{\equal{\sidebar@reset}{noreset}}{}{%
+        % Reset equation, table, and figure counters and make labels start
+        % with an "S"
+        \global\chardef\dc@currentequation=\value{equation}%
+        \global\chardef\dc@currentfigure=\value{figure}%
+        \global\chardef\dc@currenttable=\value{table}%
+        \let\c@equation\c@sidebar@equation
+        \let\c@figure\c@sidebar@figure
+        \let\c@table\c@sidebar@table
+        \renewcommand{\theequation}{S\arabic{equation}}%
+        \renewcommand{\thetable}{S\arabic{table}}%
+        \renewcommand{\thefigure}{S\arabic{figure}}%
+        \renewcommand{\theHequation}{S\arabic{equation}}%
+        \renewcommand{\theHtable}{S\arabic{table}}%
+        \renewcommand{\theHfigure}{S\arabic{figure}}%
+        % Make bibliography citations start with an "S"
+        \renewbibmacro*{cite}{\printtext[bibhyperref]{%
+            \printfield{labelprefix}S\printfield{labelnumber}%
+            \ifbool{bbx:subentry}{\printfield{entrysetcount}}{}}}%
+        \DeclareFieldFormat{labelnumberwidth}{S##1.}%
+      }%
+      % Set columns
+      \ifthenelse{\equal{\figure@width}{}}{}{%
+        \begin{multicols}{2}%
+        }%
+        % Set font
+        \fontsize{9}{13}
+        \renewcommand\familydefault\sfdefault
+        \sffamily\sansmath
+        \captionsetup[figure]{name={\bfseries\color{csm@fig@label@sidebar}FIGURE~}}
+        % Print "continued" if this is the second subsidebar panel
+        \pgfmathparse{\value{subsidebar@counter}==3 ? 1:0}%
+        \ifthenelse{\pgfmathresult>0}{%
+          \continued@message%
+        }{}%
+        % Main text body (given environment body) ...
+      }{%
+        % ... End of main text body
+        % Print the bibliography
+        \pgfmathparse{\value{subsidebar@counter}!=2 ? 1:0}
+        \ifthenelse{\pgfmathresult>0}{%
+          \AtNextBibliography{\footnotesize}%
+          \edef\sidebar@bib@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
+          \def\bib@print@cmd{\printbibliography[keyword=}%
+          \expandafter\bib@print@cmd\sidebar@bib@label]%
+        }{}%
+        % Print "continued" if this is the first subsidebar panel
+        \ifthenelse{\pgfmathresult>0}{}{%
+          \continued@message%
+        }%
+        % End columns
+        \ifthenelse{\equal{\figure@width}{}}{}{%
+        \end{multicols}%
+      }%
+      \ifthenelse{\equal{\sidebar@reset}{noreset}}{}{%
+        % Reset equation, table, and figure counters to body text values
+        \edef\equation@mem{\arabic{sidebar@equation}}%
+        \edef\figure@mem{\arabic{sidebar@figure}}%
+        \edef\table@mem{\arabic{sidebar@table}}%
+        \setcounter{equation}{\dc@currentequation}%
+        \setcounter{figure}{\dc@currentfigure}%
+        \setcounter{table}{\dc@currenttable}%
+        \setcounter{sidebar@equation}{\equation@mem}%
+        \setcounter{sidebar@figure}{\figure@mem}%
+        \setcounter{sidebar@table}{\table@mem}%
+      }%
+    \end{minipage}%
+  \end{lrbox}%
+  % Save the box for global access
+  \global%
+  \expandafter\setbox\csname\sidebar@box\endcsname%
+  \expandafter\box\csname\sidebar@box\endcsname%
+}
+
+\renewcommand*{\LettrineTextFont}{}
+\newcommand{\sbfirstword}[1]{%
+  \StrChar{#1}{1}[\first@char]%
+  \StrBehind{#1}{\first@char}[\rest@of@word]%
+  \lettrine{\color{csm@sidebar@first@char}\bfseries%
+    \first@char}{\rest@of@word}%
+}
+
+\newcommand{\sbref}[1]{%
+  \@ifundefined{sidebar:#1}{%
     ``\textbf{??}''%
   }{%
     ``\csmhyperlink{sidebar:#1}''%

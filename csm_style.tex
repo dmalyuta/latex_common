@@ -2,13 +2,90 @@
 
 \makeatletter
 
+\definecolor{csm@intro@first@char}{HTML}{df9434}
 \definecolor{csm@sidebar@bg}{HTML}{f2e9c4}
-\definecolor{csm@fig@bg}{HTML}{e6f7fe}
 \definecolor{csm@sidebar@first@char}{HTML}{a08c2f}
-\definecolor{csm@fig@label@body}{HTML}{26baf2}
-\definecolor{csm@fig@label@sidebar}{HTML}{c8b03b}
+\definecolor{csm@fig@bg}{HTML}{e6f7fe}
+\definecolor{@light@blue}{HTML}{26baf2}
+\colorlet{csm@fig@label@body}{@light@blue}
+\colorlet{csm@blurb@color}{@light@blue}
+\definecolor{@golden}{HTML}{c8b03b}
+\colorlet{csm@fig@label@sidebar}{@golden}
+\colorlet{csm@abstract@color}{@golden}
 
 \makeatother
+
+% ..:: Paragraphs ::..
+
+\setlength\parindent{1em} % Paragraph indentation
+\setlength{\parskip}{0pt plus1pt} % Paragraph spacing
+
+% ..:: Fonts ::..
+
+% \let\transp\relax
+% \usepackage{newtxmath}
+\let\temp\rmdefault
+\usepackage{mathpazo}
+\let\rmdefault\temp
+
+\DeclareMathSizes{10}{9}{7}{5}
+
+% See https://tex.stackexchange.com/a/195867/90535
+\DeclareSymbolFont{Greekletters}{OT1}{iwona}{m}{n}
+\DeclareSymbolFont{greekletters}{OML}{iwona}{m}{it}
+\DeclareMathSymbol{\Delta}{\mathord}{Greekletters}{"01}
+\DeclareMathSymbol{\Theta}{\mathord}{Greekletters}{"02}
+\DeclareMathSymbol{\Lambda}{\mathord}{Greekletters}{"03}
+\DeclareMathSymbol{\Xi}{\mathord}{Greekletters}{"04}
+\DeclareMathSymbol{\Pi}{\mathord}{Greekletters}{"05}
+\DeclareMathSymbol{\Sigma}{\mathord}{Greekletters}{"06}
+\DeclareMathSymbol{\Upsilon}{\mathord}{Greekletters}{"07}
+\DeclareMathSymbol{\Phi}{\mathord}{Greekletters}{"08}
+\DeclareMathSymbol{\Psi}{\mathord}{Greekletters}{"09}
+\DeclareMathSymbol{\Omega}{\mathord}{Greekletters}{"0A}
+\DeclareMathSymbol{\alpha}{\mathord}{greekletters}{"0B}
+\DeclareMathSymbol{\beta}{\mathord}{greekletters}{"0C}
+\DeclareMathSymbol{\gamma}{\mathord}{greekletters}{"0D}
+\DeclareMathSymbol{\delta}{\mathord}{greekletters}{"0E}
+\DeclareMathSymbol{\epsilon}{\mathord}{greekletters}{"0F}
+\DeclareMathSymbol{\zeta}{\mathord}{greekletters}{"10}
+\DeclareMathSymbol{\eta}{\mathord}{greekletters}{"11}
+\DeclareMathSymbol{\theta}{\mathord}{greekletters}{"12}
+\DeclareMathSymbol{\iota}{\mathord}{greekletters}{"13}
+\DeclareMathSymbol{\kappa}{\mathord}{greekletters}{"14}
+\DeclareMathSymbol{\lambda}{\mathord}{greekletters}{"15}
+\DeclareMathSymbol{\mu}{\mathord}{greekletters}{"16}
+\DeclareMathSymbol{\nu}{\mathord}{greekletters}{"17}
+\DeclareMathSymbol{\xi}{\mathord}{greekletters}{"18}
+\DeclareMathSymbol{\pi}{\mathord}{greekletters}{"19}
+\DeclareMathSymbol{\rho}{\mathord}{greekletters}{"1A}
+\DeclareMathSymbol{\sigma}{\mathord}{greekletters}{"1B}
+\DeclareMathSymbol{\tau}{\mathord}{greekletters}{"1C}
+\DeclareMathSymbol{\upsilon}{\mathord}{greekletters}{"1D}
+\DeclareMathSymbol{\phi}{\mathord}{greekletters}{"1E}
+\DeclareMathSymbol{\chi}{\mathord}{greekletters}{"1F}
+\DeclareMathSymbol{\psi}{\mathord}{greekletters}{"20}
+\DeclareMathSymbol{\omega}{\mathord}{greekletters}{"21}
+\DeclareMathSymbol{\varepsilon}{\mathord}{greekletters}{"22}
+\DeclareMathSymbol{\vartheta}{\mathord}{greekletters}{"23}
+\DeclareMathSymbol{\varpi}{\mathord}{greekletters}{"24}
+\DeclareMathSymbol{\varrho}{\mathord}{greekletters}{"25}
+\DeclareMathSymbol{\varsigma}{\mathord}{greekletters}{"26}
+\DeclareMathSymbol{\varphi}{\mathord}{greekletters}{"27}
+
+% ..:: Lists ::..
+
+\tikzset{
+  list bullet/.style={
+    scale=0.5
+  }
+}
+
+\setlist[itemize,1]{label={%
+    \tikz[outer sep=0,inner sep=0,baseline=-0.3em]{%
+      \node[list bullet] at (0,0) {\faChevronRight};%
+      \node[list bullet] at (0.25em,0) {\faChevronRight};}%
+  },leftmargin=1.3em}
 
 % ..:: Page geometry ::..
 
@@ -49,6 +126,21 @@
   \normalfont\fontsize{10}{12}%
   \sffamily}{}{0cm}{#1}
 \titlespacing*{\subsubsection}{0cm}{4mm}{0mm}
+
+% >> Opening text <<
+
+\makeatletter
+
+\newcommand{\firstword}[2][]{%
+  \StrChar{#2}{1}[\first@char]%
+  \StrBehind{#2}{\first@char}[\rest@of@word]%
+  \renewcommand{\LettrineFontHook}{\sffamily\bfseries}%
+  \lettrine[lines=5,#1]{%
+    \color{csm@intro@first@char}%
+    \first@char}{\rest@of@word}%
+}
+
+\makeatother
 
 % ..:: Header and footer ::..
 
@@ -231,7 +323,7 @@
   % Fonts
   fonttitle=\sffamily\bfseries\large,
   % Sizes
-  width=\textwidth,
+  width=#1,
   arc=2mm,
   boxrule=0pt,
   titlerule=0pt,
@@ -248,9 +340,7 @@
   colback=csm@sidebar@bg,
   colframe=csm@sidebar@bg,
   colbacktitle=csm@sidebar@bg,
-  coltitle=black,
-  % Other options
-  #1
+  coltitle=black
 }
 
 \newenvironment{sidebar}[1][]{%
@@ -266,11 +356,15 @@
   \pgfmathparse{\tl_use:N \l_csm_sidebar_cols_tl ==1 ? 1:0}%
   \ifthenelse{\pgfmathresult>0}{%
     \gdef\figure@width{}%
-    \tikzmath{\sidebar@width=\columnwidth-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \tikzmath{\sidebar@box@width=\columnwidth;
+      \sidebar@width=\sidebar@box@width-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \xdef\sidebar@box@width{\sidebar@box@width pt}%
     \xdef\sidebar@width{\sidebar@width pt}%
   }{%
     \gdef\figure@width{dbl}%
-    \tikzmath{\sidebar@width=\textwidth-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \tikzmath{\sidebar@box@width=\textwidth;
+      \sidebar@width=\sidebar@box@width-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \xdef\sidebar@box@width{\sidebar@box@width pt}%
     \xdef\sidebar@width{\sidebar@width pt}%
   }%
   % Create the box
@@ -318,7 +412,7 @@
         \def\tcb@rightfill{0cm}%
       }%
     }%
-    \begin{sidebarbox}%
+    \begin{sidebarbox}[\sidebar@box@width]%
       \usebox{#3}%
     \end{sidebarbox}%
   \end{figure@internal}%
@@ -376,7 +470,7 @@
         }%
         % Set font
         \fontsize{9}{13}
-        \renewcommand\familydefault\sfdefault
+        % \renewcommand\familydefault\sfdefault
         \sffamily\sansmath
         \captionsetup[figure]{name={\bfseries\color{csm@fig@label@sidebar}FIGURE~}}
         % Print "continued" if this is the second subsidebar panel
@@ -437,6 +531,130 @@
   }{%
     ``\csmhyperlink{sidebar:#1}''%
   }%
+}
+
+\makeatother
+\ExplSyntaxOff
+
+% ..:: Highlight text blurb ::..
+
+\makeatletter
+
+\def\blurb@pad{4mm}
+
+\newtcolorbox{blurbbox}{
+  % Drawing engine
+  enhanced jigsaw,
+  % Fonts
+  fontupper=\sffamily\bfseries\large,
+  % Sizes
+  width=\textwidth,
+  arc=2mm,
+  boxrule=0.5pt,
+  titlerule=0pt,
+  toptitle=2mm,
+  left=\blurb@pad,
+  right=\blurb@pad,
+  bottom=\blurb@pad,
+  top=\blurb@pad,
+  boxsep=0pt,
+  % Colors
+  opacityback=0,
+  colframe=csm@blurb@color,
+  coltext=csm@blurb@color
+}
+
+\newenvironment{blurb}{
+  \begin{figure*}[t]
+    \centering
+    \begin{blurbbox}
+      \centering
+      \setlength{\baselineskip}{1.4em}
+    }{
+    \end{blurbbox}
+  \end{figure*}
+}
+
+\makeatother
+
+% ..:: Abstract (which will not appear in print) ::..
+
+\makeatletter
+
+\def\abstract@pad{2mm}
+
+\newtcolorbox{abstractbox}{
+  % Drawing engine
+  enhanced jigsaw,
+  % Fonts
+  fontupper=\sffamily,
+  % Sizes
+  width=\textwidth,
+  arc=2mm,
+  boxrule=0.5pt,
+  titlerule=0pt,
+  toptitle=2mm,
+  left=\abstract@pad,
+  right=\abstract@pad,
+  bottom=\abstract@pad,
+  top=\abstract@pad,
+  boxsep=0pt,
+  % Colors
+  opacityback=0,
+  colframe=csm@abstract@color,
+  coltext=black!70
+}
+
+\newenvironment{csmabstract}{
+  \begin{figure*}[t]
+    \centering
+    \begin{abstractbox}%
+      \paragraph{\sffamily Abstract (hidden in print).}%
+    }{%
+    \end{abstractbox}
+  \end{figure*}
+}
+
+\makeatother
+
+% ..:: Nomenclature ::..
+
+\ExplSyntaxOn
+\makeatletter
+
+\tl_new:N \l_csm_nomenclature_title_tl
+\tl_new:N \l_csm_nomenclature_label_tl
+\tl_new:N \l_csm_nomenclature_first_col_width_tl
+
+\define@key{csm@nomenclature@keys}{title}{\tl_set:Nn
+  \l_csm_nomenclature_title_tl {#1}}
+\define@key{csm@nomenclature@keys}{label}{\tl_set:Nn
+  \l_csm_nomenclature_label_tl {#1}}
+\define@key{csm@nomenclature@keys}{width}{\tl_set:Nn
+  \l_csm_nomenclature_first_col_width_tl {#1}}
+
+\NewEnviron{csmnomenclature}[1][]{
+  \setkeys{csm@nomenclature@keys}{title=,#1}%
+  \setkeys{csm@nomenclature@keys}{label=,#1}%
+  \setkeys{csm@nomenclature@keys}{width=0.2,#1}%
+  \edef\nomenc@title{\tl_use:N
+    \l_csm_nomenclature_title_tl}%
+  \edef\nomenc@label{\tl_use:N
+    \l_csm_nomenclature_label_tl}%
+  \edef\nomenc@width{\tl_use:N
+    \l_csm_nomenclature_first_col_width_tl}%
+  \def\@nomenclature@content{\BODY}
+  \begin{sidebar}[%
+    title={\nomenc@title},%
+    columns=1,%
+    label={\nomenc@label}]%
+    \footnotesize
+    \def\arraystretch{1.2}
+    \newcolumntype{V}{>{\hsize=\nomenc@width\linewidth}X}
+    \begin{tabularx}{\columnwidth}{VX}
+      \@nomenclature@content
+    \end{tabularx}
+  \end{sidebar}
 }
 
 \makeatother

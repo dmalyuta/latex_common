@@ -1,0 +1,214 @@
+\makeatletter
+
+% ..:: Colors ::..
+
+\definecolor{@response@darkblue}{HTML}{26415d}
+\definecolor{@response@blue}{HTML}{356397}
+\definecolor{@response@green}{HTML}{5da9a1}
+\definecolor{@response@yellow}{HTML}{f1d46a}
+\definecolor{@response@red}{HTML}{db6245}
+\definecolor{@response@black}{HTML}{000000}
+\definecolor{@response@grey}{HTML}{acacac}
+
+% ..:: Page geometry ::..
+
+\def\side@margin{3cm}
+\def\top@margin{2cm}
+\usepackage[left=\side@margin,
+right=\side@margin,
+top=\top@margin,
+bottom=\top@margin]{geometry}
+
+% ..:: Some inline TikZ options ::..
+
+\tikzset{
+  response box/.style={
+    fill=@response@blue,
+    text=white,
+    font=\sffamily,
+    inner sep=1mm
+  },
+  section box/.style={
+    fill=@response@red,
+    text=white,
+    font=\sffamily,
+    inner sep=2mm
+  },
+  title box/.style={
+    fill=@response@green,
+    text=white,
+    font=\sffamily\bfseries,
+    inner sep=2mm,
+    scale=1.2,
+    minimum height=8mm
+  },
+  date box/.style={
+    title box,
+    fill=@response@yellow,
+    text=black,
+    font=\sffamily\footnotesize
+  },
+  every node/.append style={
+    inner sep=0,
+    outer sep=0,
+    minimum size=0
+  }
+}
+
+% ..:: Section style ::..
+
+\newcommand{\@section@title}[2]{%
+  \tikz[baseline=-0.5ex]{%
+    \node[section box] {#2};
+  }%
+}
+
+\usepackage{helvet}
+\titleformat{\section}{%
+  \normalfont\fontsize{10}{12}%
+  \sffamily\bfseries}{}{0cm}{%
+  \@section@title{@response@red}{\MakeUppercase{#1}}}
+\titlespacing*{\section}{0cm}{10mm}{0mm}
+
+\titleformat{\subsection}{%
+  \normalfont\fontsize{10}{12}%
+  \sffamily\bfseries\slshape}{}{0cm}{#1}
+\titlespacing*{\subsection}{0cm}{4mm}{0mm}
+
+\titleformat{\subsubsection}{%
+  \normalfont\fontsize{10}{12}%
+  \sffamily}{}{0cm}{#1}
+\titlespacing*{\subsubsection}{0cm}{4mm}{0mm}
+
+% ..:: Title text ::..
+
+\newcommand{\reviewheader}{%
+  \tikz[baseline=-0.5ex]{%
+    \node[title box] {Responses to Editor and Reviewer Comments};
+  }%
+  \hfill%
+  \tikz[baseline=-0.5ex]{%
+    \node[date box] {\today};
+  }%
+}
+
+\newtcolorbox{subtitle@box}{
+  % Drawing engine
+  enhanced jigsaw,
+  breakable,
+  % Sizes
+  width=\linewidth,
+  boxrule=0pt,
+  titlerule=0pt,
+  arc=0mm,
+  left=2mm,
+  right=2mm,
+  bottom=1mm,
+  top=1mm,
+  boxsep=1mm,
+  % Fonts
+  fontupper=\sffamily,
+  % Colors
+  colback=black!10,
+  coltext=black
+}
+
+\newcommand{\papername}[1]{%
+  \begin{subtitle@box}
+    #1
+  \end{subtitle@box}%
+}
+
+\newcommand{\authorlist}[1]{%
+  {\small\itshape #1}%
+}
+
+\newenvironment{reviewabstract}{%
+}{}
+
+% ..:: Reviewer text box ::..
+
+\newtcolorbox{review@text@box}{
+  % Drawing engine
+  enhanced jigsaw,
+  breakable,
+  % Sizes
+  width=\linewidth,
+  boxrule=0pt,
+  titlerule=0pt,
+  arc=0mm,
+  left=3mm,
+  right=3mm,
+  bottom=3mm,
+  top=3mm,
+  boxsep=1mm,
+  % Colors
+  colback=black!10
+}
+
+\newenvironment{reviewtext}{%
+  \begin{review@text@box}%
+  }{%
+  \end{review@text@box}%
+}
+
+% ..:: Response text ::..
+
+\newcommand{\@author@response}{%
+  \tikz[baseline=-0.5ex]{%
+    \node[response box] {Response};
+  }}
+
+\newenvironment{response}{%
+  \@author@response~%
+}{%
+}
+
+% ..:: Text quotes ::..
+
+\newtcolorbox{quote@text@box}{
+  % Drawing engine
+  enhanced jigsaw,
+  breakable,
+  % Sizes
+  width=\linewidth,
+  boxrule=0pt,
+  leftrule=2pt,
+  titlerule=0pt,
+  arc=0mm,
+  left=3mm,
+  right=1mm,
+  bottom=1mm,
+  top=1mm,
+  boxsep=1mm,
+  % Colors
+  opacityback=0,
+  colframe=@response@green
+}
+
+\newenvironment{paperquote}{%
+  \begin{quote@text@box}%
+    \color{black!60}
+  }{%
+  \end{quote@text@box}%
+}
+
+% ..:: Bibliography ::..
+
+\def\elscitecolor{blue!60}
+\setcitestyle{authoryear,semicolon}
+\hypersetup{
+  colorlinks,
+  linkcolor={red},
+  citecolor={\elscitecolor},
+  urlcolor={blue}
+}
+\renewcommand*{\bibfont}{\footnotesize\color{\elscitecolor}}
+\setlength{\bibsep}{1pt}
+
+\makeatother
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:

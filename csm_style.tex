@@ -12,6 +12,9 @@
 \definecolor{@golden}{HTML}{c8b03b}
 \colorlet{csm@fig@label@sidebar}{@golden}
 \colorlet{csm@abstract@color}{@golden}
+\definecolor{csm@table@caption@bg}{HTML}{abc2e9}
+\definecolor{csm@table@border}{HTML}{5e81c9}
+\colorlet{csm@table@bg}{csm@fig@bg}
 
 \makeatother
 
@@ -259,6 +262,89 @@
 
 \makeatother
 \ExplSyntaxOff
+
+% ..:: Figures ::..
+
+\ExplSyntaxOn
+\makeatletter
+
+\tl_new:N \l_csm_table_label_tl
+\tl_new:N \l_csm_table_caption_tl
+\tl_new:N \l_csm_table_pos_tl
+\tl_new:N \l_csm_table_cols_tl
+
+\def\@table@inner@pad{3mm}
+\def\@table@border@width{1pt}
+
+\newtcolorbox{tablebox}[1][]{
+  % Drawing engine
+  enhanced~jigsaw,
+  % Fonts
+  fonttitle=\sffamily\bfseries\small,
+  fontupper=\sffamily,
+  % Sizes
+  width=\linewidth,
+  arc=2mm,
+  boxrule=\@table@border@width,
+  titlerule=\@table@border@width,
+  left=\@table@inner@pad,
+  right=\@table@inner@pad,
+  bottom=\@table@inner@pad,
+  top=\@table@inner@pad,
+  toptitle=\@table@inner@pad,
+  bottomtitle=\@table@inner@pad,
+  boxsep=\tcb@boxsep,
+  % Colors
+  colback=csm@table@bg,
+  coltitle=black,
+  colbacktitle=csm@table@caption@bg,
+  colframe=csm@table@border,
+  % Title
+  title={#1},
+  attach~boxed~title~to~top,
+  boxed~title~style={colframe=csm@table@border,rounded~corners}
+}
+
+\define@key{csm@table@keys}{label}{\tl_set:Nn \l_csm_table_label_tl {#1}}
+\define@key{csm@table@keys}{caption}{\tl_set:Nn \l_csm_table_caption_tl {#1}}
+\define@key{csm@table@keys}{position}{\tl_set:Nn \l_csm_table_pos_tl {#1}}
+\define@key{csm@table@keys}{columns}{\tl_set:Nn \l_csm_table_cols_tl {#1}}
+
+% Figure selector
+\newenvironment{table@internal}[2][tbp]{%
+  \def\table@width{#2}%
+  \ifthenelse{\equal{\table@width}{}}{%
+    \begin{table}[#1]}{\begin{table*}[#1]}}{%
+      \ifthenelse{\equal{\table@width}{}}{%
+      \end{table}}{\end{table*}}}
+
+\newenvironment{csmtable}[1][]{%
+  % Options
+  \setkeys{csm@table@keys}{label=,#1}%
+  \setkeys{csm@table@keys}{caption=,#1}%
+  \setkeys{csm@table@keys}{position=tbp,#1}%
+  \setkeys{csm@table@keys}{columns=1,#1}%
+  % Parse options
+  \edef\csm@table@pos{\tl_use:N \l_csm_table_pos_tl}%
+  \pgfmathparse{\tl_use:N \l_csm_table_cols_tl ==1 ? 1:0}%
+  \ifthenelse{\pgfmathresult>0}{%
+    \gdef\csm@table@width{}%
+  }{%
+    \gdef\csm@table@width{dbl}%
+  }%
+  % Make figure
+  \edef\begin@table@cmd{{table@internal}[\csm@table@pos}%
+    \expandafter\begin\begin@table@cmd]{\csm@table@width}%
+    \refstepcounter{table}
+    \begin{tablebox}[%
+      {\bfseries TABLE~\arabic{table}}\hspace{1em}%
+      \tl_use:N \l_csm_table_caption_tl]%
+      \fontsize{9}{13}%
+    }{%
+    \end{tablebox}
+    \tablabel{\tl_use:N \l_csm_table_label_tl}
+  \end{table@internal}
+}
 
 % ..:: Referencing ::..
 
@@ -659,6 +745,11 @@
 
 \makeatother
 \ExplSyntaxOff
+
+% ..:: Author biography ::..
+
+\newenvironment{authorbio}[1][]{
+  {\bfseries\itshape #1}~}{}
 
 % ..:: Bibliography ::..
 

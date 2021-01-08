@@ -1,3 +1,163 @@
+\makeatletter
+
+% ..:: Colors ::..
+
+\definecolor{@review@yellow}{HTML}{f1d46a}
+\definecolor{@review@blue}{HTML}{356397}
+\definecolor{@review@green}{HTML}{5da9a1}
+\definecolor{@review@red}{HTML}{db6245}
+
+% ..:: Some TikZ elements ::..
+
+\tikzset{
+  every node/.style={
+    inner sep=0,
+    outer sep=0,
+    minimum size=0
+  },
+  inline box/.style={
+    rectangle,
+    inner xsep=1mm,
+    font=\normalfont\sffamily\small,
+    minimum height=1em
+  },
+  delim line/.style={
+    line width=1pt
+  }
+}
+
+\def\@delim@line@height{0.8em}
+\def\@delim@line@half@angle{60}
+\tikzmath{
+  \@delim@line@width=\@delim@line@height/2/tan(\@delim@line@half@angle);
+}
+\newcommand{\@delim@line}[2]{%
+  \ifthenelse{\equal{#2}{open}}{\xdef\@x@sign{}}{\xdef\@x@sign{-}}%
+  \protect\tikz[baseline=-0.5ex,line cap=round,line join=round]{%
+    \protect\draw[delim line,#1]
+    (\@x@sign\@delim@line@width pt,-\@delim@line@height/2) --
+    (0,0) --
+    (\@x@sign\@delim@line@width pt,\@delim@line@height/2);
+  }%
+}
+
+% ..:: Diffs ::..
+
+\def\@new@clr{@review@green}
+
+\DeclareRobustCommand{\@new@box}{%
+  \protect\tikz[baseline=-0.5ex]{%
+    \protect\node[inline box,fill=\@new@clr,text=white] {new};
+  }%
+}
+
+% Idea from: https://tex.stackexchange.com/a/23842/90535
+\DeclareRobustCommand{\changed}[1]{%
+  \texorpdfstring{%
+    \@new@box~%
+    \@delim@line{\@new@clr}{open}~%
+    {\color{\@new@clr}#1}~%
+    \@delim@line{\@new@clr}{close}}%
+  {{\color{\@new@clr}#1}}}
+
+% For \leavvmode: https://tex.stackexchange.com/a/207228/90535
+\newenvironment{changedblock}{%
+  \@new@box~%
+  \@delim@line{\@new@clr}{open}~%
+  \leavevmode\color{\@new@clr}\ignorespaces%
+}{\@delim@line{\@new@clr}{close}}
+
+\def\beginchange{\begin{changedblock}}
+\def\endchange{\end{changedblock}}
+
+\makeatother
+
+% ..:: Comments ::..
+
+% >> Question <<
+
+\makeatletter
+
+\def\@question@clr{@review@green}
+
+\DeclareRobustCommand{\@question@box}{%
+  \protect\tikz[baseline=-0.5ex]{%
+    \protect\node[inline box,fill=\@question@clr,text=white] {question};
+  }%
+}
+
+\DeclareRobustCommand{\question}[2]{%
+  \def\@text{#1}%
+  \def\@question{#2}%
+  \texorpdfstring{%
+    \@question@box~%
+    \@delim@line{\@question@clr}{open}~%
+    {\color{\@question@clr}\@text}~%
+    \@delim@line{\@question@clr}{close}%
+    {\sffamily\footnotesize\color{\@question@clr}\textbf{:}~\@question}%
+  }%
+  {{\color{\@question@clr}\@text}}}
+
+\makeatother
+
+% >> Fix <<
+
+\makeatletter
+
+\def\@fixme@clr{@review@red}
+
+\DeclareRobustCommand{\@fixme@box}{%
+  \protect\tikz[baseline=-0.5ex]{%
+    \protect\node[inline box,fill=\@fixme@clr,text=white] {fixme};
+  }%
+}
+
+\DeclareRobustCommand{\fixme}[2]{%
+  \def\@text{#1}%
+  \def\@comment{#2}%
+  \texorpdfstring{%
+    \@fixme@box~%
+    \@delim@line{\@fixme@clr}{open}~%
+    {\color{\@fixme@clr}\@text}~%
+    \@delim@line{\@fixme@clr}{close}%
+    {\sffamily\footnotesize\color{\@fixme@clr}\textbf{:}~\@comment}%
+  }%
+  {{\color{\@fixme@clr}\@text}}}
+
+\makeatother
+
+% >> Todo <<
+
+\makeatletter
+
+\def\@todo@clr{@review@yellow}
+\def\@todo@text@clr{@review@blue}
+
+\DeclareRobustCommand{\@todo@box}{%
+  \protect\tikz[baseline=-0.5ex]{%
+    \protect\node[inline box,fill=\@todo@clr,text=black] {todo};
+  }%
+}
+
+\DeclareRobustCommand{\todo}[2][]{%
+  \def\@text{#1}%
+  \def\@comment{#2}%
+  \texorpdfstring{%
+    \@todo@box~%
+    \ifthenelse{\equal{\@text}{}}{}{%
+      \@delim@line{\@todo@clr}{open}~%
+      {\color{\@todo@text@clr}\@text}~%
+      \@delim@line{\@todo@clr}{close}%
+    }%
+    \ifthenelse{\equal{\@comment}{}}{}{%
+      {\sffamily\footnotesize\color{\@todo@text@clr}\textbf{:}~\@comment}}
+  }%
+  {{\color{\@todo@text@clr}\@text}}}
+
+\makeatother
+
+% ..:: Old ::..
+
 \def\removeColor{red}
 \def\changeColor{orange}
 \def\commentColor{green}
@@ -102,7 +262,7 @@
 \newcommand{\printCommentList}{
   \section*{\color{\commentColor}Comments}
   \foreach \commentNumber/\commentText in \reviewCommentList {
-    
+
     \hypertarget{commentRef\commentNumber}{\textbf{Comment \commentNumber:}}
     \medskip
 
@@ -130,22 +290,6 @@
     {\color{orange} #2}%
   }{}%
 }
-\newcommand{\todo}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{blue}%
-      \ifthenelse{\equal{#2}{}}{TODO}{(TODO: #2)}}%
-  }{}%
-}
-\newcommand{\question}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{darkolivegreen} (Q: #2)}%
-  }{}%
-}
-\newcommand{\fixme}[2][show]{%
-  \ifthenelse{\equal{#1}{show}}{%
-    {\color{red} (FIXME: #2)}%
-  }{}%
-}
 \newcommand{\mycomment}[2][show]{%
   \ifthenelse{\equal{#1}{show}}{%
     {\color{red} (C: #2)}%
@@ -162,8 +306,6 @@
 \newcommand{\moderate}{{\color{orange}[moderate]}\xspace}
 \newcommand{\hard}{{\color{red}[hard]}\xspace}
 \newcommand{\stoppedhere}{{\color{red}\bfseries STOPPED~HERE}\xspace}
-
-
 
 %%% Local Variables:
 %%% mode: latex

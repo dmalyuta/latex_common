@@ -1,4 +1,43 @@
-% Statistics
+% ..:: General ::..
+
+% Parentheses
+\ExplSyntaxOn
+\makeatletter
+\NewDocumentCommand{\parengen}{m m m m}
+{
+  % \group_begin: Makes the variables inside *local* to the group
+  % Source: https://www.alanshawn.com/latex3-tutorial/
+  \group_begin:
+  % Parameters
+  \tl_set:Nn \l_left_paren_tl {#1}
+  \tl_set:Nn \l_right_paren_tl {#2}
+  \tl_set:Nn \l_paren_sz_tl {#3}
+  % Logic
+  \ifthenelse{\equal{\l_paren_sz_tl}{}}{
+    \l_left_paren_tl #4 \l_right_paren_tl
+  }{
+    \ifthenelse{\equal{\l_paren_sz_tl}{auto}}{
+      \left\l_left_paren_tl #4 \right\l_right_paren_tl
+    }{
+      \csname \l_paren_sz_tl l\endcsname\l_left_paren_tl
+      #4
+      \csname \l_paren_sz_tl r\endcsname\l_right_paren_tl
+    }
+  }
+  \group_end:
+}
+
+\newcommand{\pare}[2][]{\parengen{(}{)}{#1}{#2}}
+\newcommand{\brak}[2][]{\parengen{[}{]}{#1}{#2}}
+\newcommand{\brac}[2][]{\parengen{\{}{\}}{#1}{#2}}
+\newcommand{\angl}[2][]{\parengen{\langle}{\rangle}{#1}{#2}}
+
+\newcommand{\@@normgen}[2][]{\parengen{\|}{\|}{#1}{#2}}
+
+\makeatother
+\ExplSyntaxOff
+
+% ..:: Statistics ::..
 
 \DeclareMathOperator{\expectation}{\mathbf{E}}
 \newcommand{\EE}{\expectation}
@@ -6,7 +45,7 @@
 \newcommand{\Var}{\variance}
 \DeclareMathOperator{\prob}{\mathrm{prob}}
 
-% Sets
+% ..:: Sets ::..
 
 \newcommand{\powerSet}[1]{2^{#1}}
 \newcommand{\union}{\cup}
@@ -22,7 +61,7 @@
 }
 \newcommand{\extendedreals}{\overline\reals} % DEPRECATED
 \newcommand{\real}{\mathbb R}
-\newcommand{\pos}[1][R]{\mathbb #1_{++}}
+\newcommand{\pos}[1][\reals]{#1_{++}}
 \newcommand{\nonneg}[1][\reals]{#1_{+}}
 \newcommand{\normball}[1][]{%
   % {x : ||x||_#1 <= 1}
@@ -33,8 +72,8 @@
 \newcommand{\binary}{\mathbb I}
 \newcommand{\quaternion}{\mathbb Q}
 \newcommand{\symm}{\mathbb S}  % symmetric matrices
-\newcommand{\psd}{\mathbb S_{+}}
-\newcommand{\pd}{\mathbb S_{++}}
+\newcommand{\psd}{\symm_{+}}
+\newcommand{\pd}{\symm_{++}}
 \newcommand{\dom}{\mathrm{dom}}
 \newcommand{\epi}{\mathrm{epi}}
 % \newcommand{\hypo}{\mathrm{hypo}}
@@ -45,7 +84,7 @@
 \DeclareMathOperator{\bd}{bd}
 \DeclareMathOperator{\closure}{cl}
 \newcommand{\compl}[1]{#1^\mathrm{c}}
-\newcommand{\boundary}[1]{\mathrm{bdry}\left(#1\right)}
+\DeclareMathOperator{\boundary}{\partial}
 % \newcommand{\relint}{\mathrm{relint}}
 \newcommand{\coni}[1]{\mathrm{coni}(#1)}
 \newcommand{\bdry}{\partial}
@@ -66,7 +105,7 @@
 \DeclareMathOperator{\sublevelsetsymbol}{lev}
 \newcommand{\levelset}[2][]{\sublevelsetsymbol_{#1}#2}
 
-% Algorithms
+% ..:: Algorithms ::..
 
 \newcommand{\algvar}[1]{\text{\IfSubStr{#1}{_}{%
     \StrSubstitute{#1}{_}{\textunderscore}}{#1}}}
@@ -78,7 +117,7 @@
 \newcommand{\bigTheta}[1]{\Theta\left(#1\right)}
 \newcommand{\kd}{$k$-d\xspace}
 
-% Computer science
+% ..:: Computer science ::..
 
 \makeatletter
 \definecolor{listinggray}{gray}{0.9}
@@ -90,7 +129,7 @@
     macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
     using,while},%
   sensitive=true,%
-  alsoother={\$},%
+  alsoother={\$},%\$
   morecomment=[l]\#,%
   morecomment=[n]{\#=}{=\#},%
   morestring=[s]{"}{"},%
@@ -131,7 +170,7 @@
 %
 \newcommand\langname@bash{}
 \def\langname@bash{bash}
-\newcommand\prompt@bash{\texttt{\$}\ }
+\newcommand\prompt@bash{\texttt{\$}\ } %\$
 \newcommand\addedToEveryPar@bash{}
 \lst@AddToHook{EveryPar}{\addedToEveryPar@bash}
 \lst@AddToHook{PreInit}{%
@@ -155,18 +194,18 @@
 \lstnewenvironment{terminalcode}[1][]{\lstset{style=listingterminal,#1}}{}
 \makeatother
 
-% Analysis
+% ..:: Analysis ::..
 
 \newcommand{\Lone}[1]{\|#1\|_1}
 \newcommand{\Ltwo}[1]{\|#1\|_2}
 \newcommand{\FLinf}[2]{\|#1\|_{#2}}
 \newcommand{\converge}[1][]{\overset{#1}{\to}}
 
-% Numerical analysis
+% ..:: Numerical analysis ::..
 
 \renewcommand{\O}[1]{\mathcal O(#1)}
 
-% Calculus
+% ..:: Calculus ::..
 
 \newcommand{\grad}{\nabla}
 \newcommand{\hess}{\nabla^2}
@@ -174,7 +213,7 @@
 \newcommand{\hot}{\textnormal{h.o.t.}}
 \newcommand{\ddx}{\frac{\dd}{\dd x}}
 
-% Convex analysis
+% ..:: Convex analysis ::..
 
 \newcommand{\subdiff}[1][none]{%
   \ifthenelse{\equal{#1}{none}}{%
@@ -202,11 +241,11 @@
 \newcommand{\conjj}{^{**}}
 \newcommand{\shuffle}{^{\uparrow}}
 
-% Functions
+% ..:: Functions ::..
 
 \newcommand{\heaviside}{\sigma}
 
-% Linear Algebra
+% ..:: Linear Algebra ::..
 
 \DeclareMathOperator{\nul}{null}
 \DeclareMathOperator{\rank}{rank}
@@ -249,7 +288,7 @@
 \newcommand{\zeros}{\bm{0}}
 \newcommand{\ones}{\bm{1}}
 
-% Generic math
+% ..:: Generic math ::..
 
 \newcommand{\where}{:}
 \newcommand{\given}{\mid}
@@ -263,7 +302,44 @@
 \newcommand{\ceil}[1]{\left\lceil#1\right\rceil}
 \newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
 \newcommand{\sign}{\mathrm{sgn}}
-\newcommand{\norm}[2][]{\left\|#2\right\|_{#1}}
+\ExplSyntaxOn
+\makeatletter
+% Sources inspiring the below:
+%   - Main: https://tex.stackexchange.com/a/326918/90535
+%   - Optional arg count (nargin): https://tex.stackexchange.com/a/395784/90535
+\NewDocumentCommand{\norm}{o m}
+{
+  \group_begin:
+  % split the input at commas
+  \seq_set_split:Nnn \l_var_seq { , } { #1 }
+  \edef\@nargin{\seq_count:N \l_var_seq}
+  % set the item to variables
+  \seq_pop_left:NN \l_var_seq \l_norm_type_tl
+  \seq_pop_left:NN \l_var_seq \l_delimiter_size_tl
+  % Defaults
+  \pgfmathparse{\@nargin<=1 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{
+    \tl_set:Nn \l_delimiter_size_tl {}
+  }{}
+  \pgfmathparse{\@nargin==0 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{
+    \tl_set:Nn \l_norm_type_tl {2}
+  }{}
+  % Print the text
+  % print; _ is not available here
+  \ifthenelse{\equal{\l_delimiter_size_tl}{auto}}{%
+    \@@normgen[auto]{#2}}{%
+    \ifthenelse{\equal{\l_delimiter_size_tl}{}}{
+      \@@normgen[]{#2}}{\@@normgen[\l_delimiter_size_tl]{#2}}}%
+  \c_math_subscript_token{\l_norm_type_tl}
+  \group_end:
+}
+\seq_new:N \l_var_seq
+\tl_new:N \l_norm_type_tl
+\tl_new:N \l_delimiter_size_tl
+\makeatother
+\ExplSyntaxOff
+
 \newcommand{\dualnorm}[2][]{\norm[#1]{#2}^*}
 \newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1
         \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
@@ -383,11 +459,11 @@
   {\end{subequations}}
 \makeatother %not \makeatletter
 
-% Geometry
+% ..:: Geometry ::..
 
 \newcommand{\fr}[1]{\mathcal{F}_{\mathcal{#1}}}
 
-% Measure theory
+% ..:: Measure theory ::..
 
 \newcommand{\alev}[1]{\text{a.e. }#1}
 \newcommand{\gen}[1]{\text{gen. }#1}
@@ -407,16 +483,18 @@
   }%
 }
 
-% Optimization
+% ..:: Optimization ::..
 
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
-\DeclareMathOperator*{\minimize}{\textnormal{minimize}}
-\DeclareMathOperator*{\maximize}{\textnormal{maximize}}
-\DeclareMathOperator*{\find}{\textnormal{find}}
-\DeclareMathOperator{\vallue}{val}
+\DeclareMathOperator*{\minimize}{\mathrm{minimize}}
+\DeclareMathOperator*{\maximize}{\mathrm{maximize}}
+\DeclareMathOperator*{\find}{\mathrm{find}}
+\DeclareMathOperator{\val}{val}
 
-% Miscellaneous
+% Get more optimization commands via \input{latex_common/optimization.tex}
+
+% ..:: Miscellaneous ::..
 
 \newcommand{\PhD}{Ph.D.\xspace}
 \newcommand{\Behcet}{Beh\c{c}et}
@@ -551,30 +629,7 @@
 \newcommand{\lstref}[2][]{\PrintRefs[#1]{Listing}{#2}}
 
 \newcommand{\figlabel}[1]{\label{fig:#1}}
-
-% Miscallaneous
-
-\makeatletter
-\xdef\@content@box@counter{0}
-\newenvironment{contentbox}
-{%
-  \xdef\box@number{\@content@box@counter}%
-  \counter@increment{\@content@box@counter}%
-  \expandafter\newsavebox\csname @content\box@number\endcsname%
-  \lrbox{\csname @content\box@number\endcsname}%
-}{
-  \endlrbox%
-}
-\newcommand{\usecontent}[1][]{%
-  \ifthenelse{\equal{#1}{}}{%
-    \tikzmath{\@counter=int(\@content@box@counter-1);}%
-    \xdef\@counter{\@counter}%
-  }{%
-    \xdef\@counter{#1}%
-  }%
-  \expandafter\usebox\csname @content\@counter\endcsname%
-}
-\makeatother
+\newcommand{\tablabel}[1]{\label{table:#1}}
 
 %%% Local Variables:
 %%% mode: latex

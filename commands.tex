@@ -1,4 +1,4 @@
-% ..:: General ::..
+% ..:: Generic math ::..
 
 % Parentheses
 \ExplSyntaxOn
@@ -36,6 +36,177 @@
 
 \makeatother
 \ExplSyntaxOff
+
+\newcommand{\where}{:}
+\newcommand{\given}{\mid}
+\newcommand{\CC}[1]{\mathcal C^{#1}}
+\newcommand{\inv}[1][]{\ifthenelse{\equal{#1}{}}{^{-1}}{^{-#1}}}
+\newcommand{\invT}{^{-\transp}}
+\newcommand{\invsq}{^{-\frac{1}{2}}}
+\newcommand{\polar}{^{\circ}}
+\newcommand{\ortho}{^{\perp}}
+\newcommand{\powsq}{^{\frac{1}{2}}}
+\newcommand{\ceil}[1]{\left\lceil#1\right\rceil}
+\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
+\newcommand{\sign}{\mathrm{sgn}}
+\ExplSyntaxOn
+\makeatletter
+% Sources inspiring the below:
+%   - Main: https://tex.stackexchange.com/a/326918/90535
+%   - Optional arg count (nargin): https://tex.stackexchange.com/a/395784/90535
+\NewDocumentCommand{\norm}{o m}
+{
+  \group_begin:
+  % split the input at commas
+  \seq_set_split:Nnn \l_var_seq { , } { #1 }
+  \edef\@nargin{\seq_count:N \l_var_seq}
+  % set the item to variables
+  \seq_pop_left:NN \l_var_seq \l_norm_type_tl
+  \seq_pop_left:NN \l_var_seq \l_delimiter_size_tl
+  % Defaults
+  \pgfmathparse{\@nargin<=1 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{
+    \tl_set:Nn \l_delimiter_size_tl {}
+  }{}
+  \pgfmathparse{\@nargin==0 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{
+    \tl_set:Nn \l_norm_type_tl {2}
+  }{}
+  % Print the text
+  % print; _ is not available here
+  \ifthenelse{\equal{\l_delimiter_size_tl}{auto}}{%
+    \@@normgen[auto]{#2}}{%
+    \ifthenelse{\equal{\l_delimiter_size_tl}{}}{
+      \@@normgen[]{#2}}{\@@normgen[\l_delimiter_size_tl]{#2}}}%
+  \c_math_subscript_token{\l_norm_type_tl}
+  \group_end:
+}
+\seq_new:N \l_var_seq
+\tl_new:N \l_norm_type_tl
+\tl_new:N \l_delimiter_size_tl
+\makeatother
+\ExplSyntaxOff
+
+\newcommand{\dualnorm}[2][]{\norm[#1]{#2}^*}
+\newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1
+        \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
+\newcommand{\inorm}[2][]{\vertiii{#2}_{#1}}
+\newcommand{\seq}[1]{\{#1\}}
+\newcommand{\sgn}{\mbox{\textrm{sgn}}}
+\newlength{\dhatheight}
+\newcommand{\hhat}[1]{%
+  \settoheight{\dhatheight}{\ensuremath{\hat{#1}}}%
+  \addtolength{\dhatheight}{-0.35ex}%
+  \hat{\vphantom{\rule{1pt}{\dhatheight}}%
+    \smash{\hat{#1}}}}
+
+\makeatletter
+\define@key{projKeys}{set}{\def\set{#1}}
+\define@key{proxKeys}{t}{\def\t{#1}}
+\define@key{proxKeys}{f}{\def\f{#1}}
+\makeatother
+\DeclareMathOperator{\projecti}{proj}
+\DeclareMathOperator{\proj}{proj}
+\DeclareMathOperator{\proximal}{prox}
+\newcommand{\Proj}[2][]{%
+  \setkeys{projKeys}{set=,#1}%
+  \mathchoice{\underset{\set}{\projecti}}%
+  {\projecti_{\set}}{\projecti_{\set}}{\projecti_{\set}}%
+  \left(#2\right)%
+}
+\newcommand{\Prox}[2][]{%
+  \setkeys{proxKeys}{t=t,#1}%
+  \setkeys{proxKeys}{f=f,#1}%
+  \mathchoice{\underset{\t\f}{\proximal}}%
+  {\proximal_{\t\f}}{\proximal_{\t\f}}{\proximal_{\t\f}}%
+  \ifthenelse{\equal{#2}{}}{}{\left(#2\right)}%
+}
+\DeclareMathOperator{\distance}{dist}
+\newcommand{\dist}[2][]{%
+  \distance_{#1}\ifthenelse{\equal{#2}{}}{}{(#2)}
+}
+\newcommand{\gauge}[2][]{%
+  \gamma_{#1}\ifthenelse{\equal{#2}{}}{}{(#2)}
+}
+
+\newcommand{\Pre}{\mathop\text{Pre}}
+\newcommand{\PP}{$\mathcal{P}$\xspace}
+\newcommand{\NP}{$\mathcal{NP}$\xspace}
+\newcommand{\NPhard}{$\mathcal{NP}$-hard\xspace}
+\newcommand{\NPcomplete}{$\mathcal{NP}$-complete\xspace}
+\newcommand{\transp}{{\scriptscriptstyle\mathsf{T}}}
+\newcommand{\T}{^\transp}
+\newcommand{\innerproduct}[3][]{\langle#2,#3\rangle_{#1}}
+\newcommand{\inner}[2][]{\langle#2\rangle_{#1}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\dt}{\dd t}
+\newcommand{\fromabove}{\downarrow}
+\newcommand{\frombelow}{\uparrow}
+\newcommand{\fun}[2][1]{%
+  #2(%
+  \foreach \index in {1, ..., #1} {%
+    \ifthenelse{\equal{\index}{#1}}{%
+      \cdot%
+    }{%
+      \cdot,%
+    }%
+  })}
+\newcommand{\define}[1]{\textit{#1}}%
+\newcommand{\definedas}[1][tri]{%
+  \ifthenelse{\equal{#1}{tri}}{\triangleq}{\coloneqq}}
+\newcommand{\inlineint}{\textstyle\int}
+\newcommand{\inlinesum}{\textstyle\sum}
+\newcommand{\evalat}[2]{\left.#1\right|_{#2}}
+\newcommand{\epsmach}{\epsilon_{mach}}
+\renewcommand{\implies}{\Rightarrow}
+\renewcommand{\iff}{\Leftrightarrow}
+\newcommand{\mleq}{\preceq}
+\newcommand{\mgeq}{\succeq}
+\newcommand{\mle}{\prec}
+\newcommand{\mgr}{\succ}
+\DeclareMathOperator*{\exptx}{exp}
+\renewcommand{\exp}[2][exponent]{\ifthenelse{\equal{#1}{exponent}}{e^{#2}}{\exptx\left(#2\right)}}
+\DeclareMathOperator*{\expsf}{\mathsf{exp}}
+\newcommand{\expm}[2][exponent]{\ifthenelse{\equal{#1}{exponent}}{\mathsf{e}^{#2}}{\expsf\left(#2\right)}}
+\newcommand{\ttilde}[1]{\tilde{\raisebox{0pt}[0.85\height]{%
+      $\tilde{#1}$}}}
+\newcommand{\tttilde}[1]{\tilde{\raisebox{0pt}[0.88\height]{%
+      $\tilde{\raisebox{0pt}[0.85\height]{%
+          $\tilde{#1}$}}$}}}
+\newcommand{\overlline}[1]{\overline{\overline{#1}}}
+\newcommand{\bbar}[1]{\bar{\bar{#1}}}
+\newcommand{\prefix}[2][]{{}^{#1}_{#2}}
+
+\makeatletter
+\DeclareFontFamily{U}{tipa}{}
+\DeclareFontShape{U}{tipa}{m}{n}{<->tipa10}{}
+\newcommand{\arc@char}{{\usefont{U}{tipa}{m}{n}\symbol{62}}}%
+\renewcommand{\arc}[1]{\mathpalette\arc@arc{#1}}
+\newcommand{\arc@arc}[2]{%
+  \sbox0{$\m@th#1#2$}%
+  \vbox{
+    \hbox{\resizebox{\wd0}{\height}{\arc@char}}
+    \nointerlineskip
+    \box0
+  }%
+}
+\makeatother
+
+\makeatletter
+\newenvironment{taggedsubequations}[1]
+{%
+  % \end{subequations} will advance `equation`
+  \addtocounter{equation}{-1}%
+  \begin{subequations}%
+    % set the current label
+    \def\@currentlabel{#1}%
+    % redefine \theequation
+    \renewcommand{\theequation}{#1.\alph{equation}}%
+  }
+  {\end{subequations}}
+\makeatother %not \makeatletter
+
+\newcommand{\dash}{\Hyphdash}
 
 % ..:: Statistics ::..
 
@@ -287,177 +458,6 @@
 \makeatother
 \newcommand{\zeros}{\bm{0}}
 \newcommand{\ones}{\bm{1}}
-
-% ..:: Generic math ::..
-
-\newcommand{\where}{:}
-\newcommand{\given}{\mid}
-\newcommand{\CC}[1]{\mathcal C^{#1}}
-\newcommand{\inv}[1][]{\ifthenelse{\equal{#1}{}}{^{-1}}{^{-#1}}}
-\newcommand{\invT}{^{-\transp}}
-\newcommand{\invsq}{^{-\frac{1}{2}}}
-\newcommand{\polar}{^{\circ}}
-\newcommand{\ortho}{^{\perp}}
-\newcommand{\powsq}{^{\frac{1}{2}}}
-\newcommand{\ceil}[1]{\left\lceil#1\right\rceil}
-\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
-\newcommand{\sign}{\mathrm{sgn}}
-\ExplSyntaxOn
-\makeatletter
-% Sources inspiring the below:
-%   - Main: https://tex.stackexchange.com/a/326918/90535
-%   - Optional arg count (nargin): https://tex.stackexchange.com/a/395784/90535
-\NewDocumentCommand{\norm}{o m}
-{
-  \group_begin:
-  % split the input at commas
-  \seq_set_split:Nnn \l_var_seq { , } { #1 }
-  \edef\@nargin{\seq_count:N \l_var_seq}
-  % set the item to variables
-  \seq_pop_left:NN \l_var_seq \l_norm_type_tl
-  \seq_pop_left:NN \l_var_seq \l_delimiter_size_tl
-  % Defaults
-  \pgfmathparse{\@nargin<=1 ? 1:0}
-  \ifthenelse{\pgfmathresult>0}{
-    \tl_set:Nn \l_delimiter_size_tl {}
-  }{}
-  \pgfmathparse{\@nargin==0 ? 1:0}
-  \ifthenelse{\pgfmathresult>0}{
-    \tl_set:Nn \l_norm_type_tl {2}
-  }{}
-  % Print the text
-  % print; _ is not available here
-  \ifthenelse{\equal{\l_delimiter_size_tl}{auto}}{%
-    \@@normgen[auto]{#2}}{%
-    \ifthenelse{\equal{\l_delimiter_size_tl}{}}{
-      \@@normgen[]{#2}}{\@@normgen[\l_delimiter_size_tl]{#2}}}%
-  \c_math_subscript_token{\l_norm_type_tl}
-  \group_end:
-}
-\seq_new:N \l_var_seq
-\tl_new:N \l_norm_type_tl
-\tl_new:N \l_delimiter_size_tl
-\makeatother
-\ExplSyntaxOff
-
-\newcommand{\dualnorm}[2][]{\norm[#1]{#2}^*}
-\newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1
-        \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
-\newcommand{\inorm}[2][]{\vertiii{#2}_{#1}}
-\newcommand{\seq}[1]{\{#1\}}
-\newcommand{\sgn}{\mbox{\textrm{sgn}}}
-\newlength{\dhatheight}
-\newcommand{\hhat}[1]{%
-  \settoheight{\dhatheight}{\ensuremath{\hat{#1}}}%
-  \addtolength{\dhatheight}{-0.35ex}%
-  \hat{\vphantom{\rule{1pt}{\dhatheight}}%
-    \smash{\hat{#1}}}}
-
-\makeatletter
-\define@key{projKeys}{set}{\def\set{#1}}
-\define@key{proxKeys}{t}{\def\t{#1}}
-\define@key{proxKeys}{f}{\def\f{#1}}
-\makeatother
-\DeclareMathOperator{\projecti}{proj}
-\DeclareMathOperator{\proj}{proj}
-\DeclareMathOperator{\proximal}{prox}
-\newcommand{\Proj}[2][]{%
-  \setkeys{projKeys}{set=,#1}%
-  \mathchoice{\underset{\set}{\projecti}}%
-  {\projecti_{\set}}{\projecti_{\set}}{\projecti_{\set}}%
-  \left(#2\right)%
-}
-\newcommand{\Prox}[2][]{%
-  \setkeys{proxKeys}{t=t,#1}%
-  \setkeys{proxKeys}{f=f,#1}%
-  \mathchoice{\underset{\t\f}{\proximal}}%
-  {\proximal_{\t\f}}{\proximal_{\t\f}}{\proximal_{\t\f}}%
-  \ifthenelse{\equal{#2}{}}{}{\left(#2\right)}%
-}
-\DeclareMathOperator{\distance}{dist}
-\newcommand{\dist}[2][]{%
-  \distance_{#1}\ifthenelse{\equal{#2}{}}{}{(#2)}
-}
-\newcommand{\gauge}[2][]{%
-  \gamma_{#1}\ifthenelse{\equal{#2}{}}{}{(#2)}
-}
-
-\newcommand{\Pre}{\mathop\text{Pre}}
-\newcommand{\PP}{$\mathcal{P}$\xspace}
-\newcommand{\NP}{$\mathcal{NP}$\xspace}
-\newcommand{\NPhard}{$\mathcal{NP}$-hard\xspace}
-\newcommand{\NPcomplete}{$\mathcal{NP}$-complete\xspace}
-\newcommand{\transp}{{\scriptscriptstyle\mathsf{T}}}
-\newcommand{\T}{^\transp}
-\newcommand{\innerproduct}[3][]{\langle#2,#3\rangle_{#1}}
-\newcommand{\inner}[2][]{\langle#2\rangle_{#1}}
-\newcommand{\dd}{\mathrm{d}}
-\newcommand{\dt}{\dd t}
-\newcommand{\fromabove}{\downarrow}
-\newcommand{\frombelow}{\uparrow}
-\newcommand{\fun}[2][1]{%
-  #2(%
-  \foreach \index in {1, ..., #1} {%
-    \ifthenelse{\equal{\index}{#1}}{%
-      \cdot%
-    }{%
-      \cdot,%
-    }%
-  })}
-\newcommand{\define}[1]{\textit{#1}}%
-\newcommand{\definedas}[1][tri]{%
-  \ifthenelse{\equal{#1}{tri}}{\triangleq}{\coloneqq}}
-\newcommand{\inlineint}{\textstyle\int}
-\newcommand{\inlinesum}{\textstyle\sum}
-\newcommand{\evalat}[2]{\left.#1\right|_{#2}}
-\newcommand{\epsmach}{\epsilon_{mach}}
-\renewcommand{\implies}{\Rightarrow}
-\renewcommand{\iff}{\Leftrightarrow}
-\newcommand{\mleq}{\preceq}
-\newcommand{\mgeq}{\succeq}
-\newcommand{\mle}{\prec}
-\newcommand{\mgr}{\succ}
-\DeclareMathOperator*{\exptx}{exp}
-\renewcommand{\exp}[2][exponent]{\ifthenelse{\equal{#1}{exponent}}{e^{#2}}{\exptx\left(#2\right)}}
-\DeclareMathOperator*{\expsf}{\mathsf{exp}}
-\newcommand{\expm}[2][exponent]{\ifthenelse{\equal{#1}{exponent}}{\mathsf{e}^{#2}}{\expsf\left(#2\right)}}
-\newcommand{\ttilde}[1]{\tilde{\raisebox{0pt}[0.85\height]{%
-      $\tilde{#1}$}}}
-\newcommand{\tttilde}[1]{\tilde{\raisebox{0pt}[0.88\height]{%
-      $\tilde{\raisebox{0pt}[0.85\height]{%
-          $\tilde{#1}$}}$}}}
-\newcommand{\overlline}[1]{\overline{\overline{#1}}}
-\newcommand{\bbar}[1]{\bar{\bar{#1}}}
-\newcommand{\prefix}[2][]{{}^{#1}_{#2}}
-
-\makeatletter
-\DeclareFontFamily{U}{tipa}{}
-\DeclareFontShape{U}{tipa}{m}{n}{<->tipa10}{}
-\newcommand{\arc@char}{{\usefont{U}{tipa}{m}{n}\symbol{62}}}%
-\renewcommand{\arc}[1]{\mathpalette\arc@arc{#1}}
-\newcommand{\arc@arc}[2]{%
-  \sbox0{$\m@th#1#2$}%
-  \vbox{
-    \hbox{\resizebox{\wd0}{\height}{\arc@char}}
-    \nointerlineskip
-    \box0
-  }%
-}
-\makeatother
-
-\makeatletter
-\newenvironment{taggedsubequations}[1]
-{%
-  % \end{subequations} will advance `equation`
-  \addtocounter{equation}{-1}%
-  \begin{subequations}%
-    % set the current label
-    \def\@currentlabel{#1}%
-    % redefine \theequation
-    \renewcommand{\theequation}{#1.\alph{equation}}%
-  }
-  {\end{subequations}}
-\makeatother %not \makeatletter
 
 % ..:: Geometry ::..
 

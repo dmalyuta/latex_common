@@ -139,7 +139,8 @@
 \newcommand{\innerproduct}[3][]{\langle#2,#3\rangle_{#1}}
 \newcommand{\inner}[2][]{\langle#2\rangle_{#1}}
 \newcommand{\dd}{\mathrm{d}}
-\newcommand{\dt}{\dd t}
+\newcommand{\dt}[1][]{#1\dd t}
+\newcommand{\sdt}{\dt[\,]}
 \newcommand{\fromabove}{\downarrow}
 \newcommand{\frombelow}{\uparrow}
 \newcommand{\fun}[2][1]{%

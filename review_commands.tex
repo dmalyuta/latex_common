@@ -150,9 +150,37 @@
       \@delim@line{\@todo@clr}{close}%
     }%
     \ifthenelse{\equal{\@comment}{}}{}{%
-      {\sffamily\footnotesize\color{\@todo@text@clr}\textbf{:}~\@comment}}
+      {\sffamily\footnotesize\color{\@todo@text@clr}\textbf{:}~\@comment}}%
   }%
   {{\color{\@todo@text@clr}\@text}}}
+
+\makeatother
+
+% >> Bookmark <<
+
+\makeatletter
+
+\def\@bookmark@clr{@review@blue}
+
+\DeclareRobustCommand{\@bookmark@box}{%
+  \protect\tikz[baseline=-0.5ex]{%
+    \protect\node[inline box,fill=\@bookmark@clr,text=white] {bookmark};
+  }%
+}
+
+\DeclareRobustCommand{\bookmark}[2][]{%
+  \def\@text{#1}%
+  \def\@comment{#2}%
+  \texorpdfstring{%
+    \@bookmark@box~%
+    \ifthenelse{\equal{\@text}{}}{}{%
+      \@delim@line{\@bookmark@clr}{open}~%
+      {\@text}~%
+      \@delim@line{\@bookmark@clr}{close}%
+    }%
+    \ifthenelse{\equal{\@comment}{}}{}{%
+      {\sffamily\footnotesize\textbf{:}~\@comment}}%
+  }{\@text}}
 
 \makeatother
 

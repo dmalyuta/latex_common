@@ -38,6 +38,11 @@
 \makeatother
 \ExplSyntaxOff
 
+% Ifthenelse based on a mathematical condition
+\newcommand{\ifelsemath}[3]{%
+  \pgfmathparse{#1 ? 1:0}%
+  \ifthenelse{\pgfmathresult>0}{#2}{#3}}
+
 \newcommand{\where}{:}
 \newcommand{\given}{\mid}
 \newcommand{\CC}[1]{\mathcal C^{#1}}

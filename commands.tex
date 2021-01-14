@@ -144,8 +144,9 @@
 \newcommand{\T}{^\transp}
 \newcommand{\innerproduct}[3][]{\langle#2,#3\rangle_{#1}}
 \newcommand{\inner}[2][]{\langle#2\rangle_{#1}}
-\newcommand{\dd}{\mathrm{d}}
-\newcommand{\dt}[1][]{#1\dd t}
+\newcommand{\dd}[1][]{#1\mathrm{d}}
+\newcommand{\dt}[1][]{\dd[#1]t}
+\newcommand{\sdd}{\dd[\,]}
 \newcommand{\sdt}{\dt[\,]}
 \newcommand{\fromabove}{\downarrow}
 \newcommand{\frombelow}{\uparrow}

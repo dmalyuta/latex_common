@@ -20,8 +20,14 @@
 
 % ..:: Paragraphs ::..
 
-\setlength\parindent{1em} % Paragraph indentation
-\setlength{\parskip}{0pt plus1pt} % Paragraph spacing
+\makeatletter
+\def\@csm@parindent{1em}
+\def\@csm@parskip{0pt plus1pt}
+
+\setlength\parindent{\@csm@parindent} % Paragraph indentation
+\setlength{\parskip}{\@csm@parskip} % Paragraph spacing
+
+\makeatother
 
 % ..:: Fonts ::..
 
@@ -556,9 +562,12 @@
         }%
         % Set font
         \fontsize{9}{13}
+        \setlength\parindent{\@csm@parindent} % Paragraph indentation
+        \setlength{\parskip}{\@csm@parskip} % Paragraph spacing
         % \renewcommand\familydefault\sfdefault
         \sffamily\sansmath
-        \captionsetup[figure]{name={\bfseries\color{csm@fig@label@sidebar}FIGURE~}}
+        \captionsetup[figure]{name={%
+            \bfseries\color{csm@fig@label@sidebar}FIGURE~}}
         % Print "continued" if this is the second subsidebar panel
         \pgfmathparse{\value{subsidebar@counter}==3 ? 1:0}%
         \ifthenelse{\pgfmathresult>0}{%
@@ -607,7 +616,8 @@
 \newcommand{\sbfirstword}[1]{%
   \StrChar{#1}{1}[\first@char]%
   \StrBehind{#1}{\first@char}[\rest@of@word]%
-  \lettrine{\color{csm@sidebar@first@char}\bfseries%
+  \lettrine[nindent=0pt,slope=0pt,findent=3pt]{%
+    \color{csm@sidebar@first@char}\bfseries%
     \first@char}{\rest@of@word}%
 }
 
@@ -711,6 +721,7 @@
 \tl_new:N \l_csm_nomenclature_title_tl
 \tl_new:N \l_csm_nomenclature_label_tl
 \tl_new:N \l_csm_nomenclature_first_col_width_tl
+\tl_new:N \l_csm_nomenclature_position_tl
 
 \define@key{csm@nomenclature@keys}{title}{\tl_set:Nn
   \l_csm_nomenclature_title_tl {#1}}
@@ -718,22 +729,28 @@
   \l_csm_nomenclature_label_tl {#1}}
 \define@key{csm@nomenclature@keys}{width}{\tl_set:Nn
   \l_csm_nomenclature_first_col_width_tl {#1}}
+\define@key{csm@nomenclature@keys}{position}{\tl_set:Nn
+  \l_csm_nomenclature_position_tl {#1}}
 
 \NewEnviron{csmnomenclature}[1][]{
   \setkeys{csm@nomenclature@keys}{title=,#1}%
   \setkeys{csm@nomenclature@keys}{label=,#1}%
   \setkeys{csm@nomenclature@keys}{width=0.2,#1}%
+  \setkeys{csm@nomenclature@keys}{position=t,#1}%
   \edef\nomenc@title{\tl_use:N
     \l_csm_nomenclature_title_tl}%
   \edef\nomenc@label{\tl_use:N
     \l_csm_nomenclature_label_tl}%
   \edef\nomenc@width{\tl_use:N
     \l_csm_nomenclature_first_col_width_tl}%
+  \edef\nomenc@position{\tl_use:N
+    \l_csm_nomenclature_position_tl}%
   \def\@nomenclature@content{\BODY}
   \begin{sidebar}[%
     title={\nomenc@title},%
     columns=1,%
-    label={\nomenc@label}]%
+    label={\nomenc@label},
+    position={\nomenc@position}]%
     \footnotesize
     \def\arraystretch{1.2}
     \newcolumntype{V}{>{\hsize=\nomenc@width\linewidth}X}

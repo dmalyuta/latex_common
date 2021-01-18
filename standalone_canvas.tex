@@ -1,0 +1,53 @@
+\documentclass[varwidth=false,
+multi=tikzpicture,
+border=0,
+margin=1mm]{standalone}
+
+\def\latexcommonrelpath{..}
+
+\input{\latexcommonrelpath/preamble.tex}
+\input{\latexcommonrelpath/commands.tex}
+\input{\latexcommonrelpath/optimization.tex}
+\input{\latexcommonrelpath/PykZ/pykz.tex}
+
+\pykzinit{\latexcommonrelpath/PykZ/}
+\graphicspath{{../../figures/}}
+
+\makeatletter
+
+% ..:: Variable definitions ::..
+
+% \def\@foo{bar}
+
+% ..:: Layer definitions ::..
+
+\pgfdeclarelayer{bg}
+\pgfsetlayers{bg,main}
+
+% ..:: TikZ element styles ::..
+
+\tikzset{
+  every node/.append style={
+    inner sep=0,
+    outer sep=0,
+    minimum size=0
+  }
+}
+
+\begin{document}
+
+\begin{tikzpicture}[line cap=round,
+  line join=round]
+
+  % ..:: Drawing content goes here ::..
+
+\end{tikzpicture}
+
+\end{document}
+
+\makeatother
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

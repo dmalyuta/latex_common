@@ -2,13 +2,99 @@
 
 \makeatletter
 
+\definecolor{csm@intro@first@char}{HTML}{df9434}
 \definecolor{csm@sidebar@bg}{HTML}{f2e9c4}
-\definecolor{csm@fig@bg}{HTML}{e6f7fe}
 \definecolor{csm@sidebar@first@char}{HTML}{a08c2f}
-\definecolor{csm@fig@label@body}{HTML}{26baf2}
-\definecolor{csm@fig@label@sidebar}{HTML}{c8b03b}
+\definecolor{csm@fig@bg}{HTML}{e6f7fe}
+\definecolor{@light@blue}{HTML}{26baf2}
+\colorlet{csm@fig@label@body}{@light@blue}
+\colorlet{csm@blurb@color}{@light@blue}
+\definecolor{@golden}{HTML}{c8b03b}
+\colorlet{csm@fig@label@sidebar}{@golden}
+\colorlet{csm@abstract@color}{@golden}
+\definecolor{csm@table@caption@bg}{HTML}{abc2e9}
+\definecolor{csm@table@border}{HTML}{5e81c9}
+\colorlet{csm@table@bg}{csm@fig@bg}
 
 \makeatother
+
+% ..:: Paragraphs ::..
+
+\makeatletter
+\def\@csm@parindent{1em}
+\def\@csm@parskip{0pt plus1pt}
+
+\setlength\parindent{\@csm@parindent} % Paragraph indentation
+\setlength{\parskip}{\@csm@parskip} % Paragraph spacing
+
+\makeatother
+
+% ..:: Fonts ::..
+
+% \let\transp\relax
+% \usepackage{newtxmath}
+\let\temp\rmdefault
+\usepackage{mathpazo}
+\let\rmdefault\temp
+
+\DeclareMathSizes{10}{9}{7}{5}
+
+% See https://tex.stackexchange.com/a/195867/90535
+\DeclareSymbolFont{Greekletters}{OT1}{iwona}{m}{n}
+\DeclareSymbolFont{greekletters}{OML}{iwona}{m}{it}
+\DeclareMathSymbol{\Delta}{\mathord}{Greekletters}{"01}
+\DeclareMathSymbol{\Theta}{\mathord}{Greekletters}{"02}
+\DeclareMathSymbol{\Lambda}{\mathord}{Greekletters}{"03}
+\DeclareMathSymbol{\Xi}{\mathord}{Greekletters}{"04}
+\DeclareMathSymbol{\Pi}{\mathord}{Greekletters}{"05}
+\DeclareMathSymbol{\Sigma}{\mathord}{Greekletters}{"06}
+\DeclareMathSymbol{\Upsilon}{\mathord}{Greekletters}{"07}
+\DeclareMathSymbol{\Phi}{\mathord}{Greekletters}{"08}
+\DeclareMathSymbol{\Psi}{\mathord}{Greekletters}{"09}
+\DeclareMathSymbol{\Omega}{\mathord}{Greekletters}{"0A}
+\DeclareMathSymbol{\alpha}{\mathord}{greekletters}{"0B}
+\DeclareMathSymbol{\beta}{\mathord}{greekletters}{"0C}
+\DeclareMathSymbol{\gamma}{\mathord}{greekletters}{"0D}
+\DeclareMathSymbol{\delta}{\mathord}{greekletters}{"0E}
+\DeclareMathSymbol{\epsilon}{\mathord}{greekletters}{"0F}
+\DeclareMathSymbol{\zeta}{\mathord}{greekletters}{"10}
+\DeclareMathSymbol{\eta}{\mathord}{greekletters}{"11}
+\DeclareMathSymbol{\theta}{\mathord}{greekletters}{"12}
+\DeclareMathSymbol{\iota}{\mathord}{greekletters}{"13}
+\DeclareMathSymbol{\kappa}{\mathord}{greekletters}{"14}
+\DeclareMathSymbol{\lambda}{\mathord}{greekletters}{"15}
+\DeclareMathSymbol{\mu}{\mathord}{greekletters}{"16}
+\DeclareMathSymbol{\nu}{\mathord}{greekletters}{"17}
+\DeclareMathSymbol{\xi}{\mathord}{greekletters}{"18}
+\DeclareMathSymbol{\pi}{\mathord}{greekletters}{"19}
+\DeclareMathSymbol{\rho}{\mathord}{greekletters}{"1A}
+\DeclareMathSymbol{\sigma}{\mathord}{greekletters}{"1B}
+\DeclareMathSymbol{\tau}{\mathord}{greekletters}{"1C}
+\DeclareMathSymbol{\upsilon}{\mathord}{greekletters}{"1D}
+\DeclareMathSymbol{\phi}{\mathord}{greekletters}{"1E}
+\DeclareMathSymbol{\chi}{\mathord}{greekletters}{"1F}
+\DeclareMathSymbol{\psi}{\mathord}{greekletters}{"20}
+\DeclareMathSymbol{\omega}{\mathord}{greekletters}{"21}
+\DeclareMathSymbol{\varepsilon}{\mathord}{greekletters}{"22}
+\DeclareMathSymbol{\vartheta}{\mathord}{greekletters}{"23}
+\DeclareMathSymbol{\varpi}{\mathord}{greekletters}{"24}
+\DeclareMathSymbol{\varrho}{\mathord}{greekletters}{"25}
+\DeclareMathSymbol{\varsigma}{\mathord}{greekletters}{"26}
+\DeclareMathSymbol{\varphi}{\mathord}{greekletters}{"27}
+
+% ..:: Lists ::..
+
+\tikzset{
+  list bullet/.style={
+    scale=0.5
+  }
+}
+
+\setlist[itemize,1]{label={%
+    \tikz[outer sep=0,inner sep=0,baseline=-0.3em]{%
+      \node[list bullet] at (0,0) {\faChevronRight};%
+      \node[list bullet] at (0.25em,0) {\faChevronRight};}%
+  },leftmargin=1.3em}
 
 % ..:: Page geometry ::..
 
@@ -49,6 +135,21 @@
   \normalfont\fontsize{10}{12}%
   \sffamily}{}{0cm}{#1}
 \titlespacing*{\subsubsection}{0cm}{4mm}{0mm}
+
+% >> Opening text <<
+
+\makeatletter
+
+\newcommand{\firstword}[2][]{%
+  \StrChar{#2}{1}[\first@char]%
+  \StrBehind{#2}{\first@char}[\rest@of@word]%
+  \renewcommand{\LettrineFontHook}{\sffamily\bfseries}%
+  \lettrine[lines=5,#1]{%
+    \color{csm@intro@first@char}%
+    \first@char}{\rest@of@word}%
+}
+
+\makeatother
 
 % ..:: Header and footer ::..
 
@@ -168,6 +269,89 @@
 \makeatother
 \ExplSyntaxOff
 
+% ..:: Figures ::..
+
+\ExplSyntaxOn
+\makeatletter
+
+\tl_new:N \l_csm_table_label_tl
+\tl_new:N \l_csm_table_caption_tl
+\tl_new:N \l_csm_table_pos_tl
+\tl_new:N \l_csm_table_cols_tl
+
+\def\@table@inner@pad{3mm}
+\def\@table@border@width{1pt}
+
+\newtcolorbox{tablebox}[1][]{
+  % Drawing engine
+  enhanced~jigsaw,
+  % Fonts
+  fonttitle=\sffamily\bfseries\small,
+  fontupper=\sffamily,
+  % Sizes
+  width=\linewidth,
+  arc=2mm,
+  boxrule=\@table@border@width,
+  titlerule=\@table@border@width,
+  left=\@table@inner@pad,
+  right=\@table@inner@pad,
+  bottom=\@table@inner@pad,
+  top=\@table@inner@pad,
+  toptitle=\@table@inner@pad,
+  bottomtitle=\@table@inner@pad,
+  boxsep=\tcb@boxsep,
+  % Colors
+  colback=csm@table@bg,
+  coltitle=black,
+  colbacktitle=csm@table@caption@bg,
+  colframe=csm@table@border,
+  % Title
+  title={#1},
+  attach~boxed~title~to~top,
+  boxed~title~style={colframe=csm@table@border,rounded~corners}
+}
+
+\define@key{csm@table@keys}{label}{\tl_set:Nn \l_csm_table_label_tl {#1}}
+\define@key{csm@table@keys}{caption}{\tl_set:Nn \l_csm_table_caption_tl {#1}}
+\define@key{csm@table@keys}{position}{\tl_set:Nn \l_csm_table_pos_tl {#1}}
+\define@key{csm@table@keys}{columns}{\tl_set:Nn \l_csm_table_cols_tl {#1}}
+
+% Figure selector
+\newenvironment{table@internal}[2][tbp]{%
+  \def\table@width{#2}%
+  \ifthenelse{\equal{\table@width}{}}{%
+    \begin{table}[#1]}{\begin{table*}[#1]}}{%
+      \ifthenelse{\equal{\table@width}{}}{%
+      \end{table}}{\end{table*}}}
+
+\newenvironment{csmtable}[1][]{%
+  % Options
+  \setkeys{csm@table@keys}{label=,#1}%
+  \setkeys{csm@table@keys}{caption=,#1}%
+  \setkeys{csm@table@keys}{position=tbp,#1}%
+  \setkeys{csm@table@keys}{columns=1,#1}%
+  % Parse options
+  \edef\csm@table@pos{\tl_use:N \l_csm_table_pos_tl}%
+  \pgfmathparse{\tl_use:N \l_csm_table_cols_tl ==1 ? 1:0}%
+  \ifthenelse{\pgfmathresult>0}{%
+    \gdef\csm@table@width{}%
+  }{%
+    \gdef\csm@table@width{dbl}%
+  }%
+  % Make figure
+  \edef\begin@table@cmd{{table@internal}[\csm@table@pos}%
+    \expandafter\begin\begin@table@cmd]{\csm@table@width}%
+    \refstepcounter{table}
+    \begin{tablebox}[%
+      {\bfseries TABLE~\arabic{table}}\hspace{1em}%
+      \tl_use:N \l_csm_table_caption_tl]%
+      \fontsize{9}{13}%
+    }{%
+    \end{tablebox}
+    \tablabel{\tl_use:N \l_csm_table_label_tl}
+  \end{table@internal}
+}
+
 % ..:: Referencing ::..
 
 \makeatletter
@@ -231,7 +415,7 @@
   % Fonts
   fonttitle=\sffamily\bfseries\large,
   % Sizes
-  width=\textwidth,
+  width=#1,
   arc=2mm,
   boxrule=0pt,
   titlerule=0pt,
@@ -248,9 +432,7 @@
   colback=csm@sidebar@bg,
   colframe=csm@sidebar@bg,
   colbacktitle=csm@sidebar@bg,
-  coltitle=black,
-  % Other options
-  #1
+  coltitle=black
 }
 
 \newenvironment{sidebar}[1][]{%
@@ -266,11 +448,15 @@
   \pgfmathparse{\tl_use:N \l_csm_sidebar_cols_tl ==1 ? 1:0}%
   \ifthenelse{\pgfmathresult>0}{%
     \gdef\figure@width{}%
-    \tikzmath{\sidebar@width=\columnwidth-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \tikzmath{\sidebar@box@width=\columnwidth;
+      \sidebar@width=\sidebar@box@width-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \xdef\sidebar@box@width{\sidebar@box@width pt}%
     \xdef\sidebar@width{\sidebar@width pt}%
   }{%
     \gdef\figure@width{dbl}%
-    \tikzmath{\sidebar@width=\textwidth-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \tikzmath{\sidebar@box@width=\textwidth;
+      \sidebar@width=\sidebar@box@width-\tcb@left-\tcb@right-\tcb@boxsep;}
+    \xdef\sidebar@box@width{\sidebar@box@width pt}%
     \xdef\sidebar@width{\sidebar@width pt}%
   }%
   % Create the box
@@ -318,7 +504,7 @@
         \def\tcb@rightfill{0cm}%
       }%
     }%
-    \begin{sidebarbox}%
+    \begin{sidebarbox}[\sidebar@box@width]%
       \usebox{#3}%
     \end{sidebarbox}%
   \end{figure@internal}%
@@ -376,9 +562,12 @@
         }%
         % Set font
         \fontsize{9}{13}
-        \renewcommand\familydefault\sfdefault
+        \setlength\parindent{\@csm@parindent} % Paragraph indentation
+        \setlength{\parskip}{\@csm@parskip} % Paragraph spacing
+        % \renewcommand\familydefault\sfdefault
         \sffamily\sansmath
-        \captionsetup[figure]{name={\bfseries\color{csm@fig@label@sidebar}FIGURE~}}
+        \captionsetup[figure]{name={%
+            \bfseries\color{csm@fig@label@sidebar}FIGURE~}}
         % Print "continued" if this is the second subsidebar panel
         \pgfmathparse{\value{subsidebar@counter}==3 ? 1:0}%
         \ifthenelse{\pgfmathresult>0}{%
@@ -427,7 +616,8 @@
 \newcommand{\sbfirstword}[1]{%
   \StrChar{#1}{1}[\first@char]%
   \StrBehind{#1}{\first@char}[\rest@of@word]%
-  \lettrine{\color{csm@sidebar@first@char}\bfseries%
+  \lettrine[nindent=0pt,slope=0pt,findent=3pt]{%
+    \color{csm@sidebar@first@char}\bfseries%
     \first@char}{\rest@of@word}%
 }
 
@@ -441,6 +631,142 @@
 
 \makeatother
 \ExplSyntaxOff
+
+% ..:: Highlight text blurb ::..
+
+\makeatletter
+
+\def\blurb@pad{4mm}
+
+\newtcolorbox{blurbbox}{
+  % Drawing engine
+  enhanced jigsaw,
+  % Fonts
+  fontupper=\sffamily\bfseries\large,
+  % Sizes
+  width=\textwidth,
+  arc=2mm,
+  boxrule=0.5pt,
+  titlerule=0pt,
+  toptitle=2mm,
+  left=\blurb@pad,
+  right=\blurb@pad,
+  bottom=\blurb@pad,
+  top=\blurb@pad,
+  boxsep=0pt,
+  % Colors
+  opacityback=0,
+  colframe=csm@blurb@color,
+  coltext=csm@blurb@color
+}
+
+\newenvironment{blurb}{
+  \begin{figure*}[t]
+    \centering
+    \begin{blurbbox}
+      \centering
+      \setlength{\baselineskip}{1.4em}
+    }{
+    \end{blurbbox}
+  \end{figure*}
+}
+
+\makeatother
+
+% ..:: Abstract (which will not appear in print) ::..
+
+\makeatletter
+
+\def\abstract@pad{2mm}
+
+\newtcolorbox{abstractbox}{
+  % Drawing engine
+  enhanced jigsaw,
+  % Fonts
+  fontupper=\sffamily,
+  % Sizes
+  width=\textwidth,
+  arc=2mm,
+  boxrule=0.5pt,
+  titlerule=0pt,
+  toptitle=2mm,
+  left=\abstract@pad,
+  right=\abstract@pad,
+  bottom=\abstract@pad,
+  top=\abstract@pad,
+  boxsep=0pt,
+  % Colors
+  opacityback=0,
+  colframe=csm@abstract@color,
+  coltext=black!70
+}
+
+\newenvironment{csmabstract}{
+  \begin{figure*}[t]
+    \centering
+    \begin{abstractbox}%
+      \paragraph{\sffamily Abstract (hidden in print).}%
+    }{%
+    \end{abstractbox}
+  \end{figure*}
+}
+
+\makeatother
+
+% ..:: Nomenclature ::..
+
+\ExplSyntaxOn
+\makeatletter
+
+\tl_new:N \l_csm_nomenclature_title_tl
+\tl_new:N \l_csm_nomenclature_label_tl
+\tl_new:N \l_csm_nomenclature_first_col_width_tl
+\tl_new:N \l_csm_nomenclature_position_tl
+
+\define@key{csm@nomenclature@keys}{title}{\tl_set:Nn
+  \l_csm_nomenclature_title_tl {#1}}
+\define@key{csm@nomenclature@keys}{label}{\tl_set:Nn
+  \l_csm_nomenclature_label_tl {#1}}
+\define@key{csm@nomenclature@keys}{width}{\tl_set:Nn
+  \l_csm_nomenclature_first_col_width_tl {#1}}
+\define@key{csm@nomenclature@keys}{position}{\tl_set:Nn
+  \l_csm_nomenclature_position_tl {#1}}
+
+\NewEnviron{csmnomenclature}[1][]{
+  \setkeys{csm@nomenclature@keys}{title=,#1}%
+  \setkeys{csm@nomenclature@keys}{label=,#1}%
+  \setkeys{csm@nomenclature@keys}{width=0.2,#1}%
+  \setkeys{csm@nomenclature@keys}{position=t,#1}%
+  \edef\nomenc@title{\tl_use:N
+    \l_csm_nomenclature_title_tl}%
+  \edef\nomenc@label{\tl_use:N
+    \l_csm_nomenclature_label_tl}%
+  \edef\nomenc@width{\tl_use:N
+    \l_csm_nomenclature_first_col_width_tl}%
+  \edef\nomenc@position{\tl_use:N
+    \l_csm_nomenclature_position_tl}%
+  \def\@nomenclature@content{\BODY}
+  \begin{sidebar}[%
+    title={\nomenc@title},%
+    columns=1,%
+    label={\nomenc@label},
+    position={\nomenc@position}]%
+    \footnotesize
+    \def\arraystretch{1.2}
+    \newcolumntype{V}{>{\hsize=\nomenc@width\linewidth}X}
+    \begin{tabularx}{\columnwidth}{VX}
+      \@nomenclature@content
+    \end{tabularx}
+  \end{sidebar}
+}
+
+\makeatother
+\ExplSyntaxOff
+
+% ..:: Author biography ::..
+
+\newenvironment{authorbio}[1][]{
+  {\bfseries\itshape #1}~}{}
 
 % ..:: Bibliography ::..
 

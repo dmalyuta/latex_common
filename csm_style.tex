@@ -196,6 +196,65 @@
 
 \allowdisplaybreaks
 
+% ..:: Theorem environments ::..
+
+\makeatletter
+
+% >> Set the theorem environment style <<
+
+\newtheoremstyle{csm@theorem@style}% name
+{4mm}% Space above
+{1pt}% Space below
+{}% Body font
+{}% Indent amount
+{\fontsize{9}{11}\sffamily}% Theorem head font
+{}% Punctuation after theorem head
+{\newline}% Space after theorem head
+{}% Theorem head spec(can be left empty, meaning ‘normal’)
+
+\theoremstyle{csm@theorem@style}
+
+% >> Define the "basic" theorem environments <<
+
+\newtheorem{csm@theorem}{Theorem}
+\newtheorem{csm@lemma}{Lemma}
+\newtheorem{csm@corollary}{Corollary}
+\newtheorem{csm@proposition}{Proposition}
+\newtheorem{csm@remark}{Remark}
+\newtheorem{csm@property}{Property}
+\newtheorem{csm@condition}{Condition}
+\newtheorem{csm@method}{Method}
+\newtheorem{csm@example}{Example}
+\newtheorem{csm@problem}{Problem}
+\newtheorem{csm@definition}{Definition}
+\newtheorem{csm@assumption}{Assumption}
+
+% >> Update basic theorem environments with extra elements <<
+
+\def\@thmenvs{theorem,lemma,corollary,proposition,remark,property,%
+  condition,method,example,problem,definition,assumption}
+
+\foreach \@te in \@thmenvs {
+  \bgroup
+  \globaldefs=1
+  % Save the original definition
+  \expandafter\let\csname ocsm@\@te\expandafter\endcsname
+  \csname csm@\@te\endcsname
+  \expandafter\let\csname eocsm@\@te\expandafter\endcsname
+  \csname endcsm@\@te\endcsname
+  % Re-define the environment
+  \renewenvironment{\@te}[1][]{%
+    \csname ocsm@\@currenvir\endcsname%
+    \ifthenelse{\equal{##1}{}}{}{\label{\@currenvir:##1}}
+  }{%
+    \hfill$\blacksquare$% % "QED"
+    \expandafter\csname eocsm@\@currenvir\endcsname%
+  }
+  \egroup
+}
+
+\makeatother
+
 % ..:: Figures ::..
 
 \ExplSyntaxOn
@@ -269,7 +328,7 @@
 \makeatother
 \ExplSyntaxOff
 
-% ..:: Figures ::..
+% ..:: Tables ::..
 
 \ExplSyntaxOn
 \makeatletter

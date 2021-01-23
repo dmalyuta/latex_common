@@ -386,6 +386,10 @@
 
 % ..:: Calculus ::..
 
+\let\oldprime\prime
+\renewcommand{\prime}{^\oldprime}
+\newcommand{\pprime}{''}
+\newcommand{\ppprime}{'''}
 \newcommand{\grad}{\nabla}
 \newcommand{\hess}{\nabla^2}
 \newcommand{\diff}[2]{\nabla_{#1}#2}

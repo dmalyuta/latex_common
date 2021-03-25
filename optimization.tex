@@ -22,10 +22,23 @@
   \min\c_math_subscript_token
   {\mathclap{\tl_use:N \l_opti_vars_tl}}\textnormal{\ }
   & \tl_use:N \l_opti_objective_tl \\
-  \mathrm{s.t.}\textnormal{\ }
+  \mrm[t]{s.t.}\textnormal{\ }
 }{
   \endalign
   \endsubequations
+}
+
+\newenvironment{optimization*}[1][]{
+  \setkeys{optim@keys}{variables=,#1}
+  \setkeys{optim@keys}{objective=,#1}
+  \csname align*\endcsname
+  \optilabel{\objective@label}
+  \min\c_math_subscript_token
+  {\mathclap{\tl_use:N \l_opti_vars_tl}}\textnormal{\ }
+  & \tl_use:N \l_opti_objective_tl \\
+  \mrm[t]{s.t.}\textnormal{\ }
+}{
+  \csname endalign*\endcsname
 }
 
 \newcommand{\optilabel}[2][eq]{\label{#1:\tl_use:N \l_opti_label_tl _#2}}

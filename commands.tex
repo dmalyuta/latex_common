@@ -1,3 +1,8 @@
+% ..:: Helper functions ::..
+
+\newcommand{\myappend}[1]{\ifthenelse{\equal{#1}{}}{}{,#1}}
+\newcommand{\myprepend}[1]{\ifthenelse{\equal{#1}{}}{}{#1,}}
+
 % ..:: Generic math ::..
 
 % Parentheses
@@ -474,6 +479,7 @@
 \makeatother
 \newcommand{\zeros}{\bm{0}}
 \newcommand{\ones}{\bm{1}}
+\renewcommand{\skew}[1][]{^{\myprepend{#1}\times}}
 
 % ..:: Geometry ::..
 

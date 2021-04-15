@@ -24,9 +24,9 @@
     \ifthenelse{\equal{\l_paren_sz_tl}{auto}}{
       \left\l_left_paren_tl #4 \right\l_right_paren_tl
     }{
-      \csname \l_paren_sz_tl l\endcsname\l_left_paren_tl
+      \csname \l_paren_sz_tl\endcsname\l_left_paren_tl
       #4
-      \csname \l_paren_sz_tl r\endcsname\l_right_paren_tl
+      \csname \l_paren_sz_tl\endcsname\l_right_paren_tl
     }
   }
   \group_end:
@@ -42,6 +42,17 @@
 
 \makeatother
 \ExplSyntaxOff
+
+\newcommand*{\bigs}[2]{\vcenter{\hbox{\scalebox{#1}{\ensuremath#2}}}}
+\let\oldbig\big
+\let\oldbigg\bigg
+\let\oldBig\Big
+\let\oldBigg\Bigg
+\renewcommand{\big}{\oldbig}
+\renewcommand{\bigg}{\bigs{1.3}}
+\newcommand{\biggg}{\oldBig}
+\renewcommand{\Big}{\oldbigg}
+\renewcommand{\Bigg}{\oldBigg}
 
 % Ifthenelse based on a mathematical condition
 \newcommand{\ifelsemath}[3]{%

@@ -495,6 +495,9 @@
 % ..:: Geometry ::..
 
 \newcommand{\fr}[1]{\mathcal{F}_{\mathcal{#1}}}
+\DeclareMathOperator*{\Expquat}{\mathsf{Exp}}
+\DeclareMathOperator*{\Logquat}{\mathsf{Log}}
+\newcommand{\qconj}{^{*}}
 
 % ..:: Measure theory ::..
 
@@ -532,31 +535,8 @@
 
 % Get more optimization commands via \input{latex_common/optimization.tex}
 
-% ..:: Miscellaneous ::..
+% ..:: Referencing ::..
 
-% Print message to the compilation .log file
-% Source: https://tex.stackexchange.com/a/335123/90535
-\newcommand{\echodebug}[1]{\typeout{debug> #1}}
-
-\newcommand{\mrm}[2][m]{\ifthenelse{\equal{#1}{m}}{\mathrm{#2}}
-  {\textnormal{#2}}}
-\newcommand{\PhD}{Ph.D.\xspace}
-\newcommand{\Behcet}{Beh\c{c}et}
-\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e}
-\newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
-\makeatletter
-\@ifclassloaded{beamer}{}{\newcommand{\alert}[1]{\textbf{#1}}}
-\makeatother
-\newcommand{\lcvx}{LCvx\xspace}
-\newcommand{\emphasize}[1]{\textit{#1}}
-\newcommand{\scvx}{SCvx\xspace}
-\newcommand{\textsub}[1]{_{\mathrm{#1}}}
-\newcommand{\defintext}[1]{\textbf{#1}}
-\newenvironment{qanswer}{\color{blue}}{}
-\newenvironment{unfinished}{\color{red}\itshape}{}
-\newcommand{\makeunderscoreletter}{\catcode`\_11}
-\newcommand{\makeunderscoreother}{\catcode`\_8}
-% Referencing low-level code
 \def\SectionLabel{section}
 \def\SubsectionLabel{subsection}
 \def\SubsubsectionLabel{subsubsection}
@@ -620,11 +600,11 @@
       }{%
         \pgfmathparse{\MyCounter<\MyRefCount-1 ? 1 : 0}%
         \ifthenelse{\pgfmathresult>0}{%
-          \ref{\GetLabel{\MyModifiedLabel}:\AlgRef},~%
+          \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}, %
         }{%
           \pgfmathparse{\MyCounter<\MyRefCount ? 1 : 0}%
           \ifthenelse{\pgfmathresult>0}{%
-            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}~and~%
+            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef} and %
           }{%
             \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
           }%
@@ -674,6 +654,46 @@
 
 \newcommand{\figlabel}[1]{\label{fig:#1}}
 \newcommand{\tablabel}[1]{\label{table:#1}}
+
+% Add an external file whose content we wish to reference
+% Source: https://www.overleaf.com/learn/how-to/Cross_referencing_with_the_xr_package_in_Overleaf
+\makeatletter
+\newcommand*{\addFileDependency}[1]{% argument=file name and extension
+  \typeout{(#1)}
+  \@addtofilelist{#1}
+  \IfFileExists{#1}{}{\typeout{No file #1.}}
+}
+\makeatother
+\newcommand*{\myexternaldocument}[1]{%
+    \externaldocument{#1}%
+    \addFileDependency{#1.tex}%
+    \addFileDependency{#1.aux}%
+}
+
+% ..:: Miscellaneous ::..
+
+% Print message to the compilation .log file
+% Source: https://tex.stackexchange.com/a/335123/90535
+\newcommand{\echodebug}[1]{\typeout{debug> #1}}
+
+\newcommand{\mrm}[2][m]{\ifthenelse{\equal{#1}{m}}{\mathrm{#2}}
+  {\textnormal{#2}}}
+\newcommand{\PhD}{Ph.D.\xspace}
+\newcommand{\Behcet}{Beh\c{c}et}
+\newcommand{\Acikmese}{A\c{c}{\i}kme\c{s}e}
+\newcommand*\samethanks[1][\value{footnote}]{\footnotemark[#1]}
+\makeatletter
+\@ifclassloaded{beamer}{}{\newcommand{\alert}[1]{\textbf{#1}}}
+\makeatother
+\newcommand{\lcvx}{LCvx\xspace}
+\newcommand{\emphasize}[1]{\textit{#1}}
+\newcommand{\scvx}{SCvx\xspace}
+\newcommand{\textsub}[1]{_{\mathrm{#1}}}
+\newcommand{\defintext}[1]{\textbf{#1}}
+\newenvironment{qanswer}{\color{blue}}{}
+\newenvironment{unfinished}{\color{red}\itshape}{}
+\newcommand{\makeunderscoreletter}{\catcode`\_11}
+\newcommand{\makeunderscoreother}{\catcode`\_8}
 
 %%% Local Variables:
 %%% mode: latex

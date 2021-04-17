@@ -236,6 +236,15 @@
 
 \newcommand{\dash}{\Hyphdash}
 
+% \hfill equivalents inside math mode
+% Source: https://tex.stackexchange.com/a/83522/90535
+\makeatletter
+\newcommand{\pushright}[1]{%
+  \ifmeasuring@#1\else\omit\hfill$\displaystyle#1$\fi\ignorespaces}
+\newcommand{\pushleft}[1]{%
+  \ifmeasuring@#1\else\omit$\displaystyle#1$\hfill\fi\ignorespaces}
+\makeatother
+
 % ..:: Statistics ::..
 
 \DeclareMathOperator{\expectation}{\mathbf{E}}

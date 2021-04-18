@@ -147,8 +147,10 @@
 % ..:: Referencing ::..
 
 \makeatletter
+\ifthenelse{\isundefined{\nohref}}{
 \@ifclassloaded{beamer}{}{
 \usepackage[hypertexnames=false]{hyperref}}
+}{}
 \makeatother
 
 % ..:: General ::..

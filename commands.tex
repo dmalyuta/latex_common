@@ -96,7 +96,7 @@
   }{}
   \pgfmathparse{\@nargin==0 ? 1:0}
   \ifthenelse{\pgfmathresult>0}{
-    \tl_set:Nn \l_norm_type_tl {2}
+    \tl_set:Nn \l_norm_type_tl {}
   }{}
   % Print the text
   % print; _ is not available here
@@ -500,6 +500,7 @@
 \newcommand{\zeros}{\bm{0}}
 \newcommand{\ones}{\bm{1}}
 \renewcommand{\skew}[1][]{^{\myprepend{#1}\times}}
+\newcommand{\Krylov}[3][]{\mathcal K\pare[#1]{#3; #2}}
 
 % ..:: Geometry ::..
 

@@ -506,7 +506,7 @@
   \setkeys{csm@sidebar@keys}{title=,#1}%
   \setkeys{csm@sidebar@keys}{label=,#1}%
   \setkeys{csm@sidebar@keys}{side=odd,#1}%
-  \setkeys{csm@sidebar@keys}{position=t,#1}%
+  \setkeys{csm@sidebar@keys}{position=!t,#1}%
   \setkeys{csm@sidebar@keys}{columns=2,#1}%
   % Parse options
   \edef\sidebar@side{\tl_use:N \l_csm_sidebar_side_tl}%
@@ -616,11 +616,6 @@
         \renewcommand{\theHequation}{S\arabic{equation}}%
         \renewcommand{\theHtable}{S\arabic{table}}%
         \renewcommand{\theHfigure}{S\arabic{figure}}%
-        % Make bibliography citations start with an "S"
-        \renewbibmacro*{cite}{\printtext[bibhyperref]{%
-            \printfield{labelprefix}S\printfield{labelnumber}%
-            \ifbool{bbx:subentry}{\printfield{entrysetcount}}{}}}%
-        \DeclareFieldFormat{labelnumberwidth}{S##1.}%
       }%
       % Set columns
       \ifthenelse{\equal{\figure@width}{}}{}{%
@@ -642,13 +637,24 @@
         % Main text body (given environment body) ...
       }{%
         % ... End of main text body
-        % Print the bibliography
         \pgfmathparse{\value{subsidebar@counter}!=2 ? 1:0}
         \ifthenelse{\pgfmathresult>0}{%
-          \AtNextBibliography{\footnotesize}%
           \edef\sidebar@bib@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
-          \def\bib@print@cmd{\printbibliography[keyword=}%
-          \expandafter\bib@print@cmd\sidebar@bib@label]%
+          % Print the bibliography, citations start with an "S"
+          \begin{refcontext}[sorting=none,labelprefix=S]
+            \AtNextBibliography{\fontsize{7}{9}\sffamily}%
+            \DeclareFieldFormat{labelnumberwidth}{[##1]}
+            \begingroup\edef\sidebar@print@bib{\endgroup\noexpand
+              \printbibliography[title=References,
+              keyword=\sidebar@bib@label,
+              resetnumbers=false]
+            }\sidebar@print@bib
+          \end{refcontext}
+          % \AtNextBibliography{\footnotesize}%
+          % \begingroup\edef\sidebar@print@bib{\endgroup\noexpand
+          %   \printbibliography[title=References,
+          %   keyword=\sidebar@bib@label]
+          % }\sidebar@print@bib
         }{}%
         % Print "continued" if this is the first subsidebar panel
         \ifthenelse{\pgfmathresult>0}{}{%
@@ -836,13 +842,8 @@
 
 % ..:: Bibliography ::..
 
-% Font size
-\AtBeginBibliography{\small}
-
-% Citation number style and indent after
-% Source: https://tex.stackexchange.com/a/411370/90535
-\DeclareFieldFormat{labelnumberwidth}{#1.}
 \setlength{\biblabelsep}{1mm}
+\setlength\bibitemsep{0.1\baselineskip}
 
 % Remove hanging indent
 % Source: https://tex.stackexchange.com/a/400666/90535
@@ -860,6 +861,14 @@
       \labelnumberwidth+\labelsep}##1}}
 {\endlist}
 {\item}
+
+\newcommand{\csmprintmainbib}{
+  \begin{refcontext}[sorting=none]
+    \AtNextBibliography{\footnotesize}%
+    \DeclareFieldFormat{labelnumberwidth}{[##1]}
+    \printbibliography[notkeyword=sidebarbib, resetnumbers=true]
+  \end{refcontext}
+}
 
 %%% Local Variables:
 %%% mode: latex

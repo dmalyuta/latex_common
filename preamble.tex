@@ -111,6 +111,8 @@
 \usepackage{mfirstuc}
 \usepackage{import}
 \usepackage{nicematrix}
+
+\ifthenelse{\isundefined{\nobiblatex}}{
 \usepackage{bibentry} % use \bibentry{...} for in-text citation
 \usepackage[backend=biber,
             style=numeric,
@@ -118,8 +120,11 @@
             url=false,
             sortcites=true,
             defernumbers=true]{biblatex}
+}{}
+
 \usepackage[outline]{contour}
 \usepackage{extdash}
+\usepackage{textcomp}
 
 % ..:: Layout ::..
 

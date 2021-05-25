@@ -54,6 +54,12 @@
 \renewcommand{\Big}{\oldbigg}
 \renewcommand{\Bigg}{\oldBigg}
 
+\makeatletter
+\newcommand{\fade}[2][1]{%
+  \edef\fade@amount{\the\numexpr 100-#1*30 \relax}%
+  {\color{black!\fade@amount!white}#2}}
+\makeatother
+
 % Ifthenelse based on a mathematical condition
 \newcommand{\ifelsemath}[3]{%
   \pgfmathparse{#1 ? 1:0}%
@@ -614,7 +620,7 @@
         }{%
           \pgfmathparse{\MyCounter<\MyRefCount ? 1 : 0}%
           \ifthenelse{\pgfmathresult>0}{%
-            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef} and %
+            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}, and %
           }{%
             \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
           }%
@@ -679,6 +685,10 @@
     \addFileDependency{#1.tex}%
     \addFileDependency{#1.aux}%
 }
+
+% ..:: Units ::..
+
+\DeclareSIUnit{\radian}{rad}
 
 % ..:: Miscellaneous ::..
 

@@ -1,5 +1,7 @@
+\ifthenelse{\isundefined{\noindentadjust}}{
 \setlength\parindent{0pt} % No paragraph indentation
 \setlength{\parskip}{4pt} % Paragraph spacing
+}{}
 \allowdisplaybreaks       % Allow breaking long equations across pages
 
 % Hyperlinks
@@ -39,6 +41,14 @@
   \egroup
 }
 \makeatother
+
+% ..:: Nomenclature ::..
+
+\renewcommand{\nomlabel}[1]{#1\hfill\hspace{\labelsep}=}
+\setlength{\nomitemsep}{-\parsep}
+
+\newcommand{\defvar}[3][show]{\nomenclature{#2}{#3}%
+  \ifthenelse{\equal{#1}{show}}{#2}{}}
 
 %%% Local Variables:
 %%% mode: plain-tex

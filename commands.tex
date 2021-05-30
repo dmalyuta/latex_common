@@ -587,6 +587,7 @@
     \tikzmath{\MyRefCount=int(\MyRefCount+1);}%
     \xdef\MyRefCount{\MyRefCount}%
   }%
+  \edef\OrigRefCount{\MyRefCount}
   \ifthenelse{\equal{\MyRefCount}{1}}{%
     #2~\ref{\GetLabel{\MyModifiedLabel}:#3}%
   }{%
@@ -616,7 +617,9 @@
         }{%
           \pgfmathparse{\MyCounter<\MyRefCount ? 1 : 0}%
           \ifthenelse{\pgfmathresult>0}{%
-            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}, and %
+            \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
+            \pgfmathparse{\OrigRefCount==2 ? 1:0}
+            \ifthenelse{\pgfmathresult>0}{ and }{, and }%
           }{%
             \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
           }%
@@ -685,6 +688,38 @@
 % ..:: Units ::..
 
 \DeclareSIUnit{\radian}{rad}
+
+% ..:: Lists ::..
+
+\makeatletter
+
+% Create a new counter, or reset its value to zero if one already exists
+\def\providecounter#1{%
+  \@ifundefined{c@#1}%
+  {\newcounter{#1}}{\setcounter{#1}{0}}}
+
+% Make an indexable "array" from a comma-separated list
+% Arguments: #1 (list name), #2 (comma-separate value list)
+\newcommand{\makelist}[2]{
+  \xdef\@current@list@name{#1}
+  \xdef\@current@list@counter{#1@listcounter}
+  \providecounter{\@current@list@counter}
+  \edef\@tmp@list{{#2}}
+  \expandafter\forcsvlist\expandafter\list@saveitem\@tmp@list
+}
+
+% Atomic function that assign i-th list element to i-th array element
+\newcommand{\list@saveitem}[1]{%
+  \stepcounter{\@current@list@counter}%
+  \expandafter\def\csname\@current@list@name%
+  \arabic{\@current@list@counter}\endcsname{#1}
+}
+
+% Access the i-th array element
+% Arguments: #1 (list name), #2 (one-based index)
+\newcommand{\list@nth}[2]{\csname #1#2\endcsname}
+
+\makeatother
 
 % ..:: Miscellaneous ::..
 

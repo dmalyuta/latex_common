@@ -3,15 +3,18 @@
 
 \def\objective@label{objective}
 
+\tl_new:N \l_opti_task_tl
 \tl_new:N \l_opti_label_tl
 \tl_new:N \l_opti_vars_tl
 \tl_new:N \l_opti_objective_tl
 
+\define@key{optim@keys}{task}{\tl_set:Nn \l_opti_task_tl {#1}}
 \define@key{optim@keys}{label}{\tl_set:Nn \l_opti_label_tl {#1}}
 \define@key{optim@keys}{variables}{\tl_set:Nn \l_opti_vars_tl {#1}}
 \define@key{optim@keys}{objective}{\tl_set:Nn \l_opti_objective_tl {#1}}
 
 \newenvironment{optimization}[1][]{
+  \setkeys{optim@keys}{task=\min,#1}
   \setkeys{optim@keys}{label=,#1}
   \setkeys{optim@keys}{variables=,#1}
   \setkeys{optim@keys}{objective=,#1}
@@ -19,7 +22,7 @@
   \label{problem:\tl_use:N \l_opti_label_tl}
   \align
   \optilabel{\objective@label}
-  \min\c_math_subscript_token
+  \tl_use:N \l_opti_task_tl\c_math_subscript_token
   {\mathclap{\tl_use:N \l_opti_vars_tl}}\textnormal{\ }
   & \tl_use:N \l_opti_objective_tl \\
   \mrm[t]{s.t.}\textnormal{\ }
@@ -29,11 +32,12 @@
 }
 
 \newenvironment{optimization*}[1][]{
+  \setkeys{optim@keys}{task=\min,#1}
   \setkeys{optim@keys}{variables=,#1}
   \setkeys{optim@keys}{objective=,#1}
   \csname align*\endcsname
   \optilabel{\objective@label}
-  \min\c_math_subscript_token
+  \tl_use:N \l_opti_task_tl\c_math_subscript_token
   {\mathclap{\tl_use:N \l_opti_vars_tl}}\textnormal{\ }
   & \tl_use:N \l_opti_objective_tl \\
   \mrm[t]{s.t.}\textnormal{\ }

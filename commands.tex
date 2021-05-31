@@ -746,6 +746,20 @@
 \newcommand{\makeunderscoreletter}{\catcode`\_11}
 \newcommand{\makeunderscoreother}{\catcode`\_8}
 
+% >> Optionally building parts of text according to flags <<
+
+\newcommand{\makeflag}[2]{%
+  \expandafter\newif\csname ifmake#1\endcsname
+  \csname make#1#2\endcsname
+  %
+}
+
+\NewEnviron{makeif}[1]{%
+  \csname ifmake#1\endcsname
+  \BODY
+  \fi
+}
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t

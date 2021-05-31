@@ -1,3 +1,3 @@
 [submodule "PykZ"]
 	path = PykZ
-	url = http://github.com/dmalyuta/PykZ
+	url = git@github.com:dmalyuta/PykZ.git

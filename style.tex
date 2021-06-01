@@ -7,12 +7,29 @@
 % Hyperlinks
 \hypersetup{colorlinks,linkcolor={red},citecolor={green},urlcolor={blue}}
 
+\newtheoremstyle{faded}
+{\topsep}%
+{\topsep}%
+{\color{black!75!white}}%
+{}%
+{\color{black}\bfseries}
+{.}
+{.5em}%
+{\thmname{#1}~\thmnumber{#2}\thmnote{ (#3)}}%
+
+\ifthenelse{\isundefined{\theoremlook}}{
+\def\theoremlook{theorem}}{}
+
+\ifthenelse{\isundefined{\definitionlook}}{
+\def\definitionlook{definition}}{}
+
 % ..:: Theorem environments ::..
+\theoremstyle{\theoremlook}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
 \newtheorem{proposition}{Proposition}
-\theoremstyle{definition}
+\theoremstyle{\definitionlook}
 \newtheorem{remark}{Remark}
 \newtheorem{property}{Property}
 \newtheorem{condition}{Condition}

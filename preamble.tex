@@ -97,7 +97,9 @@
 \usepackage{listings}
 \usepackage{lettrine}
 \usepackage{algorithm, algorithmicx}
-\usepackage{algpseudocode}%[noend]
+\ifthenelse{\isundefined{\algouseends}}{
+\usepackage[noend]{algpseudocode}}{
+\usepackage{algpseudocode}}
 \usepackage[many,magazine]{tcolorbox}
 \usepackage[binary-units=true]{siunitx}
 \usepackage{chemformula}

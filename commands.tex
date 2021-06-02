@@ -643,10 +643,12 @@
   \setkeys{algKeys}{end=,#1}%
   \setkeys{algKeys}{show=true,#1}%
   % Print%
+  \ifthenelse{\equal{\startline}{}}{}{line%
+    \ifthenelse{\equal{\endline}{}}{}{s}}%
+  \ifthenelse{\equal{\startline}{}}{}{~\ref{alg:#2:line:\startline}%
+    \ifthenelse{\equal{\endline}{}}{}{-\ref{alg:#2:line:\endline}} %
+    of }%
   \ifthenelse{\equal{\showalg}{true}}{\PrintRefs{Algorithm}{#2}}{}%
-  \ifthenelse{\equal{\startline}{}}{}{~L\ref{alg:#2:line:\startline}%
-    \ifthenelse{\equal{\endline}{}}{}{-\ref{alg:#2:line:\endline}}%
-  }%
 }
 % Mathematical element references
 \newcommand{\pref}[2][]{\PrintRefs[#1]{Problem}{#2}}

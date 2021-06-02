@@ -91,7 +91,8 @@
 
 \makeatletter
 \@ifclassloaded{standalone}{}{\usepackage[tikz]{mdframed}}
-\@ifclassloaded{beamer}{}{\usepackage{tocloft}}
+\@ifclassloaded{beamer}{}{
+\@ifclassloaded{uwthesis/uwthesis}{}{\usepackage{tocloft}}}
 \usepackage{enumitem}
 \makeatother
 \usepackage{listings}
@@ -113,6 +114,8 @@
 \usepackage{mfirstuc}
 \usepackage{import}
 \usepackage{nicematrix}
+
+\ifthenelse{\isundefined{\nobiblatex}}{
 \usepackage{bibentry} % use \bibentry{...} for in-text citation
 \usepackage[backend=biber,
             style=numeric,
@@ -120,8 +123,11 @@
             url=false,
             sortcites=true,
             defernumbers=true]{biblatex}
+}{}
+
 \usepackage[outline]{contour}
 \usepackage{extdash}
+\usepackage{textcomp}
 
 % ..:: Layout ::..
 
@@ -165,3 +171,4 @@
 % ..:: General ::..
 
 \usepackage{xspace}
+\usepackage{setspace}

@@ -83,6 +83,10 @@
 \DeclareMathSymbol{\varphi}{\mathord}{greekletters}{"27}
 
 % Fix the prime symbol
+\let\oldprime\prime
+\renewcommand{\prime}{^\oldprime}
+\newcommand{\pprime}{''}
+\newcommand{\ppprime}{'''}
 % \newcommand\der{\mkern+0mu\raise-0.0ex\hbox{$\scriptstyle\prime$}}
 \newcommand\der{^{\mkern+2.5mu\raise-3pt\hbox{$\scriptstyle\prime$}}}
 \newcommand\dder{\der\der}

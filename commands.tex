@@ -587,7 +587,7 @@
     \tikzmath{\MyRefCount=int(\MyRefCount+1);}%
     \xdef\MyRefCount{\MyRefCount}%
   }%
-  \edef\OrigRefCount{\MyRefCount}
+  \edef\OrigRefCount{\MyRefCount}%
   \ifthenelse{\equal{\MyRefCount}{1}}{%
     #2~\ref{\GetLabel{\MyModifiedLabel}:#3}%
   }{%
@@ -618,7 +618,7 @@
           \pgfmathparse{\MyCounter<\MyRefCount ? 1 : 0}%
           \ifthenelse{\pgfmathresult>0}{%
             \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
-            \pgfmathparse{\OrigRefCount==2 ? 1:0}
+            \pgfmathparse{\OrigRefCount==2 ? 1:0}%
             \ifthenelse{\pgfmathresult>0}{ and }{, and }%
           }{%
             \ref{\GetLabel{\MyModifiedLabel}:\AlgRef}%
@@ -688,6 +688,8 @@
 % ..:: Units ::..
 
 \DeclareSIUnit{\radian}{rad}
+\DeclareSIUnit\century{century}
+\DeclareSIUnit\year{yr}
 
 % ..:: Lists ::..
 
@@ -745,6 +747,20 @@
 \newenvironment{unfinished}{\color{red}\itshape}{}
 \newcommand{\makeunderscoreletter}{\catcode`\_11}
 \newcommand{\makeunderscoreother}{\catcode`\_8}
+
+% >> Optionally building parts of text according to flags <<
+
+\newcommand{\makeflag}[2]{%
+  \expandafter\newif\csname ifmake#1\endcsname
+  \csname make#1#2\endcsname
+  %
+}
+
+\NewEnviron{makeif}[1]{%
+  \csname ifmake#1\endcsname
+  \BODY
+  \fi
+}
 
 %%% Local Variables:
 %%% mode: latex

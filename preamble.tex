@@ -91,7 +91,8 @@
 
 \makeatletter
 \@ifclassloaded{standalone}{}{\usepackage[tikz]{mdframed}}
-\@ifclassloaded{beamer}{}{\usepackage{tocloft}}
+\@ifclassloaded{beamer}{}{
+\@ifclassloaded{uwthesis/uwthesis}{}{\usepackage{tocloft}}}
 \usepackage{enumitem}
 \makeatother
 \usepackage{listings}
@@ -168,3 +169,4 @@
 % ..:: General ::..
 
 \usepackage{xspace}
+\usepackage{setspace}

@@ -32,6 +32,12 @@
 \usepackage[english]{babel}
 \usepackage{blindtext}
 % added for CSMAG only
+
+\newif\ifPDF \ifx\pdfoutput\undefined\PDFfalse \else\ifnum\pdfoutput > 0\PDFtrue \else\PDFfalse \fi \fi
+\ifPDF
+\usepackage[pdftex, plainpages = false, colorlinks=true, linkcolor=black, citecolor = green!50!blue, urlcolor = blue, filecolor=black, pagebackref=false, hypertexnames=false,  pdfpagelabels ]{hyperref}
+\fi
+
 \fi
 
 % ..:: Colors ::..
@@ -393,6 +399,7 @@
   \end{figure@internal}
 }
 \else
+\gdef\csm@singlecol@emulate@width{0.7}
 \newenvironment{csmfigure}[1][]{%
   % Options
   \setkeys{csm@figure@keys}{label=,#1}%
@@ -403,7 +410,7 @@
   \edef\csm@num@cols{\tl_use:N \l_csm_figure_cols_tl}
   \pgfmathparse{\csm@num@cols>1 ? 1:0}
   \ifthenelse{\pgfmathresult>0}{\def\csm@figarea@width{1}}{%
-    \def\csm@figarea@width{0.7}}
+    \def\csm@figarea@width{\csm@singlecol@emulate@width}}
   % Make figure
   \begin{figure}
     \centering
@@ -430,6 +437,12 @@
 \tl_new:N \l_csm_table_pos_tl
 \tl_new:N \l_csm_table_cols_tl
 
+\define@key{csm@table@keys}{label}{\tl_set:Nn \l_csm_table_label_tl {#1}}
+\define@key{csm@table@keys}{caption}{\tl_set:Nn \l_csm_table_caption_tl {#1}}
+\define@key{csm@table@keys}{position}{\tl_set:Nn \l_csm_table_pos_tl {#1}}
+\define@key{csm@table@keys}{columns}{\tl_set:Nn \l_csm_table_cols_tl {#1}}
+
+\ifmakeprettycsm
 \def\@table@inner@pad{3mm}
 \def\@table@border@width{1pt}
 
@@ -461,11 +474,6 @@
   attach~boxed~title~to~top,
   boxed~title~style={colframe=csm@table@border,rounded~corners}
 }
-
-\define@key{csm@table@keys}{label}{\tl_set:Nn \l_csm_table_label_tl {#1}}
-\define@key{csm@table@keys}{caption}{\tl_set:Nn \l_csm_table_caption_tl {#1}}
-\define@key{csm@table@keys}{position}{\tl_set:Nn \l_csm_table_pos_tl {#1}}
-\define@key{csm@table@keys}{columns}{\tl_set:Nn \l_csm_table_cols_tl {#1}}
 
 % Figure selector
 \newenvironment{table@internal}[2][tbp]{%
@@ -502,6 +510,34 @@
     \tablabel{\tl_use:N \l_csm_table_label_tl}
   \end{table@internal}
 }
+\else
+\newenvironment{csmtable}[1][]{%
+  % Options
+  \setkeys{csm@table@keys}{label=,#1}%
+  \setkeys{csm@table@keys}{caption=,#1}%
+  \setkeys{csm@table@keys}{position=tbp,#1}%
+  \setkeys{csm@table@keys}{columns=1,#1}%
+  % % Parse options
+  \edef\csm@num@cols{\tl_use:N \l_csm_table_cols_tl}
+  \pgfmathparse{\csm@num@cols>1 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{\def\csm@tabarea@width{1}}{%
+    \def\csm@tabarea@width{\csm@singlecol@emulate@width}}
+  % Make figure
+  \begin{table}[t]
+    \caption{\tl_use:N \l_csm_table_caption_tl}
+    \vspace*{.1in}
+    \centering
+    \begin{minipage}{\csm@tabarea@width\textwidth}
+    }{%
+    \end{minipage}
+    \tablabel{\tl_use:N \l_csm_table_label_tl}
+  \end{table}
+}
+\DeclareDelayedFloatFlavor{csmtable}{table}
+\fi
+
+\makeatother
+\ExplSyntaxOff
 
 % ..:: Referencing ::..
 
@@ -871,7 +907,7 @@
 
 \makeatother
 \else
-\newenvironment{csmabstract}{}{}
+\NewEnviron{csmabstract}{}
 \fi
 
 % ..:: Nomenclature ::..

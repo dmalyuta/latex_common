@@ -5,7 +5,16 @@
 \allowdisplaybreaks       % Allow breaking long equations across pages
 
 % Hyperlinks
-\hypersetup{colorlinks,linkcolor={red},citecolor={green},urlcolor={blue}}
+\makeatletter
+\ifthenelse{\isundefined{\nohref}}{
+\@ifclassloaded{beamer}{}{
+\ifthenelse{\isundefined{\preprintcsm}}{
+  \usepackage[hypertexnames=false]{hyperref}}{}}{}}{}
+\makeatother
+
+\ifthenelse{\isundefined{\nohref}}{%
+  \hypersetup{colorlinks,linkcolor={red},citecolor={green},urlcolor={blue}}
+  }{}
 
 \newtheoremstyle{faded}
 {\topsep}%

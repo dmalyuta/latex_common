@@ -52,11 +52,17 @@
 
 \usepackage{graphicx}
 \makeatletter
-\@ifclassloaded{UWThesis/uwthesis}{
-\usepackage{subfig}
-}{\usepackage{subcaption}}
+\@ifclassloaded{uwthesis/uwthesis}{
+  \usepackage{subfig}
+}{
+  \@ifclassloaded{IEEEtran}{
+    % \usepackage[caption=false]{subfig}
+  }{
+    \usepackage{subcaption}
+  }
+}
+\@ifclassloaded{IEEEtran}{}{\usepackage{caption}}
 \makeatother
-\usepackage{caption}
 \usepackage{dblfloatfix}
 
 % ..:: Tables ::..
@@ -92,7 +98,10 @@
 \makeatletter
 \@ifclassloaded{standalone}{}{\usepackage[tikz]{mdframed}}
 \@ifclassloaded{beamer}{}{
-\@ifclassloaded{uwthesis/uwthesis}{}{\usepackage{tocloft}}}
+  \@ifclassloaded{uwthesis/uwthesis}{}{
+    \@ifclassloaded{IEEEtran}{}{
+      \usepackage{tocloft}
+    }}}
 \usepackage{enumitem}
 \makeatother
 \usepackage{listings}
@@ -161,14 +170,25 @@
 % ..:: Referencing ::..
 
 \makeatletter
+
+\ifthenelse{\isundefined{\preprintcsm}}{}{
+  \gdef\nohref{}}
+\@ifclassloaded{beamer}{%
+  \gdef\nohref{}}{}
+
 \ifthenelse{\isundefined{\nohref}}{
-\@ifclassloaded{beamer}{}{
-\usepackage[hypertexnames=false]{hyperref}}
-}{}
+  \usepackage[hypertexnames=false]{hyperref}}{}
+
 \makeatother
+
 \usepackage{xr}
 
 % ..:: General ::..
 
 \usepackage{xspace}
 \usepackage{setspace}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

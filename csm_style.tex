@@ -36,7 +36,7 @@
 \usepackage{blindtext}
 % added for CSMAG only
 
-\newif\ifPDF \ifx\pdfoutput\undefined\PDFfalse \else\ifnum\pdfoutput > 0\PDFtrue \else\PDFfalse \fi \fi
+\newif\ifPDF \ifx\pdfoutput\undefined\PDFfalse \else \ifnum\pdfoutput > 0\PDFtrue \else\PDFfalse \fi
 \ifPDF
 \usepackage[pdftex, plainpages = false, colorlinks=true, linkcolor=black, citecolor = green!50!blue, urlcolor = blue, filecolor=black, pagebackref=false, hypertexnames=false,  pdfpagelabels ]{hyperref}
 \fi
@@ -586,6 +586,50 @@
 
 \setcounter{subsidebar@counter}{0}
 
+% Print a sidebar bibliography with new references specifically for the sidebar
+\newcommand{\make@sidebar@bib}{%
+  \edef\sidebar@bib@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
+  % Print the bibliography, citations start with an "S"
+  \begin{refcontext}[sorting=none,labelprefix=S]%
+    \renewcommand*{\bibfont}{\footnotesize}%
+    \DeclareFieldFormat{labelnumberwidth}{[##1]}%
+    \begingroup\edef\sidebar@print@bib{\endgroup\noexpand
+      \printbibliography[title=References,
+      keyword=\sidebar@bib@label,
+      resetnumbers=false]
+    }\sidebar@print@bib
+  \end{refcontext}%
+}
+
+% Prefix labels with "S" for sidebar
+\newcommand{\sidebar@labels@on}{
+  \global\chardef\dc@currentequation=\value{equation}%
+  \global\chardef\dc@currentfigure=\value{figure}%
+  \global\chardef\dc@currenttable=\value{table}%
+  \let\c@equation\c@sidebar@equation
+  \let\c@figure\c@sidebar@figure
+  \let\c@table\c@sidebar@table
+  \renewcommand{\theequation}{S\arabic{equation}}%
+  \renewcommand{\thetable}{S\arabic{table}}%
+  \renewcommand{\thefigure}{S\arabic{figure}}%
+  \renewcommand{\theHequation}{S\arabic{equation}}%
+  \renewcommand{\theHtable}{S\arabic{table}}%
+  \renewcommand{\theHfigure}{S\arabic{figure}}%
+}
+
+% Reset labels to original
+\newcommand{\sidebar@labels@off}{
+  \edef\equation@mem{\arabic{sidebar@equation}}%
+  \edef\figure@mem{\arabic{sidebar@figure}}%
+  \edef\table@mem{\arabic{sidebar@table}}%
+  \setcounter{equation}{\dc@currentequation}%
+  \setcounter{figure}{\dc@currentfigure}%
+  \setcounter{table}{\dc@currenttable}%
+  \setcounter{sidebar@equation}{\equation@mem}%
+  \setcounter{sidebar@figure}{\figure@mem}%
+  \setcounter{sidebar@table}{\table@mem}%
+}
+
 \ifmakeprettycsm
 
 \newsavebox{\sidebar@box@full}
@@ -727,22 +771,7 @@
   % Create the box
   \begin{lrbox}{\csname\sidebar@box\endcsname}%
     \begin{minipage}{\sidebar@width}%
-      \ifthenelse{\equal{\sidebar@reset}{noreset}}{}{%
-        % Reset equation, table, and figure counters and make labels start
-        % with an "S"
-        \global\chardef\dc@currentequation=\value{equation}%
-        \global\chardef\dc@currentfigure=\value{figure}%
-        \global\chardef\dc@currenttable=\value{table}%
-        \let\c@equation\c@sidebar@equation
-        \let\c@figure\c@sidebar@figure
-        \let\c@table\c@sidebar@table
-        \renewcommand{\theequation}{S\arabic{equation}}%
-        \renewcommand{\thetable}{S\arabic{table}}%
-        \renewcommand{\thefigure}{S\arabic{figure}}%
-        \renewcommand{\theHequation}{S\arabic{equation}}%
-        \renewcommand{\theHtable}{S\arabic{table}}%
-        \renewcommand{\theHfigure}{S\arabic{figure}}%
-      }%
+      \ifthenelse{\equal{\sidebar@reset}{noreset}}{}{\sidebar@labels@on}%
       % Set columns
       \ifthenelse{\equal{\figure@width}{}}{}{%
         \begin{multicols}{2}%
@@ -763,24 +792,10 @@
         % Main text body (given environment body) ...
       }{%
         % ... End of main text body
-        \pgfmathparse{\value{subsidebar@counter}!=2 ? 1:0}
+        \pgfmathparse{\value{subsidebar@counter}!=2 ? 1:0}%
+        % Print bibliography
         \ifthenelse{\pgfmathresult>0}{%
-          \edef\sidebar@bib@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
-          % Print the bibliography, citations start with an "S"
-          \begin{refcontext}[sorting=none,labelprefix=S]
-            \AtNextBibliography{\fontsize{7}{9}\sffamily}%
-            \DeclareFieldFormat{labelnumberwidth}{[##1]}
-            \begingroup\edef\sidebar@print@bib{\endgroup\noexpand
-              \printbibliography[title=References,
-              keyword=\sidebar@bib@label,
-              resetnumbers=false]
-            }\sidebar@print@bib
-          \end{refcontext}
-          % \AtNextBibliography{\footnotesize}%
-          % \begingroup\edef\sidebar@print@bib{\endgroup\noexpand
-          %   \printbibliography[title=References,
-          %   keyword=\sidebar@bib@label]
-          % }\sidebar@print@bib
+          \make@sidebar@bib%
         }{}%
         % Print "continued" if this is the first subsidebar panel
         \ifthenelse{\pgfmathresult>0}{}{%
@@ -790,18 +805,7 @@
         \ifthenelse{\equal{\figure@width}{}}{}{%
         \end{multicols}%
       }%
-      \ifthenelse{\equal{\sidebar@reset}{noreset}}{}{%
-        % Reset equation, table, and figure counters to body text values
-        \edef\equation@mem{\arabic{sidebar@equation}}%
-        \edef\figure@mem{\arabic{sidebar@figure}}%
-        \edef\table@mem{\arabic{sidebar@table}}%
-        \setcounter{equation}{\dc@currentequation}%
-        \setcounter{figure}{\dc@currentfigure}%
-        \setcounter{table}{\dc@currenttable}%
-        \setcounter{sidebar@equation}{\equation@mem}%
-        \setcounter{sidebar@figure}{\figure@mem}%
-        \setcounter{sidebar@table}{\table@mem}%
-      }%
+      \ifthenelse{\equal{\sidebar@reset}{noreset}}{}{\sidebar@labels@off}%
     \end{minipage}%
   \end{lrbox}%
   % Save the box for global access
@@ -822,24 +826,37 @@
   % Parse options
   \edef\@csm@sb@title{\tl_use:N \l_csm_sidebar_title_tl}
   \edef\@csm@sb@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
-  % Create the sidebar
-  % \section[\@csm@sb@title]{Sidebar:~\@csm@sb@title}
+  % New page
+  \clearpage
+  \newpage
+  % >> Create the sidebar <<
+  % Title
   \section[\@csm@sb@title]{Sidebar:~%
     \hypertarget{\@csm@sb@label}{\@csm@sb@title}}
+  \sidebar@labels@on % Turn on "S" prefixes
 }{
+  \make@sidebar@bib
+  % Print out the figures
+  \newpage
+  \processdelayedfloats % place sidebar endfloats here
+  \clearpage
+  \sidebar@labels@off % Turn off "S" prefixes
 }
 
 \fi
 
 % Define a queue of sidebars that are to be printed
 \newcounter{sidebar@queue@size}%
-\setcounter{sidebar@queue@size}{0}
-\def\csm@sb@queue@title{}
-\def\csm@sb@queue@label{}
-\def\csm@sb@queue@side{}
-\def\csm@sb@queue@position{}
-\def\csm@sb@queue@columns{}
-\def\csm@sb@queue@content{}
+\newcommand{\reset@sidebar@queue}{
+  \gdef\csm@sb@queue@title{}
+  \gdef\csm@sb@queue@label{}
+  \gdef\csm@sb@queue@side{}
+  \gdef\csm@sb@queue@position{}
+  \gdef\csm@sb@queue@columns{}
+  \gdef\csm@sb@queue@content{}
+  \setcounter{sidebar@queue@size}{0}
+}
+\reset@sidebar@queue
 
 % Push a new sidebar into the queue
 \newcommand{\declaresidebar}[2][]{
@@ -878,9 +895,6 @@
   \makelist{csm@sb@columns}{\csm@sb@queue@columns}
   \makelist{csm@sb@contents}{\csm@sb@queue@content}
   \foreach \@i in {1,...,\thesidebar@queue@size} {
-    \clearpage
-    \newpage
-
     \begin{sidebar}[%
       title={\list@nth{csm@sb@titles}{\@i}},
       label={\list@nth{csm@sb@labels}{\@i}},
@@ -889,14 +903,12 @@
       columns={\list@nth{csm@sb@columns}{\@i}}]
       \input{\list@nth{csm@sb@contents}{\@i}}
     \end{sidebar}
-
-    \newpage
-    \processdelayedfloats % place sidebar endfloats here
-    \clearpage
   }
+  \reset@sidebar@queue % Empty the queue
   \fi
 }
 
+\ifmakeprettycsm
 \renewcommand*{\LettrineTextFont}{}
 \newcommand{\sbfirstword}[1]{%
   \StrChar{#1}{1}[\first@char]%
@@ -905,6 +917,9 @@
     \color{csm@sidebar@first@char}\bfseries%
     \first@char}{\rest@of@word}%
 }
+\else
+\newcommand{\sbfirstword}[1]{#1}
+\fi
 
 \newcommand{\sbref}[1]{%
   \@ifundefined{sidebar:#1}{%
@@ -1047,7 +1062,7 @@
   \immediate\write\file{\string\begin{tabularx}{\string\columnwidth}{VX}}
   \immediate\write\file{  \string\input{#2}}
   \immediate\write\file{\string\end{tabularx}}
-  \closeout\file
+  \immediate\closeout\file
   % Push sidebar into queue
   \declaresidebar[%
   title={\nomenc@title},
@@ -1086,12 +1101,12 @@
 {\endlist}
 {\item}
 
-\newcommand{\csmprintmainbib}{
-  \begin{refcontext}[sorting=none]
-    \AtNextBibliography{\footnotesize}%
-    \DeclareFieldFormat{labelnumberwidth}{[##1]}
-    \printbibliography[notkeyword=sidebarbib, resetnumbers=true]
-  \end{refcontext}
+\newcommand{\csmprintmainbib}{%
+  \begin{refcontext}[sorting=none]%
+    \renewcommand*{\bibfont}{\footnotesize}%
+    \DeclareFieldFormat{labelnumberwidth}{[##1]}%
+    \printbibliography[notkeyword=sidebarbib, resetnumbers=true]%
+  \end{refcontext}%
 }
 
 %%% Local Variables:

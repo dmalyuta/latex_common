@@ -758,9 +758,11 @@
   %
 }
 
-\NewEnviron{makeif}[1]{%
-  \csname ifmake#1\endcsname
+\NewEnviron{makeif}[2][]{%
+  \csname ifmake#2\endcsname
   \BODY
+  \else
+  #1
   \fi
 }
 

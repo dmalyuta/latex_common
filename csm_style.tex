@@ -1,3 +1,42 @@
+% ..:: Compilattion mode ::..
+
+\ifthenelse{\isundefined{\preprintcsm}}{
+  \makeflag{prettycsm}{true}
+  \makeflag{preprintcsm}{false}
+}{
+  \makeflag{prettycsm}{false}
+  \makeflag{preprintcsm}{true}
+}
+
+% ..:: Preamble ::..
+
+\ifmakepreprintcsm
+\usepackage{csm16}
+\usepackage[margin=1in]{geometry}
+\usepackage[nolists,nomarkers,tablesfirst]{endfloat} % put figures at end
+
+% added for CSMAG only
+\usepackage{url}
+\usepackage{graphicx,xcolor}
+\usepackage{verbatim}% http://ctan.org/pkg/verbatim
+\makeatletter
+\newcommand{\verbatimfont}[1]{\def\verbatim@font{#1}}%
+\makeatother
+\verbatimfont{\ttfamily\small}
+\newcommand{\XX}[1]{{\bf XX #1 XX}}
+\newcommand{\bi}{\begin{itemize}}\newcommand{\ei}{\end{itemize}}
+\newcommand{\be}{\begin{equation}}\newcommand{\ee}{\end{equation}}
+\newcommand{\bee}{\begin{enumerate}}\newcommand{\eee}{\end{enumerate}}
+\newcommand{\bea}{\begin{eqnarray}}\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\beas}{\begin{eqnarray*}}\newcommand{\eeas}{\end{eqnarray*}}
+\newcommand{\bc}{\begin{center}}\newcommand{\ec}{\end{center}}
+%
+\usepackage[left,pagewise]{lineno}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+% added for CSMAG only
+\fi
+
 % ..:: Colors ::..
 
 \makeatletter
@@ -20,6 +59,7 @@
 
 % ..:: Paragraphs ::..
 
+\ifmakeprettycsm
 \makeatletter
 \def\@csm@parindent{1em}
 \def\@csm@parskip{0pt plus1pt}
@@ -28,9 +68,11 @@
 \setlength{\parskip}{\@csm@parskip} % Paragraph spacing
 
 \makeatother
+\fi
 
 % ..:: Fonts ::..
 
+\ifmakeprettycsm
 % \let\transp\relax
 % \usepackage{newtxmath}
 \let\temp\rmdefault
@@ -92,9 +134,11 @@
 \newcommand\dder{\der\der}
 \newcommand\ddder{\der\der\der}
 \newcommand\dddder{\der\der\der\der}
+\fi
 
 % ..:: Lists ::..
 
+\ifmakeprettycsm
 \tikzset{
   list bullet/.style={
     scale=0.5
@@ -106,9 +150,11 @@
       \node[list bullet] at (0,0) {\faChevronRight};%
       \node[list bullet] at (0.25em,0) {\faChevronRight};}%
   },leftmargin=1.3em}
+\fi
 
 % ..:: Page geometry ::..
 
+\ifmakeprettycsm
 \usepackage{geometry}
 
 \ExplSyntaxOn
@@ -128,9 +174,11 @@
   columnsep=\tl_use:N \l_columnsep_dim
 }
 \ExplSyntaxOff
+\fi
 
 % ..:: Section titles ::..
 
+\ifmakeprettycsm
 \usepackage{helvet}
 \titleformat{\section}{%
   \normalfont\fontsize{10}{12}%
@@ -146,11 +194,13 @@
   \normalfont\fontsize{10}{12}%
   \sffamily}{}{0cm}{#1}
 \titlespacing*{\subsubsection}{0cm}{4mm}{0mm}
+\fi
 
 % >> Opening text <<
 
 \makeatletter
 
+\ifmakeprettycsm
 \newcommand{\firstword}[2][]{%
   \StrChar{#2}{1}[\first@char]%
   \StrBehind{#2}{\first@char}[\rest@of@word]%
@@ -159,11 +209,15 @@
     \color{csm@intro@first@char}%
     \first@char}{\rest@of@word}%
 }
+\else
+\newcommand{\firstword}[2][]{#2}
+\fi
 
 \makeatother
 
 % ..:: Header and footer ::..
 
+\ifmakeprettycsm
 \usepackage{fontawesome}
 
 \ExplSyntaxOn
@@ -202,6 +256,9 @@
 }
 \pagestyle{csmfancy}
 \ExplSyntaxOff
+\else
+\newcommand{\csmdate}[1]{}
+\fi
 
 % ..:: Equations ::..
 
@@ -209,6 +266,7 @@
 
 % ..:: Theorem environments ::..
 
+\ifmakeprettycsm
 \makeatletter
 
 % >> Set the theorem environment style <<
@@ -265,6 +323,7 @@
 }
 
 \makeatother
+\fi
 
 % ..:: Figures ::..
 
@@ -276,6 +335,12 @@
 \tl_new:N \l_csm_figure_pos_tl
 \tl_new:N \l_csm_figure_cols_tl
 
+\define@key{csm@figure@keys}{label}{\tl_set:Nn \l_csm_figure_label_tl {#1}}
+\define@key{csm@figure@keys}{caption}{\tl_set:Nn \l_csm_figure_caption_tl {#1}}
+\define@key{csm@figure@keys}{position}{\tl_set:Nn \l_csm_figure_pos_tl {#1}}
+\define@key{csm@figure@keys}{columns}{\tl_set:Nn \l_csm_figure_cols_tl {#1}}
+
+\ifmakeprettycsm
 \newtcolorbox{figurebox}{
   % Drawing engine
   enhanced~jigsaw,
@@ -293,11 +358,6 @@
   colback=csm@fig@bg,
   colbacktitle=csm@fig@bg
 }
-
-\define@key{csm@figure@keys}{label}{\tl_set:Nn \l_csm_figure_label_tl {#1}}
-\define@key{csm@figure@keys}{caption}{\tl_set:Nn \l_csm_figure_caption_tl {#1}}
-\define@key{csm@figure@keys}{position}{\tl_set:Nn \l_csm_figure_pos_tl {#1}}
-\define@key{csm@figure@keys}{columns}{\tl_set:Nn \l_csm_figure_cols_tl {#1}}
 
 % Caption style
 \captionsetup[figure]{font={footnotesize,sf},labelfont={},
@@ -335,6 +395,30 @@
     \figlabel{\tl_use:N \l_csm_figure_label_tl}
   \end{figure@internal}
 }
+\else
+\newenvironment{csmfigure}[1][]{%
+  % Options
+  \setkeys{csm@figure@keys}{label=,#1}%
+  \setkeys{csm@figure@keys}{caption=,#1}%
+  \setkeys{csm@figure@keys}{position=tbp,#1}%
+  \setkeys{csm@figure@keys}{columns=1,#1}%
+  % Parse options
+  \edef\csm@num@cols{\tl_use:N \l_csm_figure_cols_tl}
+  \pgfmathparse{\csm@num@cols>1 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{\def\csm@figarea@width{1}}{%
+    \def\csm@figarea@width{0.7}}
+  % Make figure
+  \begin{figure}
+    \centering
+    \begin{minipage}{\csm@figarea@width\textwidth}
+    }{%
+    \end{minipage}
+    \caption{\tl_use:N \l_csm_figure_caption_tl}
+    \figlabel{\tl_use:N \l_csm_figure_label_tl}
+  \end{figure}
+}
+\DeclareDelayedFloatFlavor{csmfigure}{figure}
+\fi
 
 \makeatother
 \ExplSyntaxOff

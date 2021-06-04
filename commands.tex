@@ -697,6 +697,11 @@
 
 \makeatletter
 
+% Add an item to a comma separated list
+\newcommand{\add@list@item}[2]{
+  \ifthenelse{\equal{#1}{}}{\xdef#1{{#2}}}{\xdef#1{#1,{#2}}}
+}
+
 % Create a new counter, or reset its value to zero if one already exists
 \def\providecounter#1{%
   \@ifundefined{c@#1}%

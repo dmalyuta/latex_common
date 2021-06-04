@@ -12,6 +12,9 @@
 \usepackage[margin=1in]{geometry}
 \usepackage[nolists,nomarkers,tablesfirst]{endfloat} % put figures at end
 
+\usepackage{filecontents}
+\usepackage{fancyvrb}
+
 % added for CSMAG only
 \usepackage{url}
 \usepackage{graphicx,xcolor}
@@ -583,6 +586,8 @@
 
 \setcounter{subsidebar@counter}{0}
 
+\ifmakeprettycsm
+
 \newsavebox{\sidebar@box@full}
 \newsavebox{\sidebar@box@left}
 \newsavebox{\sidebar@box@right}
@@ -805,6 +810,93 @@
   \expandafter\box\csname\sidebar@box\endcsname%
 }
 
+\else
+
+\newenvironment{sidebar}[1][]{%
+  % Raw options
+  \setkeys{csm@sidebar@keys}{title=,#1}%
+  \setkeys{csm@sidebar@keys}{label=,#1}%
+  \setkeys{csm@sidebar@keys}{side=odd,#1}%
+  \setkeys{csm@sidebar@keys}{position=t,#1}%
+  \setkeys{csm@sidebar@keys}{columns=2,#1}%
+  % Parse options
+  \edef\@csm@sb@title{\tl_use:N \l_csm_sidebar_title_tl}
+  \edef\@csm@sb@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
+  % Create the sidebar
+  % \section[\@csm@sb@title]{Sidebar:~\@csm@sb@title}
+  \section[\@csm@sb@title]{Sidebar:~%
+    \hypertarget{\@csm@sb@label}{\@csm@sb@title}}
+}{
+}
+
+\fi
+
+% Define a queue of sidebars that are to be printed
+\newcounter{sidebar@queue@size}%
+\setcounter{sidebar@queue@size}{0}
+\def\csm@sb@queue@title{}
+\def\csm@sb@queue@label{}
+\def\csm@sb@queue@side{}
+\def\csm@sb@queue@position{}
+\def\csm@sb@queue@columns{}
+\def\csm@sb@queue@content{}
+
+% Push a new sidebar into the queue
+\newcommand{\declaresidebar}[2][]{
+  % Raw options
+  \setkeys{csm@sidebar@keys}{title=,#1}%
+  \setkeys{csm@sidebar@keys}{label=,#1}%
+  \setkeys{csm@sidebar@keys}{side=odd,#1}%
+  \setkeys{csm@sidebar@keys}{position=t,#1}%
+  \setkeys{csm@sidebar@keys}{columns=2,#1}%
+  % Save to queue
+  \add@list@item{\csm@sb@queue@title}{\tl_use:N \l_csm_sidebar_title_tl}
+  \add@list@item{\csm@sb@queue@label}{\tl_use:N \l_csm_sidebar_label_tl}
+  \add@list@item{\csm@sb@queue@side}{\tl_use:N \l_csm_sidebar_side_tl}
+  \add@list@item{\csm@sb@queue@position}{\tl_use:N \l_csm_sidebar_pos_tl}
+  \add@list@item{\csm@sb@queue@columns}{\tl_use:N \l_csm_sidebar_cols_tl}
+  \add@list@item{\csm@sb@queue@content}{#2}
+  \stepcounter{sidebar@queue@size}
+  % Print sidebars immediately if pretty CSM
+  \ifmakeprettycsm
+  \flushsidebars
+  \fi
+}
+
+% Print out all sidebars, removing them from the queue (FIFO)
+\makeflag{printsb}{false}
+\newcommand{\flushsidebars}{
+  % Decide if there are any sidebars to be printed
+  \pgfmathparse{\thesidebar@queue@size>0 ? 1:0}
+  \ifthenelse{\pgfmathresult>0}{\makeprintsbtrue}{\makeprintsbfalse}
+  \ifmakeprintsb
+  % Make sidebar queues into indexable arrays
+  \makelist{csm@sb@titles}{\csm@sb@queue@title}
+  \makelist{csm@sb@labels}{\csm@sb@queue@label}
+  \makelist{csm@sb@sides}{\csm@sb@queue@side}
+  \makelist{csm@sb@positions}{\csm@sb@queue@position}
+  \makelist{csm@sb@columns}{\csm@sb@queue@columns}
+  \makelist{csm@sb@contents}{\csm@sb@queue@content}
+  \foreach \@i in {1,...,\thesidebar@queue@size} {
+    \clearpage
+    \newpage
+
+    \begin{sidebar}[%
+      title={\list@nth{csm@sb@titles}{\@i}},
+      label={\list@nth{csm@sb@labels}{\@i}},
+      side={\list@nth{csm@sb@sides}{\@i}},
+      position={\list@nth{csm@sb@positions}{\@i}},
+      columns={\list@nth{csm@sb@columns}{\@i}}]
+      \input{\list@nth{csm@sb@contents}{\@i}}
+    \end{sidebar}
+
+    \newpage
+    \processdelayedfloats % place sidebar endfloats here
+    \clearpage
+  }
+  \fi
+}
+
 \renewcommand*{\LettrineTextFont}{}
 \newcommand{\sbfirstword}[1]{%
   \StrChar{#1}{1}[\first@char]%
@@ -929,11 +1021,13 @@
 \define@key{csm@nomenclature@keys}{position}{\tl_set:Nn
   \l_csm_nomenclature_position_tl {#1}}
 
-\NewEnviron{csmnomenclature}[1][]{
+\newcommand{\csmnomenclature}[2][]{
+  % Raw arguments
   \setkeys{csm@nomenclature@keys}{title=,#1}%
   \setkeys{csm@nomenclature@keys}{label=,#1}%
   \setkeys{csm@nomenclature@keys}{width=0.2,#1}%
   \setkeys{csm@nomenclature@keys}{position=t,#1}%
+  % Parse arguments
   \edef\nomenc@title{\tl_use:N
     \l_csm_nomenclature_title_tl}%
   \edef\nomenc@label{\tl_use:N
@@ -943,18 +1037,23 @@
   \edef\nomenc@position{\tl_use:N
     \l_csm_nomenclature_position_tl}%
   \def\@nomenclature@content{\BODY}
-  \begin{sidebar}[%
-    title={\nomenc@title},%
-    columns=1,%
-    label={\nomenc@label},
-    position={\nomenc@position}]%
-    \footnotesize
-    \def\arraystretch{1.2}
-    \newcolumntype{V}{>{\hsize=\nomenc@width\linewidth}X}
-    \begin{tabularx}{\columnwidth}{VX}
-      \@nomenclature@content
-    \end{tabularx}
-  \end{sidebar}
+  % Write sidebar body to file
+  \newwrite\file
+  \immediate\openout\file=csm_\nomenc@label.tex
+  \immediate\write\file{\noexpand\footnotesize}
+  \immediate\write\file{\string\def\string\arraystretch{1.2}}
+  \immediate\write\file{\string\newcolumntype{V}{%
+      >{\string\hsize=\nomenc@width\string\linewidth}X}}
+  \immediate\write\file{\string\begin{tabularx}{\string\columnwidth}{VX}}
+  \immediate\write\file{  \string\input{#2}}
+  \immediate\write\file{\string\end{tabularx}}
+  \closeout\file
+  % Push sidebar into queue
+  \declaresidebar[%
+  title={\nomenc@title},
+  columns=1,
+  label={\nomenc@label},
+  position={\nomenc@position}]{csm_\nomenc@label.tex}
 }
 
 \makeatother

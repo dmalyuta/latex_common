@@ -1,16 +1,13 @@
 % ..:: Compilattion mode ::..
 
 \ifthenelse{\isundefined{\preprintcsm}}{
-  \makeflag{prettycsm}{true}
-  \makeflag{preprintcsm}{false}
-}{
-  \makeflag{prettycsm}{false}
-  \makeflag{preprintcsm}{true}
-}
+  \makeflag{prettycsm}{true}}{
+  \makeflag{prettycsm}{false}}
 
 % ..:: Preamble ::..
 
-\ifmakepreprintcsm
+\ifmakeprettycsm
+\else
 \usepackage{csm16}
 \usepackage[margin=1in]{geometry}
 \usepackage[nolists,nomarkers,tablesfirst]{endfloat} % put figures at end
@@ -835,6 +832,7 @@
 
 % ..:: Abstract (which will not appear in print) ::..
 
+\ifmakeprettycsm
 \makeatletter
 
 \def\abstract@pad{2mm}
@@ -872,6 +870,9 @@
 }
 
 \makeatother
+\else
+\newenvironment{csmabstract}{}{}
+\fi
 
 % ..:: Nomenclature ::..
 

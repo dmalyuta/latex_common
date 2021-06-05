@@ -137,10 +137,12 @@
 \newcommand{\ppprime}{'''}
 % \newcommand\der{\mkern+0mu\raise-0.0ex\hbox{$\scriptstyle\prime$}}
 \newcommand\der{^{\mkern+2.5mu\raise-3pt\hbox{$\scriptstyle\prime$}}}
+\else
+\newcommand\der{'}
+\fi
 \newcommand\dder{\der\der}
 \newcommand\ddder{\der\der\der}
 \newcommand\dddder{\der\der\der\der}
-\fi
 
 % ..:: Lists ::..
 
@@ -586,17 +588,41 @@
 
 \setcounter{subsidebar@counter}{0}
 
+% Keep track of how many references the sidebar bibliography has
+\newcounter{sbrefs}
+\renewbibmacro*{finentry}{\stepcounter{sbrefs}\finentry}
+
+% Low-level print sidebar bibliography
+\newcommand{\csm@sb@printbib}[2]{%
+  \printbibliography[title=References,keyword=#1,resetnumbers=#2]}
+
 % Print a sidebar bibliography with new references specifically for the sidebar
 \newcommand{\make@sidebar@bib}{%
   \edef\sidebar@bib@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
+  % Decision whether to reset the reference counter
+  \ifmakeprettycsm
+  \def\@sb@bibnum@reset{false}%
+  \else
+  \pgfmathparse{\thesbrefs==0 ? 1:0}
+  % \ifthenelse{\equal{\@sidebar@number}{1}}{%
+  \ifthenelse{\pgfmathresult>0}{%
+    \def\@sb@bibnum@reset{true}
+  }{%
+    \def\@sb@bibnum@reset{false}
+  }%
+  \fi
   % Print the bibliography, citations start with an "S"
   \begin{refcontext}[sorting=none,labelprefix=S]%
+    \ifmakeprettycsm
+    \renewcommand*{\bibfont}{\fontsize{7}{9}\sffamily}%
+    \else
     \renewcommand*{\bibfont}{\footnotesize}%
+    \fi
     \DeclareFieldFormat{labelnumberwidth}{[##1]}%
     \begingroup\edef\sidebar@print@bib{\endgroup\noexpand
       \printbibliography[title=References,
       keyword=\sidebar@bib@label,
-      resetnumbers=false]
+      resetnumbers=\@sb@bibnum@reset]
     }\sidebar@print@bib
   \end{refcontext}%
 }
@@ -843,6 +869,8 @@
   \sidebar@labels@off % Turn off "S" prefixes
 }
 
+\newenvironment{subsidebar}[1][noreset]{}{}
+
 \fi
 
 % Define a queue of sidebars that are to be printed
@@ -887,6 +915,8 @@
   \pgfmathparse{\thesidebar@queue@size>0 ? 1:0}
   \ifthenelse{\pgfmathresult>0}{\makeprintsbtrue}{\makeprintsbfalse}
   \ifmakeprintsb
+  % Reset the reference counter
+  \setcounter{sbrefs}{0}
   % Make sidebar queues into indexable arrays
   \makelist{csm@sb@titles}{\csm@sb@queue@title}
   \makelist{csm@sb@labels}{\csm@sb@queue@label}
@@ -894,14 +924,14 @@
   \makelist{csm@sb@positions}{\csm@sb@queue@position}
   \makelist{csm@sb@columns}{\csm@sb@queue@columns}
   \makelist{csm@sb@contents}{\csm@sb@queue@content}
-  \foreach \@i in {1,...,\thesidebar@queue@size} {
+  \foreach \@sidebar@number in {1,...,\thesidebar@queue@size} {
     \begin{sidebar}[%
-      title={\list@nth{csm@sb@titles}{\@i}},
-      label={\list@nth{csm@sb@labels}{\@i}},
-      side={\list@nth{csm@sb@sides}{\@i}},
-      position={\list@nth{csm@sb@positions}{\@i}},
-      columns={\list@nth{csm@sb@columns}{\@i}}]
-      \input{\list@nth{csm@sb@contents}{\@i}}
+      title={\list@nth{csm@sb@titles}{\@sidebar@number}},
+      label={\list@nth{csm@sb@labels}{\@sidebar@number}},
+      side={\list@nth{csm@sb@sides}{\@sidebar@number}},
+      position={\list@nth{csm@sb@positions}{\@sidebar@number}},
+      columns={\list@nth{csm@sb@columns}{\@sidebar@number}}]
+      \input{\list@nth{csm@sb@contents}{\@sidebar@number}}
     \end{sidebar}
   }
   \reset@sidebar@queue % Empty the queue

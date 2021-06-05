@@ -964,6 +964,7 @@
 
 % ..:: Highlight text blurb ::..
 
+\ifmakeprettycsm
 \makeatletter
 
 \def\blurb@pad{4mm}
@@ -1002,6 +1003,9 @@
 }
 
 \makeatother
+\else
+\NewEnviron{blurb}{}
+\fi
 
 % ..:: Abstract (which will not appear in print) ::..
 

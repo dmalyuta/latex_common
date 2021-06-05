@@ -12,9 +12,6 @@
 \usepackage[margin=1in]{geometry}
 \usepackage[nolists,nomarkers,tablesfirst]{endfloat} % put figures at end
 
-\usepackage{filecontents}
-\usepackage{fancyvrb}
-
 % added for CSMAG only
 \usepackage{url}
 \usepackage{graphicx,xcolor}
@@ -431,6 +428,11 @@
 
 \makeatother
 \ExplSyntaxOff
+
+% Reference a subfigure that is baked into the drawing, so not really a LaTeX
+% subfigure
+\newcommand{\fakesubfigref}[3][]{%
+  \figref{#2}(#3)\ifthenelse{\equal{#1}{}}{}{-(#1)}}
 
 % ..:: Tables ::..
 
@@ -1110,8 +1112,13 @@
 
 % ..:: Author biography ::..
 
+\ifmakeprettycsm
 \newenvironment{authorbio}[1][]{
   {\bfseries\itshape #1}~}{}
+\else
+\newenvironment{authorbio}[1][]{
+  #1~}{}
+\fi
 
 % ..:: Bibliography ::..
 

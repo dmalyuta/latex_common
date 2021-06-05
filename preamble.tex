@@ -125,13 +125,17 @@
 \usepackage{nicematrix}
 
 \ifthenelse{\isundefined{\nobiblatex}}{
-\usepackage{bibentry} % use \bibentry{...} for in-text citation
-\usepackage[backend=biber,
-            style=numeric,
-            sorting=none,
-            url=false,
-            sortcites=true,
-            defernumbers=true]{biblatex}
+  \usepackage{bibentry} % use \bibentry{...} for in-text citation
+  \newcommand{\usebiblatex}[1]{%
+    \usepackage[backend=biber,
+    style=#1,
+    sorting=none,
+    url=false,
+    sortcites=true,
+    defernumbers=true]{biblatex}}
+  \ifthenelse{\isundefined{\preprintcsm}}{%
+    \usebiblatex{numeric}}{%
+    \usebiblatex{ieee}}
 }{}
 
 \usepackage[outline]{contour}

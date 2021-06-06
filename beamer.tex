@@ -10,6 +10,8 @@
 \definecolor{beamerGrey}{HTML}{acacac}
 \definecolor{beamerGreen}{HTML}{5da9a1}
 \definecolor{beamerBlack}{HTML}{000000}
+
+\setbeamercolor{alerted text}{fg=beamerRed}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -426,6 +428,10 @@
   \xdef\framecoord{\@x*1pt,\@y*1pt}
   \ifthenelse{\equal{#1}{}}{}{\expandafter\xdef\csname #1\endcsname{\framecoord}}%
 }
+\newcommand{\placecursor}[2][cursor]{
+  \getframecoord[@beamer@tmp@cursor@coord]{#2}
+  \coordinate (#1) at (\@beamer@tmp@cursor@coord);
+}
 \newcommand{\beamergridoverlay}{
   % Overlay a grid to aid in element placement
   \begin{tikzpicture}[overlay,remember picture,shift={(current page.south west)}]
@@ -488,6 +494,8 @@
     }
   \end{tikzpicture}
 }
+\let\beamergrid\beamergridoverlay
+\let\placegrid\beamergridoverlay
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -502,7 +510,11 @@
     remember picture,
     shift={(current page.south west)},
     apply style/.expand once=#1]
-}{\end{tikzpicture}}
+  }{
+  \end{tikzpicture}
+}
+\let\beamertikz\beamertikzpicture
+\let\endbeamertikz\endbeamertikzpicture
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

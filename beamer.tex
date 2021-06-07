@@ -15,6 +15,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ..:: Links ::..
+\hypersetup{colorlinks,
+  linkcolor={beamerRed},
+  citecolor={beamerGrey},
+  urlcolor={beamerBlue}}
+
+\newcommand{\beamcite}[1]{{\color{beamerGrey}\cite{#1}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ..:: Font ::..
 % Font size
 \usepackage{scrextend}
@@ -341,7 +351,8 @@
       }
       \node[sections list element,
       color=\sectioncolor] (section text) at
-      (-\footer@text@xshift,\current@y*1pt) {\hyperlink{\section}{\section}};
+      (-\footer@text@xshift,\current@y*1pt) {%
+        \hyperlink{\section}{\color{\sectioncolor}\section}};
       \get@section@color{\section@counter}
       \node[section color bubble=\this@section@color,
       anchor=west] at (section text.east) {};

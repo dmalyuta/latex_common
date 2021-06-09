@@ -124,6 +124,7 @@
 \usepackage{import}
 \usepackage{nicematrix}
 
+\makeatletter
 \ifthenelse{\isundefined{\nobiblatex}}{
   \usepackage{bibentry} % use \bibentry{...} for in-text citation
   \newcommand{\usebiblatex}[1]{%
@@ -133,10 +134,13 @@
     url=false,
     sortcites=true,
     defernumbers=true]{biblatex}}
-  \ifthenelse{\isundefined{\preprintcsm}}{%
-    \usebiblatex{numeric}}{%
-    \usebiblatex{ieee}}
+  \@ifclassloaded{beamer}{
+    \usebiblatex{authoryear}}{
+    \ifthenelse{\isundefined{\preprintcsm}}{%
+      \usebiblatex{numeric}}{%
+      \usebiblatex{ieee}}}
 }{}
+\makeatother
 
 \usepackage[outline]{contour}
 \usepackage{extdash}

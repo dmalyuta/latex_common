@@ -1,13 +1,21 @@
 % ..:: Compilattion mode ::..
 
-\ifthenelse{\isundefined{\preprintcsm}}{
-  \makeflag{prettycsm}{true}}{
-  \makeflag{prettycsm}{false}}
+\makeflag{prettycsm}{true}
+\makeflag{twocolcsm}{true}
+\ifthenelse{\isundefined{\preprintcsm}}{}{
+  \makeflag{prettycsm}{false}
+  \makeflag{twocolcsm}{false}
+}
+\ifthenelse{\isundefined{\arxivcsm}}{}{
+  \makeflag{prettycsm}{false}
+  \makeflag{arxivcsm}{true}
+}
 
 % ..:: Preamble ::..
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \else
+
 \usepackage{csm16}
 \usepackage[margin=1in]{geometry}
 \usepackage[nolists,nomarkers,tablesfirst]{endfloat} % put figures at end
@@ -48,6 +56,7 @@
 
 \definecolor{csm@intro@first@char}{HTML}{df9434}
 \definecolor{csm@sidebar@bg}{HTML}{f2e9c4}
+\colorlet{csm@sidebar@arxiv@bg}{black!2!white}
 \definecolor{csm@sidebar@first@char}{HTML}{a08c2f}
 \definecolor{csm@fig@bg}{HTML}{e6f7fe}
 \definecolor{@light@blue}{HTML}{26baf2}
@@ -58,13 +67,18 @@
 \colorlet{csm@abstract@color}{@golden}
 \definecolor{csm@table@caption@bg}{HTML}{abc2e9}
 \definecolor{csm@table@border}{HTML}{5e81c9}
+\colorlet{csm@table@arxiv@border}{black}
 \colorlet{csm@table@bg}{csm@fig@bg}
+\colorlet{csm@table@arxiv@bg}{black!4!white}
+\ifmakearxivcsm
+\definecolor{TitleRed}{HTML}{db6245}
+\fi
 
 \makeatother
 
 % ..:: Paragraphs ::..
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \makeatletter
 \def\@csm@parindent{1em}
 \def\@csm@parskip{0pt plus1pt}
@@ -145,7 +159,7 @@
 
 % ..:: Lists ::..
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \tikzset{
   list bullet/.style={
     scale=0.5
@@ -161,15 +175,29 @@
 
 % ..:: Page geometry ::..
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \usepackage{geometry}
 
 \ExplSyntaxOn
+\ifmakeprettycsm
 \tl_set:Nn \l_sidemargin_dim {1.5cm}
 \tl_set:Nn \l_topmargin_dim {2.2cm}
 \tl_set:Nn \l_botmargin_dim {1.6cm}
 \tl_set:Nn \l_footmargin_dim {6mm}
 \tl_set:Nn \l_columnsep_dim {3mm}
+\else
+\ifmakearxivcsm
+\tl_set:Nn \l_sidemargin_dim {1.2cm}
+\tl_set:Nn \l_topmargin_dim {2cm}
+\tl_set:Nn \l_botmargin_dim {1.4cm}
+\tl_set:Nn \l_footmargin_dim {6mm}
+\tl_set:Nn \l_columnsep_dim {4mm}
+
+\xdef\csmtopmargin{\tl_use:N \l_topmargin_dim}
+
+\setlength{\emergencystretch}{3em}
+\fi
+\fi
 \geometry{
   papersize={200mm,273mm},
   twocolumn,
@@ -185,7 +213,7 @@
 
 % ..:: Section titles ::..
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \usepackage{helvet}
 \titleformat{\section}{%
   \normalfont\fontsize{10}{12}%
@@ -207,13 +235,19 @@
 
 \makeatletter
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \newcommand{\firstword}[2][]{%
   \StrChar{#2}{1}[\first@char]%
   \StrBehind{#2}{\first@char}[\rest@of@word]%
   \renewcommand{\LettrineFontHook}{\sffamily\bfseries}%
   \lettrine[lines=5,#1]{%
+    \ifmakeprettycsm
     \color{csm@intro@first@char}%
+    \else
+    \ifmakearxivcsm
+    \color{TitleRed}%
+    \fi
+    \fi
     \first@char}{\rest@of@word}%
 }
 \else
@@ -259,12 +293,46 @@
     \textbf{~IEEE~CONTROL~SYSTEMS}%
     \fontsize{9}{11}%
     \textbf{~~\thepage}%
+  }
+}
+\pagestyle{csmfancy}
+\ExplSyntaxOff
+\else
+\ifmakearxivcsm
+\usepackage{fontawesome}
+
+\ExplSyntaxOn
+\tl_new:N \l_csm_date
+\tl_set:Nn \l_csm_date {}
+
+\newcommand{\csmdate}[1]{
+  \tl_set:Nn \l_csm_date {#1}
+}
+
+\fancypagestyle{csmfancy}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyfoot[LO]{%
+    \sffamily%
+    \fontsize{9}{11}%
+    \textbf{\thepage}%
+  }%
+  \fancyfoot[RE]{%
+    \fontsize{6}{8}%
+    \sffamily%
+    \fontsize{9}{11}%
+    \textbf{\thepage}%
+  }%
+  \fancyhead[C]{%
+    \footnotesize\sffamily\color{black!20!white}%
+    Preprint%
   }%
 }
 \pagestyle{csmfancy}
 \ExplSyntaxOff
 \else
 \newcommand{\csmdate}[1]{}
+\fi
 \fi
 
 % ..:: Equations ::..
@@ -273,7 +341,7 @@
 
 % ..:: Theorem environments ::..
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \makeatletter
 
 % >> Set the theorem environment style <<
@@ -369,6 +437,34 @@
 % Caption style
 \captionsetup[figure]{font={footnotesize,sf},labelfont={},
   name={\bfseries\color{csm@fig@label@body}FIGURE~},labelsep=space}
+\else
+\ifmakearxivcsm
+\newtcolorbox{figurebox}{
+  % Drawing engine
+  enhanced~jigsaw,
+  % Sizes
+  width=\linewidth,
+  arc=0pt,
+  boxrule=0pt,
+  titlerule=0pt,
+  left=3mm,
+  right=3mm,
+  bottom=3mm,
+  top=3mm,
+  boxsep=\tcb@boxsep,
+  % Colors
+  colback=white,
+  colbacktitle=white,
+  opacityfill=0
+}
+
+% Caption style
+\captionsetup[figure]{font={footnotesize,sf},labelfont={},
+  name={\bfseries FIGURE~},labelsep=space}
+\fi
+\fi
+
+\ifmaketwocolcsm
 
 % Figure selector
 \newenvironment{figure@internal}[2][tbp]{%
@@ -483,6 +579,50 @@
   attach~boxed~title~to~top,
   boxed~title~style={colframe=csm@table@border,rounded~corners}
 }
+\else
+\ifmakearxivcsm
+\def\@table@inner@pad{3mm}
+\def\@table@border@width{1pt}
+
+\newtcolorbox{tablebox}[1][]{
+  % Drawing engine
+  enhanced~jigsaw,
+  % Fonts
+  fonttitle=\sffamily\bfseries\small,
+  fontupper=\sffamily,
+  % Sizes
+  width=\linewidth,
+  arc=2mm,
+  boxrule=\@table@border@width,
+  titlerule=\@table@border@width,
+  left=\@table@inner@pad,
+  right=\@table@inner@pad,
+  bottom=\@table@inner@pad,
+  top=\@table@inner@pad,
+  toptitle=\@table@inner@pad,
+  bottomtitle=\@table@inner@pad,
+  boxsep=\tcb@boxsep,
+  % Colors
+  colback=csm@table@arxiv@bg,
+  coltitle=black,
+  colbacktitle=csm@table@caption@bg,
+  colframe=csm@table@arxiv@border,
+  % Title
+  minipage~boxed~title,
+  title={#1},
+  attach~boxed~title~to~top~left,
+  boxed~title~style={%
+    rounded~corners,
+    boxrule=0pt,
+    colback=white,
+    left=0pt,
+    right=0pt
+  }
+}
+\fi
+\fi
+
+\ifmaketwocolcsm
 
 % Figure selector
 \newenvironment{table@internal}[2][tbp]{%
@@ -604,7 +744,7 @@
 \newcommand{\make@sidebar@bib}{%
   \edef\sidebar@bib@label{sidebar:\tl_use:N \l_csm_sidebar_label_tl}%
   % Decision whether to reset the reference counter
-  \ifmakeprettycsm
+  \ifmaketwocolcsm
   \def\@sb@bibnum@reset{false}%
   \else
   \pgfmathparse{\thesbrefs==0 ? 1:0}
@@ -617,7 +757,7 @@
   \fi
   % Print the bibliography, citations start with an "S"
   \begin{refcontext}[sorting=none,labelprefix=S]%
-    \ifmakeprettycsm
+    \ifmaketwocolcsm
     \renewcommand*{\bibfont}{\fontsize{7}{9}\sffamily}%
     \else
     \renewcommand*{\bibfont}{\footnotesize}%
@@ -662,10 +802,6 @@
 
 \ifmakeprettycsm
 
-\newsavebox{\sidebar@box@full}
-\newsavebox{\sidebar@box@left}
-\newsavebox{\sidebar@box@right}
-
 \def\tcb@left{1em}
 \def\tcb@right{1em}
 \def\tcb@bottom{1em}
@@ -700,6 +836,49 @@
   colbacktitle=csm@sidebar@bg,
   coltitle=black
 }
+
+\else
+\ifmakearxivcsm
+
+\def\tcb@left{1em}
+\def\tcb@right{1em}
+\def\tcb@bottom{1em}
+\def\tcb@boxsep{0pt}
+\def\tcb@leftfill{0cm}
+\def\tcb@rightfill{0cm}
+
+\def\continued@message{\textit{(continued...)}}
+
+\newtcolorbox{sidebarbox}[1][]{
+  % Drawing engine
+  enhanced~jigsaw,
+  % Fonts
+  fonttitle=\sffamily\bfseries\large,
+  % Sizes
+  width=#1,
+  boxrule=0pt,
+  arc=0pt,
+  titlerule=0pt,
+  toptitle=2mm,
+  left=\tcb@left,
+  right=\tcb@right,
+  bottom=\tcb@bottom,
+  boxsep=\tcb@boxsep,
+  bottomrule=1.5pt,
+  % Colors
+  colback=csm@sidebar@arxiv@bg,
+  colframe=black,
+  colbacktitle=csm@sidebar@arxiv@bg,
+  coltitle=black
+}
+
+\fi
+
+\ifmaketwocolcsm
+
+\newsavebox{\sidebar@box@full}
+\newsavebox{\sidebar@box@left}
+\newsavebox{\sidebar@box@right}
 
 \newenvironment{sidebar}[1][]{%
   % Raw options
@@ -812,8 +991,10 @@
         \setlength{\parskip}{\@csm@parskip} % Paragraph spacing
         % \renewcommand\familydefault\sfdefault
         \sffamily\sansmath
+        \ifmakeprettycsm
         \captionsetup[figure]{name={%
             \bfseries\color{csm@fig@label@sidebar}FIGURE~}}
+        \fi
         % Print "continued" if this is the second subsidebar panel
         \pgfmathparse{\value{subsidebar@counter}==3 ? 1:0}%
         \ifthenelse{\pgfmathresult>0}{%
@@ -907,7 +1088,7 @@
   \add@list@item{\csm@sb@queue@content}{#2}
   \stepcounter{sidebar@queue@size}
   % Print sidebars immediately if pretty CSM
-  \ifmakeprettycsm
+  \ifmaketwocolcsm
   \flushsidebars
   \fi
 }
@@ -942,13 +1123,19 @@
   \fi
 }
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \renewcommand*{\LettrineTextFont}{}
 \newcommand{\sbfirstword}[1]{%
   \StrChar{#1}{1}[\first@char]%
   \StrBehind{#1}{\first@char}[\rest@of@word]%
   \lettrine[nindent=0pt,slope=0pt,findent=3pt]{%
+    \ifmakeprettycsm
     \color{csm@sidebar@first@char}\bfseries%
+    \else
+    \ifmakearxivcsm
+    \bfseries%
+    \fi
+    \fi
     \first@char}{\rest@of@word}%
 }
 \else
@@ -968,9 +1155,10 @@
 
 % ..:: Highlight text blurb ::..
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \makeatletter
 
+\ifmakeprettycsm
 \def\blurb@pad{4mm}
 
 \newtcolorbox{blurbbox}{
@@ -994,6 +1182,30 @@
   colframe=csm@blurb@color,
   coltext=csm@blurb@color
 }
+\else
+\def\blurb@pad{4mm}
+
+\newtcolorbox{blurbbox}{
+  % Drawing engine
+  enhanced jigsaw,
+  % Fonts
+  fontupper=\sffamily\itshape\large,
+  % Sizes
+  width=\textwidth,
+  sharp corners=all,
+  boxrule=0pt,
+  titlerule=0pt,
+  toptitle=2mm,
+  left=\blurb@pad,
+  right=\blurb@pad,
+  bottom=\blurb@pad,
+  top=\blurb@pad,
+  boxsep=0pt,
+  % Colors
+  colback=black!5!white,
+  coltext=black
+}
+\fi
 
 \newenvironment{blurb}{
   \begin{figure*}[!t]
@@ -1114,7 +1326,7 @@
 
 % ..:: Author biography ::..
 
-\ifmakeprettycsm
+\ifmaketwocolcsm
 \newenvironment{authorbio}[1][]{
   {\bfseries\itshape #1}~}{}
 \else

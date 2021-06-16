@@ -756,6 +756,11 @@
 \newcommand{\makeunderscoreletter}{\catcode`\_11}
 \newcommand{\makeunderscoreother}{\catcode`\_8}
 
+% Hypertarget with correct baseline (to not aim a line too low)
+\makeatletter
+\newcommand{\linkdest}[1]{\Hy@raisedlink{\hypertarget{#1}{}}}
+\makeatother
+
 % >> Optionally building parts of text according to flags <<
 
 \newcommand{\makeflag}[2]{%
